@@ -1,0 +1,26 @@
+{
+  "name": "llrpjs",
+  "version": "1.0.0",
+  "description": "A Low Level Reader Protocol (LLRP) library based on the LTK project",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "camaro": "^6.0.2",
+    "debug": "^4.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "llrp",
+    "rfid",
+    "uhf",
+    "epcglobal",
+    "gs1"
+  ],
+  "author": "Haytham Halimeh <haytham.halimeh@gmail.com>",
+  "license": "ISC"
+}
