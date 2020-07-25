@@ -1,0 +1,3 @@
+[submodule "ltk"]
+	path = LTK
+	url = git@github.com:haytham43/ltk.git
