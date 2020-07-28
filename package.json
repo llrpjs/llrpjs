@@ -1,6 +1,6 @@
 {
   "name": "llrpjs",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A Low Level Reader Protocol (LLRP) library based on the LTK project",
   "main": "index.js",
   "directories": {
