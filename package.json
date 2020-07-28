@@ -7,11 +7,11 @@
     "test": "test"
   },
   "dependencies": {
-    "camaro": "^6.0.2",
     "debug": "^4.1.1"
   },
   "devDependencies": {},
   "scripts": {
+    "postinstall": "scripts/xsltproc.sh",
     "test": "mocha"
   },
   "keywords": [
@@ -19,7 +19,9 @@
     "rfid",
     "uhf",
     "epcglobal",
-    "gs1"
+    "gs1",
+    "ltk",
+    "llrp-toolkit"
   ],
   "author": "Haytham Halimeh <haytham.halimeh@gmail.com>",
   "license": "ISC"
