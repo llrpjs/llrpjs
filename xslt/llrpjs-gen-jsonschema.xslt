@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- This XSLT file is used to generate a JSON schema from the original LLRP definition XML file-->
+<!--
+    This XSLT file is used to generate a JSON schema from the original LLRP definition XML file
+
+    I could have used the LLRP XML schema (XSD) file to generate a JSON schema yet I chose not to:
+        1. I found that some vendors do not provide XML schemas along with their custom LLRP definitions file
+        2. It seems like a good idea to generate binary encoding definitions, document schemas, and protocol
+            documentation out of a single file
+
+    Feel free to correct me :-)
+
+    Haytham Halimeh <haytham.halimeh@gmail.com>
+-->
 
 <xsl:stylesheet version='1.0'
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -17,7 +28,7 @@
 
     <!-- output header-->
     <xsl:template name="header">
-    "$comment": "Generated file",
+    "$comment": "Generated file (source: <xsl:value-of select="namespace-uri()"/>)",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "id": "llrp-1x0.json",
     "title": "LLRP Message Schema",

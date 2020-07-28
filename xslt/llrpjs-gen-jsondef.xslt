@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- This file converts LLRP definition files to JSON definition files that can be used by the LLRPJS library-->
+<!-- This file converts LLRP binary encoding definition files to JSON that can be used by the llrp.js library-->
 
 <xsl:stylesheet version='1.0'
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -29,7 +29,7 @@
     </xsl:template>
 
     <xsl:template name="header">
-    "$comment": "Generated file",
+    "$comment": "Generated file (source: <xsl:value-of select="namespace-uri()"/>)",
     "title": "LLRP Binary Definition",
     "description": "A Low-Level Reader Protocol (LLRP) Message JSON binary definition"
     </xsl:template>
