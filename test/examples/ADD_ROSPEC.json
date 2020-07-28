@@ -1,0 +1,110 @@
+{
+    "MessageID": 103,
+    "MessageType": "ADD_ROSPEC",
+    "MessageBody": {
+        "ROSpec": {
+            "ROSpecID": 1,
+            "Priority": 0,
+            "CurrentState": "Disabled",
+            "ROBoundarySpec": {
+                "ROSpecStartTrigger": {
+                    "ROSpecStartTriggerType": "GPI",
+                    "GPITriggerValue": {
+                        "GPIPortNum": 1,
+                        "GPIEvent": 1,
+                        "Timeout": 0
+                    }
+                },
+                "ROSpecStopTrigger": {
+                    "ROSpecStopTriggerType": "Null",
+                    "DurationTriggerValue": 0
+                }
+            },
+            "AISpec": [
+                {
+                    "AntennaIDs": [2],
+                    "AISpecStopTrigger": {
+                        "AISpecStopTriggerType": "Duration",
+                        "DurationTrigger": 60000
+                    },
+                    "InventoryParameterSpec": {
+                        "InventoryParameterSpecID": 1,
+                        "ProtocolID": "EPCGlobalClass1Gen2",
+                        "AntennaConfiguration": {
+                            "AntennaID": 0,
+                            "C1G2InventoryCommand": {
+                                "TagInventoryStateAware": 0,
+                                "C1G2RFControl": {
+                                    "ModeIndex": 0,
+                                    "Tari": 0
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "AntennaIDs": [3],
+                    "AISpecStopTrigger": {
+                        "AISpecStopTriggerType": "Duration",
+                        "DurationTrigger": 60000
+                    },
+                    "InventoryParameterSpec": {
+                        "InventoryParameterSpecID": 1,
+                        "ProtocolID": "EPCGlobalClass1Gen2",
+                        "AntennaConfiguration": {
+                            "AntennaID": 0,
+                            "C1G2InventoryCommand": {
+                                "TagInventoryStateAware": 0,
+                                "C1G2RFControl": {
+                                    "ModeIndex": 0,
+                                    "Tari": 0
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "AntennaIDs": [2, 3],
+                    "AISpecStopTrigger": {
+                        "AISpecStopTriggerType": "Duration",
+                        "DurationTrigger": 60000
+                    },
+                    "InventoryParameterSpec": {
+                        "InventoryParameterSpecID": 1,
+                        "ProtocolID": "EPCGlobalClass1Gen2",
+                        "AntennaConfiguration": {
+                            "AntennaID": 0,
+                            "C1G2InventoryCommand": {
+                                "TagInventoryStateAware": 0,
+                                "C1G2RFControl": {
+                                    "ModeIndex": 0,
+                                    "Tari": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "ROReportSpec": {
+                "ROReportTrigger": "Upon_N_Tags_Or_End_Of_AISpec",
+                "N": 0,
+                "TagReportContentSelector": {
+                    "EnableROSpecID": 1,
+                    "EnableSpecIndex": 1,
+                    "EnableInventoryParameterSpecID": 1,
+                    "EnableAntennaID": 1,
+                    "EnableChannelIndex": 1,
+                    "EnablePeakRSSI": 1,
+                    "EnableFirstSeenTimestamp": 1,
+                    "EnableLastSeenTimestamp": 1,
+                    "EnableTagSeenCount": 1,
+                    "EnableAccessSpecID": 1,
+                    "C1G2EPCMemorySelector": {
+                        "EnableCRC": 1,
+                        "EnablePCBits": 1
+                    }
+                }
+            }
+        }
+    }
+}
