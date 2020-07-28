@@ -7,22 +7,25 @@
     <xsl:output omit-xml-declaration='yes' method='text' encoding='iso-8859-1' />
     <!-- top template-->
     <xsl:template match="llrpdef:llrpdef">
-        <xsl:call-template name="header"/>
-        <xsl:call-template name="parameterDefinitions"/>
-        <xsl:call-template name="enumerationDefinitions"/>
-        <xsl:call-template name="messageDefinitions"/>
+{
+        <xsl:call-template name="header"/>,
+        <xsl:call-template name="definitions"/>,
+        <xsl:call-template name="topLevelProperties"/>
         <xsl:call-template name="trailer"/>
+}
     </xsl:template>
 
     <!-- output header-->
     <xsl:template name="header">
-{
     "$comment": "Generated file",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "id": "llrp-1x0.json",
     "title": "LLRP Message Schema",
     "description": "A Low-Level Reader Protocol (LLRP) Message JSONSchema",
-    "type": "object",
+    "type": "object"
+    </xsl:template>
+
+    <xsl:template name="definitions">
     "definitions": {
         "Message": {
             "type": "object",
@@ -138,6 +141,28 @@
             },
             "BytesToEnd": {"$ref": "#/definitions/Types/UnsignedByteArray"}
         },
+        <xsl:call-template name="parameterDefinitions"/>,
+        <xsl:call-template name="enumerationDefinitions"/>,
+        <xsl:call-template name="messageDefinitions"/>
+    }
+    </xsl:template>
+
+    <xsl:template name="topLevelProperties">
+    "allOf": [
+        {"$ref": "#/definitions/Message"},
+        {
+            "oneOf": [
+                <xsl:for-each select="llrpdef:messageDefinition">
+                {
+                    "properties": {
+                        "MessageType": { "const": "<xsl:value-of select="@name"/>" },
+                        "MessageBody": { "$ref": "#/definitions/Messages/<xsl:value-of select="@name"/>"}
+                    }
+                }<xsl:if test="position() != last()">,</xsl:if>
+                </xsl:for-each>
+            ]
+        }
+    ]
     </xsl:template>
 
     <!-- parameters-->
@@ -157,7 +182,7 @@
                 </xsl:if>
             }<xsl:if test="position() != last()"><xsl:text>,&#xa;</xsl:text></xsl:if>
         </xsl:for-each>
-        },
+        }
     </xsl:template>
 
     <xsl:template name="enumerationDefinitions">
@@ -174,47 +199,24 @@
 
     <!-- messages-->
     <xsl:template name="messageDefinitions">
-    },
-    "anyOf": [<xsl:for-each select='llrpdef:messageDefinition'>
-        {
-            "allOf": [
-                {"$ref": "#/definitions/Message"},
-                {
-                    "properties": {
-                        "MessageType": {
-                            "const": "<xsl:value-of select="@name"/>"
-                        },
-                        "MessageBody": {
-                            "properties": {
-                                <xsl:call-template name="resolveReferences"/>
-                            }<xsl:if test="./*[(name() = 'field') or ((name() = 'parameter') and ((@repeat='1') or (@repeat='1-N')))]">
-                            ,"required": [
-                                <xsl:call-template name="requiredFieldsParameters"/>
-                            ]</xsl:if><xsl:if test="./*[(name() = 'choice') and ((@repeat='1') or (@repeat='1-N'))]">
-                            ,"allOf": [
-                                <xsl:call-template name="requiredChoices"></xsl:call-template>
-                            ]
-                            </xsl:if>
-                        }
-                    }
-                }
-            ]
-            <xsl:choose>
-                <xsl:when test="position() = last()">
-        }
-                </xsl:when>
-                <xsl:otherwise>
-        },
-                </xsl:otherwise>
-            </xsl:choose>
+        "Messages": {<xsl:for-each select='llrpdef:messageDefinition'>
+            "<xsl:value-of select="@name"/>": {
+                "properties": {
+                    <xsl:call-template name="resolveReferences"/>
+                }<xsl:if test="./*[(name() = 'field') or ((name() = 'parameter') and ((@repeat='1') or (@repeat='1-N')))]">
+                ,"required": [
+                    <xsl:call-template name="requiredFieldsParameters"/>
+                ]</xsl:if><xsl:if test="./*[(name() = 'choice') and ((@repeat='1') or (@repeat='1-N'))]">
+                ,"allOf": [
+                    <xsl:call-template name="requiredChoices"></xsl:call-template>
+                ]</xsl:if>
+            }<xsl:if test="position() != last()">,</xsl:if>
         </xsl:for-each>
+        }
     </xsl:template>
 
     <!-- output trailer-->
-    <xsl:template name="trailer">
-    ]
-}
-    </xsl:template>
+    <xsl:template name="trailer"></xsl:template>
 
     <!-- iterate message sub-elements-->
     <xsl:template name="resolveReferences">
