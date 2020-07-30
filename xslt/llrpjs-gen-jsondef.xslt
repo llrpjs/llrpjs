@@ -208,8 +208,8 @@
             "node": "field",
             "name": "<xsl:value-of select="@name"/>",
             "type": "<xsl:value-of select="@type"/>"<xsl:if test="@enumeration">,
-            "enumeration": "<xsl:value-of select="@enumeration"/>"
-            </xsl:if>
+            "enumeration": "<xsl:value-of select="@enumeration"/>"</xsl:if><xsl:if test="@format">,
+            "format": "<xsl:value-of select="@format"/>"</xsl:if>
     </xsl:template>
 
     <xsl:template match="llrpdef:*/*[name() = 'reserved']">

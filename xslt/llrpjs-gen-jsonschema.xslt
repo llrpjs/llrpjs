@@ -150,6 +150,22 @@
                 "minimum": 0,
                 "maximum": 79228162514264337593543950335
             },
+            "U96HexString": {
+                "type": "string",
+                "minLength": 24,
+                "maxLength": 24,
+                "pattern": "^[a-fA-F0-9]+$"
+            },
+            "HexString": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 131072,
+                "pattern": "^[a-fA-F0-9]+$"
+            },
+            "DateTime": {
+                "type": "string",
+                "format": "date-time"
+            },
             "BytesToEnd": {"$ref": "#/definitions/Types/UnsignedByteArray"}
         },
         <xsl:call-template name="parameterDefinitions"/>,
@@ -330,6 +346,10 @@
         "<xsl:value-of select="@name"/>": <xsl:choose>
             <xsl:when test="not(@enumeration)">
                 <xsl:choose>
+                    <xsl:when test="(@type='u96') and (@format = 'Hex')">{"$ref": "#/definitions/Types/U96HexString"}</xsl:when>
+                    <xsl:when test="@format = 'Hex'">{"$ref": "#/definitions/Types/HexString"}</xsl:when>
+                    <xsl:when test="@format = 'Datetime'">{"$ref": "#/definitions/Types/DateTime"}</xsl:when>
+
                     <xsl:when test="@type='u1'">{"$ref": "#/definitions/Types/Bit"}</xsl:when>
                     <xsl:when test="@type='u2'">{"$ref": "#/definitions/Types/TwoBit"}</xsl:when>
                     <xsl:when test="@type='u1v'">{"$ref": "#/definitions/Types/BitArray"}</xsl:when>
@@ -337,7 +357,7 @@
                     <xsl:when test="@type='s8'">{"$ref": "#/definitions/Types/Byte"}</xsl:when>
                     <xsl:when test="@type='u8v'">{"$ref": "#/definitions/Types/UnsignedByteArray"}</xsl:when>
                     <xsl:when test="@type='s8v'">{"$ref": "#/definitions/Types/ByteArray"}</xsl:when>
-                    <!-- FIXME: check if this matches utf8 strings only-->
+
                     <xsl:when test="@type='utf8v'">{"type": "string"}</xsl:when>
                     <xsl:when test="@type='u16'">{"$ref": "#/definitions/Types/UnsignedShort"}</xsl:when>
                     <xsl:when test="@type='s16'">{"$ref": "#/definitions/Types/Short"}</xsl:when>
