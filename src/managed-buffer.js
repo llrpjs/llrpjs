@@ -4,8 +4,10 @@ let debug = require('debug')('llrpjs:mbuffer')
 
 
 /**
- * @fileOverview Read and write llrp binary data from/to a buffer
- *
+ * @fileOverview Read and write LTK data types from/to a buffer.
+ * 
+ * For more information on the LTK binary schema:
+ *      {@link http://llrp.org/ltk/schema/core/encoding/binary/1.0/llrpdef.xsd}
  *
  * @author Haytham Halimeh <haytham.halimeh@gmail.com>
  * 
@@ -44,6 +46,12 @@ function ManagedBuffer (buf) {
         _byte: 0,
         get bit() {return this._bit;},
         get byte() {return this._byte;},
+        set bit(value) {
+            this._bit = value;
+        },
+        set byte(value) {
+            this._byte = value;
+        },
         get incBit() {
             this._bit++;
             if (this._bit >= 8) {
@@ -90,7 +98,7 @@ ManagedBuffer.prototype.get_u1 = function () {
 /**
  *  reads the number of bits from the first two bytes and reads off a series of bits accordingly
  * 
- * @return {Array}      returns array of 1s and 0s
+ * @return {number[]}      returns array of 1s and 0s
  */
 ManagedBuffer.prototype.get_u1v = function () {
     let bitCount = this.get_u16.call(this);
@@ -133,7 +141,7 @@ ManagedBuffer.prototype.get_s8 = function () {
 /**
  *  reads the number of elements from the first two bytes then gets a series of bytes accordingly
  * 
- * @return {Array}      returns an array of unsigned bytes
+ * @return {number[]}      returns an array of unsigned bytes
  */
 ManagedBuffer.prototype.get_u8v = function () {
     assertAvail(this.idx, 0, 2);
@@ -146,7 +154,7 @@ ManagedBuffer.prototype.get_u8v = function () {
 /**
  *  reads the number of elements from the first two bytes then gets a series of signed bytes accordingly
  * 
- * @return {Array}      returns an array of signed bytes
+ * @return {number[]}      returns an array of signed bytes
  */
 ManagedBuffer.prototype.get_s8v = function () {
     assertAvail(this.idx, 0, 2);
@@ -194,7 +202,7 @@ ManagedBuffer.prototype.get_s16 = function () {
 /**
  *  reads a series of short integers (2 BE-bytes) off the buffer with length read from the first 2 bytes
  * 
- * @return {Array}      returns an array of short integers
+ * @return {number[]}      returns an array of short integers
  */
 ManagedBuffer.prototype.get_u16v = function () {
     let wordCount = this.get_u16.call(this);
@@ -206,7 +214,7 @@ ManagedBuffer.prototype.get_u16v = function () {
 /**
  *  reads a series of signed short ints (2-BE-bytes) off the buffer with length read from the first 2 bytes
  * 
- * @return {Array}      returns an array of signed short integers
+ * @return {number[]}      returns an array of signed short integers
  */
 ManagedBuffer.prototype.get_s16v = function () {
     let wordCount = this.get_u16.call(this);
@@ -240,7 +248,7 @@ ManagedBuffer.prototype.get_s32 = function () {
 /**
  *  reads a series of 4-byte (BE) values and returns an array of integers with length set in the first 2 bytes
  * 
- * @return {Array}      returns an array of integers
+ * @return {number[]}      returns an array of integers
  */
 ManagedBuffer.prototype.get_u32v = function () {
     let dWordCount = this.get_u16.call(this);
@@ -253,7 +261,7 @@ ManagedBuffer.prototype.get_u32v = function () {
 /**
  *  reads a series of 4-byte (BE) values and returns an array of signed integers with length set in the first 2 bytes
  * 
- * @return {Array}      returns an array of signed integers
+ * @return {number[]}      returns an array of signed integers
  */
 ManagedBuffer.prototype.get_s32v = function () {
     let dWordCount = this.get_u16.call(this);
@@ -311,7 +319,7 @@ ManagedBuffer.prototype.get_s64v = function () {
 /**
  *  reads 12 bytes off the current location and returns an array of bytes
  * 
- * @return {Array}     returns a 12-bytes array
+ * @return {number[]}     returns a 12-bytes array
  */
 ManagedBuffer.prototype.get_u96 = function () {
     let byteCount = 12;
@@ -323,7 +331,7 @@ ManagedBuffer.prototype.get_u96 = function () {
 /**
  *  reads off all bytes left in the buffer
  * 
- * @return {Array}     returns a byte array
+ * @return {number[]}     returns a byte array
  */
 ManagedBuffer.prototype.get_bytesToEnd = function () {
     let result = [];
@@ -571,7 +579,7 @@ ManagedBuffer.prototype.set_s64 = function (value) {
 /**
  * writes a series of long integers in length-value format
  * 
- * @param   {Array} value   long integers array
+ * @param   {number[]} value   long integers array
  * @return  {!number}        returns number of written bytes
  */
 ManagedBuffer.prototype.set_u64v = function (value) {
@@ -584,7 +592,7 @@ ManagedBuffer.prototype.set_u64v = function (value) {
 /**
  * writes a series of signed long integers in length-value format
  * 
- * @param   {Array} value   signed long integers array
+ * @param   {number[]} value   signed long integers array
  * @return  {!number}        returns number of written bytes
  */
 ManagedBuffer.prototype.set_s64v = function (value) {
@@ -597,7 +605,7 @@ ManagedBuffer.prototype.set_s64v = function (value) {
 /**
  * writes 12-bytes at the current location
  * 
- * @param   {Array} value   12-byte array
+ * @param   {number[]} value   12-byte array
  * @return  {!number}        returns number of written bytes
  */
 ManagedBuffer.prototype.set_u96 = function (value) {
@@ -610,7 +618,7 @@ ManagedBuffer.prototype.set_u96 = function (value) {
 /**
  * writes a series bytes at the current location
  * 
- * @param   {Array} value   array of bytes
+ * @param   {number[]} value   array of bytes
  * @return  {!number}        returns number of written bytes
  */
 ManagedBuffer.prototype.set_bytesToEnd = function (value) {
