@@ -14,6 +14,41 @@ function groupBy (array, key) {
     }, {});
 };
 
+/*
+ turns this:
+    [
+        { AISpec: { a: 1, b: 2 } },
+        { AISpec: { c: 3, d: 4 } },
+        { RFSurvey: { e: 1 } }
+    ]
+ into this:
+    {
+        AISpec: [
+            { a: 1, b: 2 },
+            { c: 3, d: 4 }
+        ],
+        RFSurvey: { e: 1 }
+    }
+*/
+function groupByFirstKey (array) {
+    // collect first-keys
+    let fKeys = [...new Set(array.map(x=>Object.keys(x)[0]))];
+    // some map/reduce magic
+    return fKeys.map(key=>{
+                let result = array.reduce((rv, x)=>{
+                    x[key]?(rv[key] = rv[key] || []).push(x[key]):rv;
+                    return rv;
+                }, {});
+                // if one-item array per key, return its item
+                return result[key].length > 1?result:{[key]:result[key][0]};
+            }).reduce((obj, item)=>{
+                return {
+                    ...obj,
+                    ...item
+                }
+            }, {});
+}
+
 function Decoder(llrpdef, options) {
     if (!(this instanceof Decoder)) return new Decoder(...arguments);
 
@@ -106,12 +141,7 @@ Decoder.prototype.definition = function (def) {
                 if (repeat.endsWith("1"))   // max one occurence allowed
                     break;
             }
-            if (resArray.length > 1) {
-                let key = Object.keys(resArray[0])[0];
-                result = {...result, ...{[key]: resArray.map(x=>x[key])}};
-            } else if (resArray.length == 1) {
-                result = {...result, ...resArray[0]};
-            }
+            result = groupByFirstKey(resArray);
         } else {
             result = decoder.call(this, defRef);
         }
