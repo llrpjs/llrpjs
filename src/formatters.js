@@ -2,8 +2,9 @@
 module.exports = {
     u1v: (value, format)=>{
         if (format == "Hex")
-            return value.reduce((acc, x)=>acc.length == 8?`${acc},${x}`:`${acc}${x}`, '')
-                        .split(',').map(x=>parseInt(x.padEnd(4, 0)).toString(16)).join('').toUpperCase();
+            return value.length?
+                    value.reduce((acc, x, i)=>(i%8==0) && (i != 0)?`${acc},${x}`:`${acc}${x}`, '')
+                        .split(',').map(x=>parseInt(x.padEnd(8, 0), 2).toString(16).padStart(2, 0)).join('').toUpperCase() : "";
         else
             return value;
     },
@@ -11,15 +12,15 @@ module.exports = {
         return value.toString('utf8');
     },
     u8v: (value, format)=>{
-        if (format == "Hex")
-            return value.map(x=>x.toString(16).padStart(2, 0)).join('').toUpperCase();
-        else
+        if (format == "Hex") {
+            return value.length? value.map(x=>x.toString(16).padStart(2, 0)).join('').toUpperCase() : "";
+        } else
             return value;
     },
     u16v: (value, format)=>{
-        if (format == "Hex")
-            return value.map(x=>x.toString(16).padStart(4, 0)).join('').toUpperCase();
-        else
+        if (format == "Hex") {
+            return value.length? value.map(x=>x.toString(16).padStart(4, 0)).join('').toUpperCase() : "";
+        } else
             return value;
     },
     u64: (value, format)=>{
