@@ -108,12 +108,8 @@ Decoder.prototype.message = function (buf) {
     debug(`msgType: ${msg['MessageType']} - msgLen ${length}`);
 
     let body;
-    if (typeNum == 1023) {
-        // custom message
-        // check if we have a definition for it, if not use the generic one
-    } else {
-        body = this.definition.call(this, def.body);
-    }
+    //TODO: custom message: check if we have a definition for it, if not use the generic one
+    body = this.definition.call(this, def.body);
     msg["MessageBody"] = body;
     debug('finished');
     return msg;
