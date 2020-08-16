@@ -616,10 +616,3 @@ describe('managed-buffer.js', ()=>{
 
 });
 
-[1,2,3,4,5,6,7,8].reduce((acc, x, i, arr)=>{
-    if (Array.isArray(acc)) {
-        let prev = arr[i-1];
-        return (i%2)?[...acc, (prev << 8) + x]:acc;
-    } else
-        return [(acc << 8) + x];
-});

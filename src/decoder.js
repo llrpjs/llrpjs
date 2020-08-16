@@ -1,5 +1,6 @@
 const debug = require('debug')('llrpjs:Decoder');
 const MgBuf = require('./managed-buffer');
+const formatters = require('./formatters');
 
 function isEmpty(obj) {
     return Object.keys(obj).length === 0 && obj.constructor === Object
@@ -165,6 +166,11 @@ Decoder.prototype.field = function (def) {
             throw new Error(`unknown ${def.enumeration} enum entry ${fieldValue}`);
         fieldValue = enumDefByValue[fieldValue].name;
     }
+
+    if (def.hasOwnProperty("format")) {
+        let fieldFormatter = this._getFieldFormatter(def.type);
+        fieldValue = fieldFormatter(fieldValue, def.format);
+    }
     result[def.name] = fieldValue;
     return result;
 }
@@ -218,7 +224,6 @@ Decoder.prototype.choice = function (defRef) {
     let choiceDef = this.choiceDefByName[defRef.type];
     // check if it's really one of our parameters in the buffer
     if (!choiceDef.body.filter(x=>x.type == paramDef.name).length) {
-        console.log(paramDef, choiceDef);
         return {};
     }
 
@@ -276,6 +281,10 @@ Decoder.prototype._getFieldOps = function (type) {
   
         "bytesToEnd": this.mBuf.get_bytesToEnd.bind(this.mBuf)
     }[type];
+}
+
+Decoder.prototype._getFieldFormatter = function(type) {
+    return formatters[type] || formatters.no_formatter;
 }
 
 module.exports = Decoder;
