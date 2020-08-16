@@ -105,6 +105,7 @@ Decoder.prototype.message = function (buf) {
     msg["MessageType"] = def["name"];
     let messageID = this.mBuf.get_u32();
     msg["MessageID"] = messageID;
+    debug(`msgType: ${msg['MessageType']} - msgLen ${length}`);
 
     let body;
     if (typeNum == 1023) {
@@ -114,6 +115,7 @@ Decoder.prototype.message = function (buf) {
         body = this.definition.call(this, def.body);
     }
     msg["MessageBody"] = body;
+    debug('finished');
     return msg;
 }
 
@@ -126,11 +128,12 @@ Decoder.prototype.definition = function (def) {
         let node = defRef.node;
         let decoder = this._getPropertyDecoder.call(this, node);
         let result = {};
+        debug(node);
         if (["parameter", "choice"].includes(node)) {
             let resArray = [];
             let repeat = defRef.repeat;
             while (true) {
-                if (!this.mBuf.idx.bitsLeft)
+                if (this.mBuf.idx.bitsLeft < 8)
                     break;
 
                 let resItem = decoder.call(this, defRef);
@@ -171,6 +174,7 @@ Decoder.prototype.field = function (def) {
         let fieldFormatter = this._getFieldFormatter(def.type);
         fieldValue = fieldFormatter(fieldValue, def.format);
     }
+    debug(`field: ${def.name} - ${def.type}`);
     result[def.name] = fieldValue;
     return result;
 }
@@ -199,6 +203,7 @@ Decoder.prototype.parameter = function (defRef) {
         this.mBuf.idx.byte = startByte;
         return {};
     }
+    debug(`paramType ${defRef.type} - paramLen ${length}`);
 
     return { 
         [def.name]: this.definition.call(this, def.body)
@@ -221,6 +226,10 @@ Decoder.prototype.choice = function (defRef) {
     this.mBuf.idx.bit = startBit;
     this.mBuf.idx.byte = startByte;
     let paramDef = this.paramDefByTypeNum[type];
+    if (!paramDef) {
+        // well, that's probably not a parameter then
+        return {};
+    }
     let choiceDef = this.choiceDefByName[defRef.type];
     // check if it's really one of our parameters in the buffer
     if (!choiceDef.body.filter(x=>x.type == paramDef.name).length) {
