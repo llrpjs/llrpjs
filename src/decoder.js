@@ -117,6 +117,7 @@ Decoder.prototype.definition = function (def) {
 
 Decoder.prototype.field = function (def) {
     let fieldOps = this._getFieldOps.call(this, def.type);
+    if (!fieldOps) throw new Error(`no fieldOps for type ${def.type}`);
     let result = {};
     let fieldValue = fieldOps();
     if (def.enumeration) {
