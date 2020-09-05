@@ -69,8 +69,20 @@ function Decoder(llrpdef, options) {
     this.choiceDefByName = groupBy(llrpdef.choiceDefinitions, "name");
     this.enumDefByName = groupBy(llrpdef.enumerationDefinitions, "name");
 
-    this.mBuf = null;
+    this.mBuf = new MgBuf(Buffer.alloc(0));     // starting off with empty buffer
 }
+
+Decoder.prototype.addBuffer = function (buf) {
+    this.mBuf.buffer = Buffer.concat([this.mBuf.buffer, buf]);
+    this.mBuf.idx._bufLength = this.mBuf.buffer.length;
+    return this.mBuf.buffer.length;
+}
+
+Decoder.prototype.flushBuffer = function (buf) {
+    this.mBuf = new MgBuf(Buffer.alloc(0));      // start off fresh
+    return 0;
+}
+
 /**
  * 1) read the message header and extract type
  * 2) get the definition from type
@@ -79,10 +91,8 @@ function Decoder(llrpdef, options) {
  * 5) in parameters and choices, get their definitions and iterate through their content similarly
  */
 
-Decoder.prototype.message = function (buf) {
-    this.buf = buf;
+Decoder.prototype.message = function () {
     let msg = {};
-    this.mBuf = new MgBuf(buf);
 
     let typeNum = this.mBuf.get_u16();
     let version = (typeNum >>> 10) & 0x03;
@@ -95,7 +105,7 @@ Decoder.prototype.message = function (buf) {
     if (length < 10)
         throw new Error(`message length too small`);
 
-    if (length > buf.length)
+    if (length > this.mBuf.buffer.length)
         throw new Error(`buffer length too small`);
 
     let def = this.msgDefByTypeNum[typeNum];
