@@ -1,7 +1,8 @@
 const debug = require('debug')('llrpjs:decoder');
 const MgBuf = require('./managed-buffer');
 const formatters = require('./formatters');
-const {isEmpty, groupBy, groupByFirstKey} = require('./tools');
+const {isEmpty, groupBy,
+    groupByFirstKey, isParamWrapper} = require('./tools');
 
 
 function Decoder(llrpdef, options) {
@@ -11,7 +12,8 @@ function Decoder(llrpdef, options) {
         format: {
             "u64": "iso-8601",
             "u96": "hex"
-        }
+        },
+        wrapperParam: true
     };
     this.opt = {...defaultOpt, ...options};
 
@@ -165,6 +167,10 @@ Decoder.prototype.parameter = function (defRef) {
         this.mBuf.idx.bit = startBit;
         this.mBuf.idx.byte = startByte;
         return {};
+    }
+
+    if (isParamWrapper(def, defRef) && (!this.opt.wrapperParam)) {
+        return this.definition.call(this, def.body);
     }
 
     return { 

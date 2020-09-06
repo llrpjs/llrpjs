@@ -46,4 +46,21 @@ function groupByFirstKey (array) {
             }, {});
 }
 
-module.exports = {isEmpty, groupBy, groupByFirstKey};
+/**
+ * checks whether the parameter in test is merely a wrapper to a field or not
+ * 
+ * @param {object} def      definition of parameter
+ * @param {object} defRef   definition reference of parameter
+ * @returns {boolean}       return true or false
+ */
+
+function isParamWrapper(def, defRef) {
+    if (defRef.repeat.startsWith("0")) {    // optional
+        if (def.body.length == 1) {
+            if (def.name == def.body[0].name) return true;
+        }
+    }
+    return false;
+}
+
+module.exports = {isEmpty, groupBy, groupByFirstKey, isParamWrapper};
