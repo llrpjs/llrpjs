@@ -1,7 +1,30 @@
+/**
+ * checks whether the object is empty or not
+ * @param {object} obj  object to test
+ * @returns             true if empty and false if not
+ */
 function isEmpty(obj) {
     return Object.keys(obj).length === 0 && obj.constructor === Object
 }
 
+/**
+ * converts an array of objects with a common key to an object that contains
+ *  keys derived from the values of the common key in each object
+ * @example
+ * groupBy([
+ *      {name : "a", content: {}},
+ *      {name : "b", content: {}}
+ * ], "name")
+ *
+ * returns {
+ *      a: {name : "a", content: {}},
+ *      b: {name : "b", content: {}}
+ * }
+ * 
+ * @param {array} array     array of objects with shared keys
+ * @param {string} key      a shared key between objects in array
+ * @returns                 an object with keys obtained from the value of each obj[key]
+ */
 function groupBy (array, key) {
     return array.reduce((obj, item) => {
         return {
@@ -11,22 +34,29 @@ function groupBy (array, key) {
     }, {});
 };
 
-/*
- turns this:
-    [
-        { AISpec: { a: 1, b: 2 } },
-        { AISpec: { c: 3, d: 4 } },
-        { RFSurvey: { e: 1 } }
-    ]
- into this:
-    {
-        AISpec: [
-            { a: 1, b: 2 },
-            { c: 3, d: 4 }
-        ],
-        RFSurvey: { e: 1 }
-    }
-*/
+/**
+ * conflates objects within an array into one object
+ * 
+ * @example
+ *  turns this:
+ *  [
+ *      { AISpec: { a: 1, b: 2 } },
+ *      { AISpec: { c: 3, d: 4 } },
+ *      { RFSurvey: { e: 1 } }
+ *  ]
+ *  into this:
+ *  {
+ *      AISpec: [
+ *          { a: 1, b: 2 },
+ *          { c: 3, d: 4 }
+ *      ],
+ *      RFSurvey: { e: 1 }
+ *  }
+ * 
+ * @param {array} array     array of objects with equal first keys
+ * @returns {object}        object with values of the same key occurences grouped in arrays
+ * 
+ */
 function groupByFirstKey (array) {
     // collect first-keys
     let fKeys = [...new Set(array.map(x=>Object.keys(x)[0]))];
