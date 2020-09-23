@@ -93,4 +93,18 @@ function isParamWrapper(def, defRef) {
     return false;
 }
 
-module.exports = {isEmpty, groupBy, groupByFirstKey, isParamWrapper};
+/**
+ * returns object containing only the passed key leaving all other keys filtered out
+ * 
+ * @param {object} obj main object
+ * @param {string} key key to be filtered
+ * @returns {object}    object with filtered key only
+ */
+
+function filter(obj, key) {
+    return Object.keys(obj)
+        .filter(k => [key].includes(k))
+        .reduce((o, k)=>{o[k] = obj[k]; return o;}, {});
+}
+
+module.exports = {isEmpty, groupBy, groupByFirstKey, isParamWrapper, filter};
