@@ -38,6 +38,10 @@ function assertAvail(idx, bitCount=0, byteCount=0) {
 function ManagedBuffer (buf) {
     if (!(this instanceof ManagedBuffer)) return new ManagedBuffer(...arguments);
 
+    if (!buf) {
+        buf = Buffer.alloc(128*1024);       // default LTK buffer size
+    }
+
     this.buffer = buf;
     this.bitResidue = 0;
     this.idx = {
@@ -81,6 +85,11 @@ function ManagedBuffer (buf) {
         }
     }
 
+    Object.defineProperties(this, {
+        length: {
+            get: () => this.idx._bufLength
+        }
+    });
 }
 
 /**
