@@ -6,7 +6,7 @@ const parsers = require('./parsers');
 
 
 function Encoder(llrpdef, options) {
-    if (!(this instanceof Decoder)) return new Decoder(...arguments);
+    if (!(this instanceof Encoder)) return new Encoder(...arguments);
 
     let defaultOpt = {
         format: {
