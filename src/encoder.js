@@ -99,6 +99,19 @@ Encoder.prototype.parameter = function (parameter, defRef) {
     let def = this.paramDefByName[name];
     let typeNum = Number(def.typeNum);
 
+    if (Array.isArray(parameter[name])) {
+        let prevByte = this.mBuf.idx.byte;
+        for (let i in parameter[name]) {
+            let subElement = parameter[name][i];
+            this.parameter.call(this, {
+                [name]: subElement
+            }, defRef);
+            
+        }
+        let newByte = this.mBuf.idx.byte;
+        return this.mBuf.buffer.slice(prevByte, newByte);
+    }
+
     if (isParamWrapper(def, defRef)) {
         // if the passed field isn't wrapped already, wrap it.
         if (!parameter[name][name]) {
