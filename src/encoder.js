@@ -89,7 +89,7 @@ Encoder.prototype.definition = function (element, def) {
  * @param {!object} defRef       the parameter's definition reference object
  */
 Encoder.prototype.parameter = function (parameter, defRef) {
-    let name = defRef.name;
+    let name = defRef.type;
     let def = this.paramDefByName[name];
     let typeNum = Number(def.typeNum);
 
