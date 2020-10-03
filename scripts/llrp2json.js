@@ -31,16 +31,16 @@ const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs=>{
     while(scanner.hasNext()) {
         let msgBuf;
         if(msgBuf = scanner.nextMsg()) {
-            debug(msgBuf);
-            result.push(decoder.message(msgBuf));
+            debug(msgBuf.toString('hex').match(/../g).join(' '));
+            decoder.addBuffer(msgBuf);
+            let msg = decoder.message(msgBuf);
+            debug(JSON.stringify(msg, bigIntParser, 2));
+            result.push(msg);
+            decoder.flushBuffer();
         }
     }
     
-    let jsonData = JSON.stringify(result, (key, value) =>
-            typeof value === 'bigint'
-                ? value.toString()
-                : value // return everything else unchanged
-    , 2);
+    let jsonData = JSON.stringify(result, bigIntParser, 2);
 
     if (argv.output) {
         fs.writeFileSync(argv.output, jsonData, {
@@ -50,3 +50,9 @@ const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs=>{
         console.log(jsonData);
     }
 })();
+
+function bigIntParser (key, value) {
+    return typeof value === 'bigint'
+            ? value.toString()
+            : value // return everything else unchanged
+}
