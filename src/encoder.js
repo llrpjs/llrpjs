@@ -12,7 +12,8 @@ function Encoder(llrpdef, options) {
         format: {
             "u64": "iso-8601",
             "u96": "hex"
-        }
+        },
+        bufSize : 128 * 1024                // default LTK buf size
     };
     this.opt = {...defaultOpt, ...options};
 
@@ -23,7 +24,7 @@ function Encoder(llrpdef, options) {
     this.choiceDefByName = groupBy(llrpdef.choiceDefinitions, "name");
     this.enumDefByName = groupBy(llrpdef.enumerationDefinitions, "name");
 
-    this.mBuf = new MgBuf(Buffer.alloc(128*1024));          // default LTK buf size
+    this.mBuf = new MgBuf(Buffer.alloc(this.opt.bufSize));
 };
 
 /**
@@ -36,31 +37,30 @@ Encoder.prototype.message = function (message) {
     let def = this.msgDefByName[message.MessageType];
     if (!def)
         throw new Error(`unknown message type ${message.MessageType}`);
-    
-    let bodyBuf = this.definition.call(message.MessageBody, def);     // process body content and fill the buffer
 
-    let mBuf = new MgBuf(Buffer.alloc(10));
+    this.mBuf.idx.incByte = 10;                         // jump to payload (body) location
+    this.definition.call(message.MessageBody, def);     // process body content and fill the buffer
 
-    mBuf.set_u16((1 << 10) | Number(message.MessageType));       // rsvd, version and type
+    let msgLength = this.mBuf.idx.byte;
+    this.mBuf.idx.byte = 0;
+    this.mBuf.idx.bit = 0;
 
-    mBuf.set_u32(10 + bodyBuf.length);             // set length to zero for now till we figure out the total length.
+    this.mBuf.set_u16((1 << 10) | Number(message.MessageType));       // rsvd, version and type
 
-    mBuf.set_u32(Number(message.MessageID));
+    this.mBuf.set_u32(msgLength);
 
-    let hdrBuf = mBuf.buffer;
+    this.mBuf.set_u32(Number(message.MessageID));
 
-    return Buffer.concat([hdrBuf, bodyBuf]);
+    return this.mBuf.buffer.slice(0, msgLength);
 };
 
 /**
  * 
  * @param {!object} element 
  * @param {!object} def 
- * @returns {?Buffer}
  */
 
 Encoder.prototype.definition = function (element, def) {
-    let result = [];
     for (let i in def.body) {
         let defRef = def.body[i];
         let node = defRef.node;
@@ -68,19 +68,16 @@ Encoder.prototype.definition = function (element, def) {
         let encoder = this._getPropertyEncoder.call(this, node);
         let subElement = element[name];
         if (!subElement) continue;              // optional? should I care?!
-        let buf;
         if (node == "choice") {
             // needs further processing to filter the target attribute, let the choice encoder decide;
-            buf = encoder.call(this, element, defRef);
+            encoder.call(this, element, defRef);
         } else{
             let filtered = filter(element, name);
             if (!filtered) continue;
-            buf = encoder.call(this, filtered, defRef);
+            encoder.call(this, filtered, defRef);
         }
-        if (!buf) continue;
-        result.push(buf);
     }
-    return Buffer.concat(result);
+    return;
 }
 
 /**
@@ -96,29 +93,41 @@ Encoder.prototype.parameter = function (parameter, defRef) {
     let def = this.paramDefByName[name];
     let typeNum = Number(def.typeNum);
 
-    let bodyBuf = this.definition.call(this, parameter[name], def);
-
-    let mBuf;
+    // preserve location
+    let prevByte = this.mBuf.idx.byte;
+    let prevBit = this.mBuf.idx.bit;
     if (typeNum > 127) {
         // TLV
-        if (bodyBuf.length > 2**16 - 1) {
+
+        this.mBuf.idx.incByte = 4;                          // rsvd + type + length = 4 bytes
+        this.definition.call(this, parameter[name], def);
+
+        // preserve new location
+        let newByte = this.mBuf.idx.byte;
+        let newBit = this.mBuf.idx.bit;
+
+        // got back to param header and write rsvd, type, and length
+        this.mBuf.idx.byte = prevByte;
+        this.mBuf.idx.bit = prevBit;
+        this.mBuf.set_u16(0x3ff & typeNum);
+
+        let length = newByte - prevByte;
+        if (length > 65535) {
             throw new Error(`parameter payload buffer is too large`);
         }
+        this.mBuf.set_u16(length);
 
-        mBuf = new MgBuf(Buffer.alloc(4));
-
-        mBuf.set_u16(0x3ff & typeNum);
-        mBuf.set_u16(4 + bodyBuf.length);
+        // restore the new location
+        this.mBuf.idx.byte = newByte;
+        this.mBuf.idx.bit = newBit;
     } else {
         // TV
-        mBuf = new MgBuf(Buffer.alloc(1));
-
-        mBuf.set_u8((1 << 7) | (0x7ff & typeNum));
+        this.mBuf.set_u8((1 << 7) | (0x7ff & typeNum));
+        this.definition.call(this, parameter[name], def);
     }
 
-    let hdrBuf = mBuf.buffer;
-
-    return Buffer.concat([hdrBuf, bodyBuf]);
+    let newByte = this.mBuf.idx.byte;
+    return this.mBuf.buffer.slice(prevByte, newByte);
 };
 
 /**
@@ -135,18 +144,19 @@ Encoder.prototype.choice = function (element, defRef) {
     let choiceDef = this.choiceDefByName[choiceName];
 
     let choiceDefArr = choiceDef.body.filter(x=>x.type == element[x.type]);
-    let result = [];
+    let prevByte = this.mBuf.idx.byte;
     for (let def in choiceDefArr) {
         let paramName = def.type;
-        let filtered = filter(element, paramName)
-        result.push(this.definition.call(this, filtered, {
+        let filtered = filter(element, paramName);
+        this.definition.call(this, filtered, {
             node: "parameter",
             type: paramName,
             repeat: defRef.repeat
-        }));
+        });
     }
+    let newByte = this.mBuf.idx.byte;
 
-    return result.length? Buffer.concat(result) : null;
+    return this.mBuf.buffer.slice(prevByte, newByte);
 }
 
 /**
@@ -163,6 +173,8 @@ Encoder.prototype.field = function (obj, def) {
      * 3. calculate required buffer size
      * 4. encode it
      */
+    let prevByte = this.mBuf.idx.byte;
+
     let fieldValue = obj[def.name];
     if (def.enumeration) {
         let enumDef = this.enumDefByName[def.enumeration];
@@ -178,13 +190,14 @@ Encoder.prototype.field = function (obj, def) {
         fieldValue = parser(fieldValue, def.format);
     }
 
-    let bufSize = this._getBufSize.call(this, def.type, fieldValue);
-    let mBuf = new MgBuf(Buffer.alloc(bufSize));
-    let fieldOps = this._getFieldOps.call(this, mBuf, def.type);
+    let fieldOps = this._getFieldOps.call(this, def.type);
     if (!fieldOps) throw new Error(`no fieldOps for type ${def.type}`);
 
     fieldOps(fieldValue);   // write value to buffer
-    return mBuf.buffer;
+
+    // return for testing
+    let newByte = this.mBuf.idx.byte;
+    return this.mBuf.buffer.slice(prevByte, newByte);
 };
 
 /**
@@ -193,12 +206,9 @@ Encoder.prototype.field = function (obj, def) {
  * @param {!object} def         reserved definition object
  */
 Encoder.prototype.reserved = function (def) {
-    let bitCount = def.bitCount;
-    let bufSize = Math.ceil(bitCount / 8);
-    let mBuf = new MgBuf(Buffer.alloc(bufSize));
-
-    mBuf.set_reserved(bitCount);
-    return mBuf.buffer;
+    let bitCount = Number(def.bitCount);
+    this.mBuf.set_reserved(bitCount);
+    return;
 };
 
 Encoder.prototype._getPropertyEncoder = function (node) {
@@ -210,38 +220,38 @@ Encoder.prototype._getPropertyEncoder = function (node) {
     }[node]  || (()=>{throw new Error(`no encoder for node ${node}`)});
 }
 
-Encoder.prototype._getFieldOps = function (mBuf, type) {
+Encoder.prototype._getFieldOps = function (type) {
     return {
-        "u1": mBuf.set_u1.bind(mBuf),
-        "u2": mBuf.set_u2.bind(mBuf),
+        "u1": this.mBuf.set_u1.bind(this.mBuf),
+        "u2": this.mBuf.set_u2.bind(this.mBuf),
   
-        "u1v": mBuf.set_u1v.bind(mBuf),
+        "u1v": this.mBuf.set_u1v.bind(this.mBuf),
   
-        "u8": mBuf.set_u8.bind(mBuf),
-        "s8": mBuf.set_s8.bind(mBuf),
-        "u8v": mBuf.set_u8v.bind(mBuf),
-        "s8v": mBuf.set_s8v.bind(mBuf),
+        "u8": this.mBuf.set_u8.bind(this.mBuf),
+        "s8": this.mBuf.set_s8.bind(this.mBuf),
+        "u8v": this.mBuf.set_u8v.bind(this.mBuf),
+        "s8v": this.mBuf.set_s8v.bind(this.mBuf),
   
-        "utf8v": mBuf.set_utf8v.bind(mBuf),
+        "utf8v": this.mBuf.set_utf8v.bind(this.mBuf),
   
-        "u16": mBuf.set_u16.bind(mBuf),
-        "s16": mBuf.set_s16.bind(mBuf),
-        "u16v": mBuf.set_u16v.bind(mBuf),
-        "s16v": mBuf.set_s16v.bind(mBuf),
+        "u16": this.mBuf.set_u16.bind(this.mBuf),
+        "s16": this.mBuf.set_s16.bind(this.mBuf),
+        "u16v": this.mBuf.set_u16v.bind(this.mBuf),
+        "s16v": this.mBuf.set_s16v.bind(this.mBuf),
   
-        "u32": mBuf.set_u32.bind(mBuf),
-        "s32": mBuf.set_s32.bind(mBuf),
-        "u32v": mBuf.set_u32v.bind(mBuf),
-        "s32v": mBuf.set_s32v.bind(mBuf),
+        "u32": this.mBuf.set_u32.bind(this.mBuf),
+        "s32": this.mBuf.set_s32.bind(this.mBuf),
+        "u32v": this.mBuf.set_u32v.bind(this.mBuf),
+        "s32v": this.mBuf.set_s32v.bind(this.mBuf),
   
-        "u64": mBuf.set_u64.bind(mBuf),
-        "s64": mBuf.set_s64.bind(mBuf),
-        "u64v": mBuf.set_u64v.bind(mBuf),
-        "s64v": mBuf.set_s64v.bind(mBuf),
+        "u64": this.mBuf.set_u64.bind(this.mBuf),
+        "s64": this.mBuf.set_s64.bind(this.mBuf),
+        "u64v": this.mBuf.set_u64v.bind(this.mBuf),
+        "s64v": this.mBuf.set_s64v.bind(this.mBuf),
   
-        "u96": mBuf.set_u96.bind(mBuf),
+        "u96": this.mBuf.set_u96.bind(this.mBuf),
   
-        "bytesToEnd": mBuf.set_bytesToEnd.bind(mBuf)
+        "bytesToEnd": this.mBuf.set_bytesToEnd.bind(this.mBuf)
     }[type];
 }
 
@@ -262,3 +272,5 @@ Encoder.prototype._getBufSize = function (type, value) {
     }
     return size;
 }
+
+module.exports = Encoder;
