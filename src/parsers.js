@@ -30,7 +30,7 @@ module.exports = {
     u64: (value, format)=>{
         if (format == "Datetime")
             // return microseconds
-            return BigInt(value) * 1000n;
+            return BigInt(new Date(value)) * 1000n;
         else
             return value;
     },
