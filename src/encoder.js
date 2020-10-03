@@ -39,17 +39,19 @@ Encoder.prototype.message = function (message) {
         throw new Error(`unknown message type ${message.MessageType}`);
 
     this.mBuf.idx.incByte = 10;                         // jump to payload (body) location
-    this.definition.call(message.MessageBody, def);     // process body content and fill the buffer
+    this.definition.call(this, message.MessageBody, def);     // process body content and fill the buffer
 
     let msgLength = this.mBuf.idx.byte;
     this.mBuf.idx.byte = 0;
-    this.mBuf.idx.bit = 0;
 
-    this.mBuf.set_u16((1 << 10) | Number(message.MessageType));       // rsvd, version and type
+    this.mBuf.set_u16((1 << 10) | Number(def.typeNum));       // rsvd, version and type
 
     this.mBuf.set_u32(msgLength);
 
     this.mBuf.set_u32(Number(message.MessageID));
+
+    // reset for next message
+    this.mBuf.idx.byte = 0;
 
     return this.mBuf.buffer.slice(0, msgLength);
 };
