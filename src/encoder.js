@@ -66,17 +66,21 @@ Encoder.prototype.definition = function (element, def) {
     for (let i in def.body) {
         let defRef = def.body[i];
         let node = defRef.node;
-        let name = defRef.name;
         let encoder = this._getPropertyEncoder.call(this, node);
-        let subElement = element[name];
-        if (!subElement) continue;              // optional? should I care?!
         if (node == "choice") {
             // needs further processing to filter the target attribute, let the choice encoder decide;
             encoder.call(this, element, defRef);
-        } else{
+        } else if (node == "parameter") {
+            let name = defRef.type;
             let filtered = filter(element, name);
-            if (!filtered) continue;
+            if (isEmpty(filtered)) continue;        // optional parameter
             encoder.call(this, filtered, defRef);
+        } else if (node == "field") {
+            let name = defRef.name;
+            let filtered = filter(element, name);
+            encoder.call(this, filtered, defRef);
+        } else if (node == "reserved") {
+            encoder.call(this, defRef);
         }
     }
     return;
