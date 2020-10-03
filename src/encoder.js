@@ -151,23 +151,13 @@ Encoder.prototype.parameter = function (parameter, defRef) {
  */
 
 Encoder.prototype.choice = function (element, defRef) {
-    let choiceName = defRef.name;
-    let choiceDef = this.choiceDefByName[choiceName];
+    let paramName = Object.keys(element)[0];
 
-    let choiceDefArr = choiceDef.body.filter(x=>x.type == element[x.type]);
-    let prevByte = this.mBuf.idx.byte;
-    for (let def in choiceDefArr) {
-        let paramName = def.type;
-        let filtered = filter(element, paramName);
-        this.definition.call(this, filtered, {
-            node: "parameter",
-            type: paramName,
-            repeat: defRef.repeat
-        });
-    }
-    let newByte = this.mBuf.idx.byte;
-
-    return this.mBuf.buffer.slice(prevByte, newByte);
+    return this.parameter.call(this, element, {
+        node: "parameter",
+        type: paramName,
+        repeat: defRef.repeat
+    });
 }
 
 /**
