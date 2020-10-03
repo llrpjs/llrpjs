@@ -102,7 +102,7 @@ describe(`decoder.js`, ()=>{
         describe(`parameter wrapping a field`, ()=>{
             it(`should return wrapped field`, ()=>{
                 let d = new Decoder(llrpdef, {wrapperParam: true});
-                d.addBuffer(Buffer.from(`00110006abcd`, 'hex'));        // wrapped parameter
+                d.addBuffer(Buffer.from(`91abcd`, 'hex'));        // wrapped parameter
 
                 let paramDefRef = paramDefByName.ReaderExceptionEvent.body[6];
                 expect(d.parameter(paramDefRef)).to.deep.equal({
@@ -114,7 +114,7 @@ describe(`decoder.js`, ()=>{
 
             it(`should return unwrapped field`, ()=>{
                 let d = new Decoder(llrpdef, {wrapperParam: false});
-                d.addBuffer(Buffer.from(`00110006abcd`, 'hex'));        // wrapped parameter
+                d.addBuffer(Buffer.from(`91abcd`, 'hex'));        // wrapped parameter
 
                 let paramDefRef = paramDefByName.ReaderExceptionEvent.body[6];
                 expect(d.parameter(paramDefRef)).to.deep.equal({ OpSpecID: 0xabcd });
