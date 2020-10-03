@@ -125,7 +125,7 @@ describe(`decoder.js`, ()=>{
     describe(`choice`, ()=>{
         it(`should return parameter`, ()=>{
             let d = new Decoder(llrpdef);
-            d.addBuffer(Buffer.from(`008100121234567890abcdef`, 'hex'));
+            d.addBuffer(Buffer.from(`0081000c1234567890abcdef`, 'hex'));
 
             let choiceDefRef = paramDefByName.FrequencyRSSILevelEntry.body[4];
             expect(d.choice(choiceDefRef)).to.deep.equal({
