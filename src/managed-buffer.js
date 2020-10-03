@@ -25,7 +25,7 @@ function assertAvail(idx, bitCount=0, byteCount=0) {
     let totalBits = bitCount + byteCount * 8;
     debug(`${totalBits} - ${idx.bitsLeft}`);
     if (totalBits > idx.bitsLeft)
-        throw new Error('attempt to read beyond buffer limit');
+        throw new Error('attempt to read or write beyond buffer limit');
 }
 
 /**
@@ -568,7 +568,7 @@ ManagedBuffer.prototype.set_s32v = function (value) {
 ManagedBuffer.prototype.set_u64 = function (value) {
     let byteCount = 8;
     assertAvail(this.idx, 0, byteCount);
-    this.buffer.writeBigUInt64BE(value, this.idx.byte);
+    this.buffer.writeBigUInt64BE(BigInt(value), this.idx.byte);
     this.idx.incByte = byteCount;
     return byteCount;
 }
@@ -581,7 +581,7 @@ ManagedBuffer.prototype.set_u64 = function (value) {
 ManagedBuffer.prototype.set_s64 = function (value) {
     let byteCount = 8;
     assertAvail(this.idx, 0, byteCount);
-    this.buffer.writeBigInt64BE(value, this.idx.byte);
+    this.buffer.writeBigInt64BE(BigInt(value), this.idx.byte);
     this.idx.incByte = byteCount;
     return byteCount;
 }
