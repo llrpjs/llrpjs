@@ -93,6 +93,15 @@ Encoder.prototype.parameter = function (parameter, defRef) {
     let def = this.paramDefByName[name];
     let typeNum = Number(def.typeNum);
 
+    if (isParamWrapper(def, defRef)) {
+        // if the passed field isn't wrapped already, wrap it.
+        if (!parameter[name][name]) {
+            parameter = {
+                [name]: parameter
+            }
+        }
+    }
+
     // preserve location
     let prevByte = this.mBuf.idx.byte;
     let prevBit = this.mBuf.idx.bit;
