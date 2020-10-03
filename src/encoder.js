@@ -168,13 +168,25 @@ Encoder.prototype.parameter = function (parameter, defRef) {
  */
 
 Encoder.prototype.choice = function (element, defRef) {
-    let paramName = Object.keys(element)[0];
+    // Note: element is unfiltered, we need to iterate for all matches
+    let choiceName = defRef.type;
+    let choiceDef = this.choiceDefByName[choiceName];
 
-    return this.parameter.call(this, element, {
-        node: "parameter",
-        type: paramName,
-        repeat: defRef.repeat
-    });
+    let paramDefRefs = choiceDef.body.filter(dRef=>Object.keys(element).includes(dRef.type));
+
+    let prevByte = this.mBuf.idx.byte;
+    for (let i in paramDefRefs) {
+        let name = paramDefRefs[i].type;
+        let filtered = filter(element, name);
+        this.parameter.call(this, filtered, {
+            node: "parameter",
+            type: name,
+            repeat: defRef.repeat
+        });  // { AISpec: [] }
+    }
+    let newByte = this.mBuf.idx.byte;
+
+    return this.mBuf.buffer.slice(prevByte, newByte);
 }
 
 /**
