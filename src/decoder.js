@@ -1,6 +1,6 @@
 const debug = require('debug')('llrpjs:decoder');
 const MgBuf = require('./managed-buffer');
-const formatters = require('./formatters');
+const formatters = require('./field-formatters');
 const {isEmpty, groupBy,
     groupByFirstKey, isParamWrapper} = require('./tools');
 

@@ -2,7 +2,7 @@ const debug = require('debug')('llrpjs:encoder');
 const MgBuf = require('./managed-buffer');
 const {isEmpty, groupBy,
     groupByFirstKey, isParamWrapper, filter} = require('./tools');
-const parsers = require('./parsers');
+const parsers = require('./field-parsers');
 
 
 function Encoder(llrpdef, options) {
@@ -286,7 +286,7 @@ Encoder.prototype._getFieldOps = function (type) {
 }
 
 Encoder.prototype._getFieldParser = function(type) {
-    return parsers[type] || parsers.no_parser;
+    return parsers[type] || parsers.nop;
 }
 
 Encoder.prototype._getBufSize = function (type, value) {
