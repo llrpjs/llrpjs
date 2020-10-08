@@ -32,5 +32,5 @@ module.exports = {
     },
     u96: (value, format)=>{return module.exports.u8v(value, format)},
     bytesToEnd: (value, format)=>{return module.exports.u8v(value, format)},
-    no_formatter: (value, format)=>value
+    nop: (value, format)=>value
 };

@@ -261,7 +261,7 @@ Decoder.prototype._getFieldOps = function (type) {
 }
 
 Decoder.prototype._getFieldFormatter = function(type) {
-    return formatters[type] || formatters.no_formatter;
+    return formatters[type] || formatters.nop;
 }
 
 module.exports = Decoder;
