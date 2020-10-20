@@ -29,7 +29,7 @@ function groupBy (array, key) {
     return array.reduce((obj, item) => {
         return {
             ...obj,
-            [item[key]]: item,
+            [item[key]]: obj[item[key]]? (Array.isArray(obj[item[key]])? obj[item[key]].concat(item): [obj[item[key]], item]) : item,
         };
     }, {});
 };
