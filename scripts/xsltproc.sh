@@ -12,14 +12,15 @@ if [ -z "$CMD" ]; then
 fi
 
 OUT_DIR="generated"
+XML_DEF_PATH="LTK/Definitions/Core/llrp-1x0-def.xml"
 
 [ -e "$OUT_DIR" ] || mkdir -p $OUT_DIR
 
 CMD_ARG_LIST=(
     # generate LLRP.js definitions file
-    "--output $OUT_DIR/llrpjs.def.json xslt/llrpjs-gen-jsondef.xslt LTK/Definitions/Core/llrp-1x0-def.xml"
-    # generate LLRP.js protocol schema
-    "--output $OUT_DIR/llrpjs.jsonschema xslt/llrpjs-gen-jsonschema.xslt LTK/Definitions/Core/llrp-1x0-def.xml"
+    "--output $OUT_DIR/def.json xslt/llrpjs-gen-jsondef.xslt $XML_DEF_PATH"
+    # generate LLRP protocol definitions schema
+    "--output $OUT_DIR/def.schema.json xslt/llrpjs-gen-jsonschema.xslt $XML_DEF_PATH"
 )
 
 for ((i = 0; i < ${#CMD_ARG_LIST[@]}; i++)); do
