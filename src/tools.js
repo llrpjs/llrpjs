@@ -27,9 +27,10 @@ function isEmpty(obj) {
  */
 function groupBy (array, key) {
     return array.reduce((obj, item) => {
+        let cur = obj[item[key]];
         return {
             ...obj,
-            [item[key]]: obj[item[key]]? (Array.isArray(obj[item[key]])? obj[item[key]].concat(item): [obj[item[key]], item]) : item,
+            [item[key]]: cur? (Array.isArray(cur)? cur.concat(item): [cur, item]) : item,
         };
     }, {});
 };
