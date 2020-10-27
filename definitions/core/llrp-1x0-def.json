@@ -1,0 +1,4650 @@
+{
+    "$comment": "Generated file (source: http://www.llrp.org/ltk/schema/core/encoding/binary/1.0)",
+    "title": "LLRP Binary Definition",
+    "description": "A Low-Level Reader Protocol (LLRP) Message JSON binary definition",
+    "namespaceDefinition": {
+        "prefix": "llrp",
+        "URI": "https://llrpjs.github.io/schema/core/encoding/json/1.0",
+        "schemaLocation": "https://llrpjs.github.io/schema/core/encoding/json/1.0/llrp-1x0.schema.json"
+    },
+    "parameterDefinitions": [
+        {
+            "name": "UTCTimestamp",
+            "typeNum": "128",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Microseconds",
+                    "type": "u64",
+                    "format": "Datetime"
+                }
+            ]
+        },
+        {
+            "name": "Uptime",
+            "typeNum": "129",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Microseconds",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "Custom",
+            "typeNum": "1023",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "VendorIdentifier",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "ParameterSubtype",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "Data",
+                    "type": "bytesToEnd",
+                    "format": "Hex"
+                }
+            ]
+        },
+        {
+            "name": "GeneralDeviceCapabilities",
+            "typeNum": "137",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "MaxNumberOfAntennaSupported",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "CanSetAntennaProperties",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "HasUTCClockCapability",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "14"
+                },
+                {
+                    "node": "field",
+                    "name": "DeviceManufacturerName",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "ModelName",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "ReaderFirmwareVersion",
+                    "type": "utf8v",
+                    "format": "UTF8"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ReceiveSensitivityTableEntry",
+                    "repeat": "1-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "PerAntennaReceiveSensitivityRange",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "GPIOCapabilities",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "PerAntennaAirProtocol",
+                    "repeat": "1-N"
+                }
+            ]
+        },
+        {
+            "name": "ReceiveSensitivityTableEntry",
+            "typeNum": "139",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Index",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "ReceiveSensitivityValue",
+                    "type": "s16"
+                }
+            ]
+        },
+        {
+            "name": "PerAntennaReceiveSensitivityRange",
+            "typeNum": "149",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AntennaID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "ReceiveSensitivityIndexMin",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "ReceiveSensitivityIndexMax",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "PerAntennaAirProtocol",
+            "typeNum": "140",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AntennaID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "ProtocolID",
+                    "type": "u8v",
+                    "enumeration": "AirProtocols"
+                }
+            ]
+        },
+        {
+            "name": "GPIOCapabilities",
+            "typeNum": "141",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "NumGPIs",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "NumGPOs",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "LLRPCapabilities",
+            "typeNum": "142",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "CanDoRFSurvey",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "CanReportBufferFillWarning",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "SupportsClientRequestOpSpec",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "CanDoTagInventoryStateAwareSingulation",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "SupportsEventAndReportHolding",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "3"
+                },
+                {
+                    "node": "field",
+                    "name": "MaxNumPriorityLevelsSupported",
+                    "type": "u8"
+                },
+                {
+                    "node": "field",
+                    "name": "ClientRequestOpSpecTimeout",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "MaxNumROSpecs",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MaxNumSpecsPerROSpec",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MaxNumInventoryParameterSpecsPerAISpec",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MaxNumAccessSpecs",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MaxNumOpSpecsPerAccessSpec",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "RegulatoryCapabilities",
+            "typeNum": "143",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "CountryCode",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "CommunicationsStandard",
+                    "type": "u16",
+                    "enumeration": "CommunicationsStandard"
+                },
+                {
+                    "node": "parameter",
+                    "type": "UHFBandCapabilities",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "UHFBandCapabilities",
+            "typeNum": "144",
+            "required": "true",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "TransmitPowerLevelTableEntry",
+                    "repeat": "1-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "FrequencyInformation",
+                    "repeat": "1"
+                },
+                {
+                    "node": "choice",
+                    "type": "AirProtocolUHFRFModeTable",
+                    "repeat": "1-N"
+                }
+            ]
+        },
+        {
+            "name": "TransmitPowerLevelTableEntry",
+            "typeNum": "145",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Index",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "TransmitPowerValue",
+                    "type": "s16"
+                }
+            ]
+        },
+        {
+            "name": "FrequencyInformation",
+            "typeNum": "146",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Hopping",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                },
+                {
+                    "node": "parameter",
+                    "type": "FrequencyHopTable",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "FixedFrequencyTable",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "FrequencyHopTable",
+            "typeNum": "147",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "HopTableID",
+                    "type": "u8"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "8"
+                },
+                {
+                    "node": "field",
+                    "name": "Frequency",
+                    "type": "u32v"
+                }
+            ]
+        },
+        {
+            "name": "FixedFrequencyTable",
+            "typeNum": "148",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Frequency",
+                    "type": "u32v"
+                }
+            ]
+        },
+        {
+            "name": "ROSpec",
+            "typeNum": "177",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "Priority",
+                    "type": "u8"
+                },
+                {
+                    "node": "field",
+                    "name": "CurrentState",
+                    "type": "u8",
+                    "enumeration": "ROSpecState"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ROBoundarySpec",
+                    "repeat": "1"
+                },
+                {
+                    "node": "choice",
+                    "type": "SpecParameter",
+                    "repeat": "1-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ROReportSpec",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "ROBoundarySpec",
+            "typeNum": "178",
+            "required": "true",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "ROSpecStartTrigger",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ROSpecStopTrigger",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "ROSpecStartTrigger",
+            "typeNum": "179",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ROSpecStartTriggerType",
+                    "type": "u8",
+                    "enumeration": "ROSpecStartTriggerType"
+                },
+                {
+                    "node": "parameter",
+                    "type": "PeriodicTriggerValue",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "GPITriggerValue",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "PeriodicTriggerValue",
+            "typeNum": "180",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Offset",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "Period",
+                    "type": "u32"
+                },
+                {
+                    "node": "parameter",
+                    "type": "UTCTimestamp",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "GPITriggerValue",
+            "typeNum": "181",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "GPIPortNum",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "GPIEvent",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                },
+                {
+                    "node": "field",
+                    "name": "Timeout",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "ROSpecStopTrigger",
+            "typeNum": "182",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ROSpecStopTriggerType",
+                    "type": "u8",
+                    "enumeration": "ROSpecStopTriggerType"
+                },
+                {
+                    "node": "field",
+                    "name": "DurationTriggerValue",
+                    "type": "u32"
+                },
+                {
+                    "node": "parameter",
+                    "type": "GPITriggerValue",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "AISpec",
+            "typeNum": "183",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AntennaIDs",
+                    "type": "u16v"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AISpecStopTrigger",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "InventoryParameterSpec",
+                    "repeat": "1-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "AISpecStopTrigger",
+            "typeNum": "184",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AISpecStopTriggerType",
+                    "type": "u8",
+                    "enumeration": "AISpecStopTriggerType"
+                },
+                {
+                    "node": "field",
+                    "name": "DurationTrigger",
+                    "type": "u32"
+                },
+                {
+                    "node": "parameter",
+                    "type": "GPITriggerValue",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "TagObservationTrigger",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "TagObservationTrigger",
+            "typeNum": "185",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "TriggerType",
+                    "type": "u8",
+                    "enumeration": "TagObservationTriggerType"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "8"
+                },
+                {
+                    "node": "field",
+                    "name": "NumberOfTags",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "NumberOfAttempts",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "T",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "Timeout",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "InventoryParameterSpec",
+            "typeNum": "186",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "InventoryParameterSpecID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "ProtocolID",
+                    "type": "u8",
+                    "enumeration": "AirProtocols"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AntennaConfiguration",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "RFSurveySpec",
+            "typeNum": "187",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AntennaID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "StartFrequency",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "EndFrequency",
+                    "type": "u32"
+                },
+                {
+                    "node": "parameter",
+                    "type": "RFSurveySpecStopTrigger",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "RFSurveySpecStopTrigger",
+            "typeNum": "188",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "StopTriggerType",
+                    "type": "u8",
+                    "enumeration": "RFSurveySpecStopTriggerType"
+                },
+                {
+                    "node": "field",
+                    "name": "DurationPeriod",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "N",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "AccessSpec",
+            "typeNum": "207",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AccessSpecID",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "AntennaID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "ProtocolID",
+                    "type": "u8",
+                    "enumeration": "AirProtocols"
+                },
+                {
+                    "node": "field",
+                    "name": "CurrentState",
+                    "type": "u1",
+                    "enumeration": "AccessSpecState"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                },
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AccessSpecStopTrigger",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AccessCommand",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AccessReportSpec",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "AccessSpecStopTrigger",
+            "typeNum": "208",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AccessSpecStopTrigger",
+                    "type": "u8",
+                    "enumeration": "AccessSpecStopTriggerType"
+                },
+                {
+                    "node": "field",
+                    "name": "OperationCountValue",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "AccessCommand",
+            "typeNum": "209",
+            "required": "true",
+            "body": [
+                {
+                    "node": "choice",
+                    "type": "AirProtocolTagSpec",
+                    "repeat": "1"
+                },
+                {
+                    "node": "choice",
+                    "type": "AccessCommandOpSpec",
+                    "repeat": "1-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "LLRPConfigurationStateValue",
+            "typeNum": "217",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "LLRPConfigurationStateValue",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "Identification",
+            "typeNum": "218",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "IDType",
+                    "type": "u8",
+                    "enumeration": "IdentificationType"
+                },
+                {
+                    "node": "field",
+                    "name": "ReaderID",
+                    "type": "u8v",
+                    "format": "Hex"
+                }
+            ]
+        },
+        {
+            "name": "GPOWriteData",
+            "typeNum": "219",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "GPOPortNumber",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "GPOData",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                }
+            ]
+        },
+        {
+            "name": "KeepaliveSpec",
+            "typeNum": "220",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "KeepaliveTriggerType",
+                    "type": "u8",
+                    "enumeration": "KeepaliveTriggerType"
+                },
+                {
+                    "node": "field",
+                    "name": "PeriodicTriggerValue",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "AntennaProperties",
+            "typeNum": "221",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AntennaConnected",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                },
+                {
+                    "node": "field",
+                    "name": "AntennaID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "AntennaGain",
+                    "type": "s16"
+                }
+            ]
+        },
+        {
+            "name": "AntennaConfiguration",
+            "typeNum": "222",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AntennaID",
+                    "type": "u16"
+                },
+                {
+                    "node": "parameter",
+                    "type": "RFReceiver",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "RFTransmitter",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "choice",
+                    "type": "AirProtocolInventoryCommandSettings",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "RFReceiver",
+            "typeNum": "223",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ReceiverSensitivity",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "RFTransmitter",
+            "typeNum": "224",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "HopTableID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "ChannelIndex",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "TransmitPower",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "GPIPortCurrentState",
+            "typeNum": "225",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "GPIPortNum",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "Config",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                },
+                {
+                    "node": "field",
+                    "name": "State",
+                    "type": "u8",
+                    "enumeration": "GPIPortState"
+                }
+            ]
+        },
+        {
+            "name": "EventsAndReports",
+            "typeNum": "226",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "HoldEventsAndReportsUponReconnect",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                }
+            ]
+        },
+        {
+            "name": "ROReportSpec",
+            "typeNum": "237",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ROReportTrigger",
+                    "type": "u8",
+                    "enumeration": "ROReportTriggerType"
+                },
+                {
+                    "node": "field",
+                    "name": "N",
+                    "type": "u16"
+                },
+                {
+                    "node": "parameter",
+                    "type": "TagReportContentSelector",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "TagReportContentSelector",
+            "typeNum": "238",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "EnableROSpecID",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "EnableSpecIndex",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "EnableInventoryParameterSpecID",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "EnableAntennaID",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "EnableChannelIndex",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "EnablePeakRSSI",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "EnableFirstSeenTimestamp",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "EnableLastSeenTimestamp",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "EnableTagSeenCount",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "EnableAccessSpecID",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                },
+                {
+                    "node": "choice",
+                    "type": "AirProtocolEPCMemorySelector",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "AccessReportSpec",
+            "typeNum": "239",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AccessReportTrigger",
+                    "type": "u8",
+                    "enumeration": "AccessReportTriggerType"
+                }
+            ]
+        },
+        {
+            "name": "TagReportData",
+            "typeNum": "240",
+            "required": "true",
+            "body": [
+                {
+                    "node": "choice",
+                    "type": "EPCParameter",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ROSpecID",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "SpecIndex",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "InventoryParameterSpecID",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AntennaID",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "PeakRSSI",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ChannelIndex",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "FirstSeenTimestampUTC",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "FirstSeenTimestampUptime",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "LastSeenTimestampUTC",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "LastSeenTimestampUptime",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "TagSeenCount",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "choice",
+                    "type": "AirProtocolTagData",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AccessSpecID",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "choice",
+                    "type": "AccessCommandOpSpecResult",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "EPCData",
+            "typeNum": "241",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "EPC",
+                    "type": "u1v",
+                    "format": "Hex"
+                }
+            ]
+        },
+        {
+            "name": "EPC_96",
+            "typeNum": "13",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "EPC",
+                    "type": "u96",
+                    "format": "Hex"
+                }
+            ]
+        },
+        {
+            "name": "ROSpecID",
+            "typeNum": "9",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "SpecIndex",
+            "typeNum": "14",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "SpecIndex",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "InventoryParameterSpecID",
+            "typeNum": "10",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "InventoryParameterSpecID",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "AntennaID",
+            "typeNum": "1",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AntennaID",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "PeakRSSI",
+            "typeNum": "6",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "PeakRSSI",
+                    "type": "s8"
+                }
+            ]
+        },
+        {
+            "name": "ChannelIndex",
+            "typeNum": "7",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ChannelIndex",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "FirstSeenTimestampUTC",
+            "typeNum": "2",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Microseconds",
+                    "type": "u64",
+                    "format": "Datetime"
+                }
+            ]
+        },
+        {
+            "name": "FirstSeenTimestampUptime",
+            "typeNum": "3",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Microseconds",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "LastSeenTimestampUTC",
+            "typeNum": "4",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Microseconds",
+                    "type": "u64",
+                    "format": "Datetime"
+                }
+            ]
+        },
+        {
+            "name": "LastSeenTimestampUptime",
+            "typeNum": "5",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Microseconds",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "TagSeenCount",
+            "typeNum": "8",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "TagCount",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "AccessSpecID",
+            "typeNum": "16",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AccessSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "RFSurveyReportData",
+            "typeNum": "242",
+            "required": "false",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "ROSpecID",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "SpecIndex",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "FrequencyRSSILevelEntry",
+                    "repeat": "1-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "FrequencyRSSILevelEntry",
+            "typeNum": "243",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Frequency",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "Bandwidth",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "AverageRSSI",
+                    "type": "s8"
+                },
+                {
+                    "node": "field",
+                    "name": "PeakRSSI",
+                    "type": "s8"
+                },
+                {
+                    "node": "choice",
+                    "type": "Timestamp",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "ReaderEventNotificationSpec",
+            "typeNum": "244",
+            "required": "true",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "EventNotificationState",
+                    "repeat": "1-N"
+                }
+            ]
+        },
+        {
+            "name": "EventNotificationState",
+            "typeNum": "245",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "EventType",
+                    "type": "u16",
+                    "enumeration": "NotificationEventType"
+                },
+                {
+                    "node": "field",
+                    "name": "NotificationState",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                }
+            ]
+        },
+        {
+            "name": "ReaderEventNotificationData",
+            "typeNum": "246",
+            "required": "true",
+            "body": [
+                {
+                    "node": "choice",
+                    "type": "Timestamp",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "HoppingEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "GPIEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ROSpecEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ReportBufferLevelWarningEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ReportBufferOverflowErrorEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ReaderExceptionEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "RFSurveyEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AISpecEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AntennaEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ConnectionAttemptEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ConnectionCloseEvent",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "HoppingEvent",
+            "typeNum": "247",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "HopTableID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "NextChannelIndex",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "GPIEvent",
+            "typeNum": "248",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "GPIPortNumber",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "GPIEvent",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                }
+            ]
+        },
+        {
+            "name": "ROSpecEvent",
+            "typeNum": "249",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "EventType",
+                    "type": "u8",
+                    "enumeration": "ROSpecEventType"
+                },
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "PreemptingROSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "ReportBufferLevelWarningEvent",
+            "typeNum": "250",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ReportBufferPercentageFull",
+                    "type": "u8"
+                }
+            ]
+        },
+        {
+            "name": "ReportBufferOverflowErrorEvent",
+            "typeNum": "251",
+            "required": "true",
+            "body": []
+        },
+        {
+            "name": "ReaderExceptionEvent",
+            "typeNum": "252",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Message",
+                    "type": "utf8v",
+                    "format": "UTF8"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ROSpecID",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "SpecIndex",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "InventoryParameterSpecID",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AntennaID",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AccessSpecID",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "OpSpecID",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "OpSpecID",
+            "typeNum": "17",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "RFSurveyEvent",
+            "typeNum": "253",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "EventType",
+                    "type": "u8",
+                    "enumeration": "RFSurveyEventType"
+                },
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "SpecIndex",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "AISpecEvent",
+            "typeNum": "254",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "EventType",
+                    "type": "u8",
+                    "enumeration": "AISpecEventType"
+                },
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "SpecIndex",
+                    "type": "u16"
+                },
+                {
+                    "node": "choice",
+                    "type": "AirProtocolSingulationDetails",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "AntennaEvent",
+            "typeNum": "255",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "EventType",
+                    "type": "u8",
+                    "enumeration": "AntennaEventType"
+                },
+                {
+                    "node": "field",
+                    "name": "AntennaID",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "ConnectionAttemptEvent",
+            "typeNum": "256",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Status",
+                    "type": "u16",
+                    "enumeration": "ConnectionAttemptStatusType"
+                }
+            ]
+        },
+        {
+            "name": "ConnectionCloseEvent",
+            "typeNum": "257",
+            "required": "true",
+            "body": []
+        },
+        {
+            "name": "LLRPStatus",
+            "typeNum": "287",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "StatusCode",
+                    "type": "u16",
+                    "enumeration": "StatusCode"
+                },
+                {
+                    "node": "field",
+                    "name": "ErrorDescription",
+                    "type": "utf8v",
+                    "format": "UTF8"
+                },
+                {
+                    "node": "parameter",
+                    "type": "FieldError",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ParameterError",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "FieldError",
+            "typeNum": "288",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "FieldNum",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "ErrorCode",
+                    "type": "u16",
+                    "enumeration": "StatusCode"
+                }
+            ]
+        },
+        {
+            "name": "ParameterError",
+            "typeNum": "289",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ParameterType",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "ErrorCode",
+                    "type": "u16",
+                    "enumeration": "StatusCode"
+                },
+                {
+                    "node": "parameter",
+                    "type": "FieldError",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ParameterError",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "C1G2LLRPCapabilities",
+            "typeNum": "327",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "CanSupportBlockErase",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "CanSupportBlockWrite",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                },
+                {
+                    "node": "field",
+                    "name": "MaxNumSelectFiltersPerQuery",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2UHFRFModeTable",
+            "typeNum": "328",
+            "required": "true",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2UHFRFModeTableEntry",
+                    "repeat": "1-N"
+                }
+            ]
+        },
+        {
+            "name": "C1G2UHFRFModeTableEntry",
+            "typeNum": "329",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ModeIdentifier",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "DRValue",
+                    "type": "u1",
+                    "enumeration": "C1G2DRValue"
+                },
+                {
+                    "node": "field",
+                    "name": "EPCHAGTCConformance",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                },
+                {
+                    "node": "field",
+                    "name": "MValue",
+                    "type": "u8",
+                    "enumeration": "C1G2MValue"
+                },
+                {
+                    "node": "field",
+                    "name": "ForwardLinkModulation",
+                    "type": "u8",
+                    "enumeration": "C1G2ForwardLinkModulation"
+                },
+                {
+                    "node": "field",
+                    "name": "SpectralMaskIndicator",
+                    "type": "u8",
+                    "enumeration": "C1G2SpectralMaskIndicator"
+                },
+                {
+                    "node": "field",
+                    "name": "BDRValue",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "PIEValue",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MinTariValue",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MaxTariValue",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "StepTariValue",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "C1G2InventoryCommand",
+            "typeNum": "330",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "TagInventoryStateAware",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2Filter",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2RFControl",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2SingulationControl",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "C1G2Filter",
+            "typeNum": "331",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "T",
+                    "type": "u2",
+                    "enumeration": "C1G2TruncateAction"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2TagInventoryMask",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2TagInventoryStateAwareFilterAction",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2TagInventoryStateUnawareFilterAction",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "C1G2TagInventoryMask",
+            "typeNum": "332",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "MB",
+                    "type": "u2"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                },
+                {
+                    "node": "field",
+                    "name": "Pointer",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "TagMask",
+                    "type": "u1v",
+                    "format": "Hex"
+                }
+            ]
+        },
+        {
+            "name": "C1G2TagInventoryStateAwareFilterAction",
+            "typeNum": "333",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Target",
+                    "type": "u8",
+                    "enumeration": "C1G2StateAwareTarget"
+                },
+                {
+                    "node": "field",
+                    "name": "Action",
+                    "type": "u8",
+                    "enumeration": "C1G2StateAwareAction"
+                }
+            ]
+        },
+        {
+            "name": "C1G2TagInventoryStateUnawareFilterAction",
+            "typeNum": "334",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Action",
+                    "type": "u8",
+                    "enumeration": "C1G2StateUnawareAction"
+                }
+            ]
+        },
+        {
+            "name": "C1G2RFControl",
+            "typeNum": "335",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ModeIndex",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "Tari",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2SingulationControl",
+            "typeNum": "336",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Session",
+                    "type": "u2"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                },
+                {
+                    "node": "field",
+                    "name": "TagPopulation",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "TagTransitTime",
+                    "type": "u32"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2TagInventoryStateAwareSingulationAction",
+                    "repeat": "0-1"
+                }
+            ]
+        },
+        {
+            "name": "C1G2TagInventoryStateAwareSingulationAction",
+            "typeNum": "337",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "I",
+                    "type": "u1",
+                    "enumeration": "C1G2TagInventoryStateAwareI"
+                },
+                {
+                    "node": "field",
+                    "name": "S",
+                    "type": "u1",
+                    "enumeration": "C1G2TagInventoryStateAwareS"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                }
+            ]
+        },
+        {
+            "name": "C1G2TagSpec",
+            "typeNum": "338",
+            "required": "true",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2TargetTag",
+                    "repeat": "1-N"
+                }
+            ]
+        },
+        {
+            "name": "C1G2TargetTag",
+            "typeNum": "339",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "MB",
+                    "type": "u2"
+                },
+                {
+                    "node": "field",
+                    "name": "Match",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "5"
+                },
+                {
+                    "node": "field",
+                    "name": "Pointer",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "TagMask",
+                    "type": "u1v",
+                    "format": "Hex"
+                },
+                {
+                    "node": "field",
+                    "name": "TagData",
+                    "type": "u1v",
+                    "format": "Hex"
+                }
+            ]
+        },
+        {
+            "name": "C1G2Read",
+            "typeNum": "341",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "AccessPassword",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MB",
+                    "type": "u2"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                },
+                {
+                    "node": "field",
+                    "name": "WordPointer",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "WordCount",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2Write",
+            "typeNum": "342",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "AccessPassword",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MB",
+                    "type": "u2"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                },
+                {
+                    "node": "field",
+                    "name": "WordPointer",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "WriteData",
+                    "type": "u16v",
+                    "format": "Hex"
+                }
+            ]
+        },
+        {
+            "name": "C1G2Kill",
+            "typeNum": "343",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "KillPassword",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "C1G2Lock",
+            "typeNum": "344",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "AccessPassword",
+                    "type": "u32"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2LockPayload",
+                    "repeat": "1-N"
+                }
+            ]
+        },
+        {
+            "name": "C1G2LockPayload",
+            "typeNum": "345",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Privilege",
+                    "type": "u8",
+                    "enumeration": "C1G2LockPrivilege"
+                },
+                {
+                    "node": "field",
+                    "name": "DataField",
+                    "type": "u8",
+                    "enumeration": "C1G2LockDataField"
+                }
+            ]
+        },
+        {
+            "name": "C1G2BlockErase",
+            "typeNum": "346",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "AccessPassword",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MB",
+                    "type": "u2"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                },
+                {
+                    "node": "field",
+                    "name": "WordPointer",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "WordCount",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2BlockWrite",
+            "typeNum": "347",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "AccessPassword",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MB",
+                    "type": "u2"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                },
+                {
+                    "node": "field",
+                    "name": "WordPointer",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "WriteData",
+                    "type": "u16v",
+                    "format": "Hex"
+                }
+            ]
+        },
+        {
+            "name": "C1G2EPCMemorySelector",
+            "typeNum": "348",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "EnableCRC",
+                    "type": "u1"
+                },
+                {
+                    "node": "field",
+                    "name": "EnablePCBits",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "6"
+                }
+            ]
+        },
+        {
+            "name": "C1G2_PC",
+            "typeNum": "12",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "PC_Bits",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2_CRC",
+            "typeNum": "11",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "CRC",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2SingulationDetails",
+            "typeNum": "18",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "NumCollisionSlots",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "NumEmptySlots",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2ReadOpSpecResult",
+            "typeNum": "349",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Result",
+                    "type": "u8",
+                    "enumeration": "C1G2ReadResultType"
+                },
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "ReadData",
+                    "type": "u16v",
+                    "format": "Hex"
+                }
+            ]
+        },
+        {
+            "name": "C1G2WriteOpSpecResult",
+            "typeNum": "350",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Result",
+                    "type": "u8",
+                    "enumeration": "C1G2WriteResultType"
+                },
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "NumWordsWritten",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2KillOpSpecResult",
+            "typeNum": "351",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Result",
+                    "type": "u8",
+                    "enumeration": "C1G2KillResultType"
+                },
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2LockOpSpecResult",
+            "typeNum": "352",
+            "required": "true",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Result",
+                    "type": "u8",
+                    "enumeration": "C1G2LockResultType"
+                },
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2BlockEraseOpSpecResult",
+            "typeNum": "353",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Result",
+                    "type": "u8",
+                    "enumeration": "C1G2BlockEraseResultType"
+                },
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "C1G2BlockWriteOpSpecResult",
+            "typeNum": "354",
+            "required": "false",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "Result",
+                    "type": "u8",
+                    "enumeration": "C1G2BlockWriteResultType"
+                },
+                {
+                    "node": "field",
+                    "name": "OpSpecID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "NumWordsWritten",
+                    "type": "u16"
+                }
+            ]
+        }
+    ],
+    "choiceDefinitions": [
+        {
+            "name": "SpecParameter",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "AISpec"
+                },
+                {
+                    "node": "parameter",
+                    "type": "RFSurveySpec"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom"
+                }
+            ]
+        },
+        {
+            "name": "AccessCommandOpSpec",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2Read"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2Write"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2Kill"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2Lock"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2BlockErase"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2BlockWrite"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom"
+                }
+            ]
+        },
+        {
+            "name": "AccessCommandOpSpecResult",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2ReadOpSpecResult"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2WriteOpSpecResult"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2KillOpSpecResult"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2LockOpSpecResult"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2BlockEraseOpSpecResult"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2BlockWriteOpSpecResult"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom"
+                }
+            ]
+        },
+        {
+            "name": "EPCParameter",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "EPCData"
+                },
+                {
+                    "node": "parameter",
+                    "type": "EPC_96"
+                }
+            ]
+        },
+        {
+            "name": "Timestamp",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "UTCTimestamp"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Uptime"
+                }
+            ]
+        },
+        {
+            "name": "AirProtocolLLRPCapabilities",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2LLRPCapabilities"
+                }
+            ]
+        },
+        {
+            "name": "AirProtocolUHFRFModeTable",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2UHFRFModeTable"
+                }
+            ]
+        },
+        {
+            "name": "AirProtocolInventoryCommandSettings",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2InventoryCommand"
+                }
+            ]
+        },
+        {
+            "name": "AirProtocolTagSpec",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2TagSpec"
+                }
+            ]
+        },
+        {
+            "name": "AirProtocolEPCMemorySelector",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2EPCMemorySelector"
+                }
+            ]
+        },
+        {
+            "name": "AirProtocolTagData",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2_PC"
+                },
+                {
+                    "node": "parameter",
+                    "type": "C1G2_CRC"
+                }
+            ]
+        },
+        {
+            "name": "AirProtocolSingulationDetails",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "C1G2SingulationDetails"
+                }
+            ]
+        }
+    ],
+    "enumerationDefinitions": [
+        {
+            "name": "AirProtocols",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Unspecified",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "EPCGlobalClass1Gen2",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "GetReaderCapabilitiesRequestedData",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "All",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "General_Device_Capabilities",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "LLRP_Capabilities",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Regulatory_Capabilities",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "LLRP_Air_Protocol_Capabilities",
+                    "value": "4"
+                }
+            ]
+        },
+        {
+            "name": "CommunicationsStandard",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Unspecified",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "US_FCC_Part_15",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "ETSI_302_208",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "ETSI_300_220",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "Australia_LIPD_1W",
+                    "value": "4"
+                },
+                {
+                    "node": "entry",
+                    "name": "Australia_LIPD_4W",
+                    "value": "5"
+                },
+                {
+                    "node": "entry",
+                    "name": "Japan_ARIB_STD_T89",
+                    "value": "6"
+                },
+                {
+                    "node": "entry",
+                    "name": "Hong_Kong_OFTA_1049",
+                    "value": "7"
+                },
+                {
+                    "node": "entry",
+                    "name": "Taiwan_DGT_LP0002",
+                    "value": "8"
+                },
+                {
+                    "node": "entry",
+                    "name": "Korea_MIC_Article_5_2",
+                    "value": "9"
+                }
+            ]
+        },
+        {
+            "name": "ROSpecState",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Disabled",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Inactive",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Active",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "name": "ROSpecStartTriggerType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Null",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Immediate",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Periodic",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "GPI",
+                    "value": "3"
+                }
+            ]
+        },
+        {
+            "name": "ROSpecStopTriggerType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Null",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Duration",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "GPI_With_Timeout",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "name": "AISpecStopTriggerType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Null",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Duration",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "GPI_With_Timeout",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Tag_Observation",
+                    "value": "3"
+                }
+            ]
+        },
+        {
+            "name": "TagObservationTriggerType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Upon_Seeing_N_Tags_Or_Timeout",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Upon_Seeing_No_More_New_Tags_For_Tms_Or_Timeout",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "N_Attempts_To_See_All_Tags_In_FOV_Or_Timeout",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "name": "RFSurveySpecStopTriggerType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Null",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Duration",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "N_Iterations_Through_Frequency_Range",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "name": "AccessSpecState",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Disabled",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Active",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "AccessSpecStopTriggerType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Null",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Operation_Count",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "GetReaderConfigRequestedData",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "All",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Identification",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "AntennaProperties",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "AntennaConfiguration",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "ROReportSpec",
+                    "value": "4"
+                },
+                {
+                    "node": "entry",
+                    "name": "ReaderEventNotificationSpec",
+                    "value": "5"
+                },
+                {
+                    "node": "entry",
+                    "name": "AccessReportSpec",
+                    "value": "6"
+                },
+                {
+                    "node": "entry",
+                    "name": "LLRPConfigurationStateValue",
+                    "value": "7"
+                },
+                {
+                    "node": "entry",
+                    "name": "KeepaliveSpec",
+                    "value": "8"
+                },
+                {
+                    "node": "entry",
+                    "name": "GPIPortCurrentState",
+                    "value": "9"
+                },
+                {
+                    "node": "entry",
+                    "name": "GPOWriteData",
+                    "value": "10"
+                },
+                {
+                    "node": "entry",
+                    "name": "EventsAndReports",
+                    "value": "11"
+                }
+            ]
+        },
+        {
+            "name": "IdentificationType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "MAC_Address",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "EPC",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "KeepaliveTriggerType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Null",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Periodic",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "GPIPortState",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Low",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "High",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Unknown",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "name": "ROReportTriggerType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "None",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Upon_N_Tags_Or_End_Of_AISpec",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Upon_N_Tags_Or_End_Of_ROSpec",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "name": "AccessReportTriggerType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Whenever_ROReport_Is_Generated",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "End_Of_AccessSpec",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "NotificationEventType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Upon_Hopping_To_Next_Channel",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "GPI_Event",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "ROSpec_Event",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Report_Buffer_Fill_Warning",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "Reader_Exception_Event",
+                    "value": "4"
+                },
+                {
+                    "node": "entry",
+                    "name": "RFSurvey_Event",
+                    "value": "5"
+                },
+                {
+                    "node": "entry",
+                    "name": "AISpec_Event",
+                    "value": "6"
+                },
+                {
+                    "node": "entry",
+                    "name": "AISpec_Event_With_Details",
+                    "value": "7"
+                },
+                {
+                    "node": "entry",
+                    "name": "Antenna_Event",
+                    "value": "8"
+                }
+            ]
+        },
+        {
+            "name": "ROSpecEventType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Start_Of_ROSpec",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "End_Of_ROSpec",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Preemption_Of_ROSpec",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "name": "RFSurveyEventType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Start_Of_RFSurvey",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "End_Of_RFSurvey",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "AISpecEventType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "End_Of_AISpec",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "name": "AntennaEventType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Antenna_Disconnected",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Antenna_Connected",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "ConnectionAttemptStatusType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Success",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Failed_A_Reader_Initiated_Connection_Already_Exists",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Failed_A_Client_Initiated_Connection_Already_Exists",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Failed_Reason_Other_Than_A_Connection_Already_Exists",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "Another_Connection_Attempted",
+                    "value": "4"
+                }
+            ]
+        },
+        {
+            "name": "StatusCode",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "M_Success",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_ParameterError",
+                    "value": "100"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_FieldError",
+                    "value": "101"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_UnexpectedParameter",
+                    "value": "102"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_MissingParameter",
+                    "value": "103"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_DuplicateParameter",
+                    "value": "104"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_OverflowParameter",
+                    "value": "105"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_OverflowField",
+                    "value": "106"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_UnknownParameter",
+                    "value": "107"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_UnknownField",
+                    "value": "108"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_UnsupportedMessage",
+                    "value": "109"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_UnsupportedVersion",
+                    "value": "110"
+                },
+                {
+                    "node": "entry",
+                    "name": "M_UnsupportedParameter",
+                    "value": "111"
+                },
+                {
+                    "node": "entry",
+                    "name": "P_ParameterError",
+                    "value": "200"
+                },
+                {
+                    "node": "entry",
+                    "name": "P_FieldError",
+                    "value": "201"
+                },
+                {
+                    "node": "entry",
+                    "name": "P_UnexpectedParameter",
+                    "value": "202"
+                },
+                {
+                    "node": "entry",
+                    "name": "P_MissingParameter",
+                    "value": "203"
+                },
+                {
+                    "node": "entry",
+                    "name": "P_DuplicateParameter",
+                    "value": "204"
+                },
+                {
+                    "node": "entry",
+                    "name": "P_OverflowParameter",
+                    "value": "205"
+                },
+                {
+                    "node": "entry",
+                    "name": "P_OverflowField",
+                    "value": "206"
+                },
+                {
+                    "node": "entry",
+                    "name": "P_UnknownParameter",
+                    "value": "207"
+                },
+                {
+                    "node": "entry",
+                    "name": "P_UnknownField",
+                    "value": "208"
+                },
+                {
+                    "node": "entry",
+                    "name": "P_UnsupportedParameter",
+                    "value": "209"
+                },
+                {
+                    "node": "entry",
+                    "name": "A_Invalid",
+                    "value": "300"
+                },
+                {
+                    "node": "entry",
+                    "name": "A_OutOfRange",
+                    "value": "301"
+                },
+                {
+                    "node": "entry",
+                    "name": "R_DeviceError",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "name": "C1G2DRValue",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "DRV_8",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "DRV_64_3",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "C1G2MValue",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "MV_FM0",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "MV_2",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "MV_4",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "MV_8",
+                    "value": "3"
+                }
+            ]
+        },
+        {
+            "name": "C1G2ForwardLinkModulation",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "PR_ASK",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "SSB_ASK",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "DSB_ASK",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "name": "C1G2SpectralMaskIndicator",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Unknown",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "SI",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "MI",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "DI",
+                    "value": "3"
+                }
+            ]
+        },
+        {
+            "name": "C1G2TruncateAction",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Unspecified",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Do_Not_Truncate",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Truncate",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "name": "C1G2StateAwareTarget",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "SL",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Inventoried_State_For_Session_S0",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Inventoried_State_For_Session_S1",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Inventoried_State_For_Session_S2",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "Inventoried_State_For_Session_S3",
+                    "value": "4"
+                }
+            ]
+        },
+        {
+            "name": "C1G2StateAwareAction",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "AssertSLOrA_DeassertSLOrB",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "AssertSLOrA_Noop",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Noop_DeassertSLOrB",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "NegateSLOrABBA_Noop",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "DeassertSLOrB_AssertSLOrA",
+                    "value": "4"
+                },
+                {
+                    "node": "entry",
+                    "name": "DeassertSLOrB_Noop",
+                    "value": "5"
+                },
+                {
+                    "node": "entry",
+                    "name": "Noop_AssertSLOrA",
+                    "value": "6"
+                },
+                {
+                    "node": "entry",
+                    "name": "Noop_NegateSLOrABBA",
+                    "value": "7"
+                }
+            ]
+        },
+        {
+            "name": "C1G2StateUnawareAction",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Select_Unselect",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Select_DoNothing",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "DoNothing_Unselect",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Unselect_DoNothing",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "Unselect_Select",
+                    "value": "4"
+                },
+                {
+                    "node": "entry",
+                    "name": "DoNothing_Select",
+                    "value": "5"
+                }
+            ]
+        },
+        {
+            "name": "C1G2TagInventoryStateAwareI",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "State_A",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "State_B",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "C1G2TagInventoryStateAwareS",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "SL",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Not_SL",
+                    "value": "1"
+                }
+            ]
+        },
+        {
+            "name": "C1G2LockPrivilege",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Read_Write",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Perma_Lock",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Perma_Unlock",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Unlock",
+                    "value": "3"
+                }
+            ]
+        },
+        {
+            "name": "C1G2LockDataField",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Kill_Password",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Access_Password",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "EPC_Memory",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "TID_Memory",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "User_Memory",
+                    "value": "4"
+                }
+            ]
+        },
+        {
+            "name": "C1G2ReadResultType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Success",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Tag_Error",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "No_Response_From_Tag",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Reader_Error",
+                    "value": "3"
+                }
+            ]
+        },
+        {
+            "name": "C1G2WriteResultType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Success",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Tag_Memory_Overrun_Error",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Tag_Memory_Locked_Error",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Insufficient_Power",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Tag_Error",
+                    "value": "4"
+                },
+                {
+                    "node": "entry",
+                    "name": "No_Response_From_Tag",
+                    "value": "5"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Reader_Error",
+                    "value": "6"
+                }
+            ]
+        },
+        {
+            "name": "C1G2KillResultType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Success",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Zero_Kill_Password_Error",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Insufficient_Power",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Tag_Error",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "No_Response_From_Tag",
+                    "value": "4"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Reader_Error",
+                    "value": "5"
+                }
+            ]
+        },
+        {
+            "name": "C1G2LockResultType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Success",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Insufficient_Power",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Tag_Error",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "No_Response_From_Tag",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Reader_Error",
+                    "value": "4"
+                }
+            ]
+        },
+        {
+            "name": "C1G2BlockEraseResultType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Success",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Tag_Memory_Overrun_Error",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Tag_Memory_Locked_Error",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Insufficient_Power",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Tag_Error",
+                    "value": "4"
+                },
+                {
+                    "node": "entry",
+                    "name": "No_Response_From_Tag",
+                    "value": "5"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Reader_Error",
+                    "value": "6"
+                }
+            ]
+        },
+        {
+            "name": "C1G2BlockWriteResultType",
+            "entry": [
+                {
+                    "node": "entry",
+                    "name": "Success",
+                    "value": "0"
+                },
+                {
+                    "node": "entry",
+                    "name": "Tag_Memory_Overrun_Error",
+                    "value": "1"
+                },
+                {
+                    "node": "entry",
+                    "name": "Tag_Memory_Locked_Error",
+                    "value": "2"
+                },
+                {
+                    "node": "entry",
+                    "name": "Insufficient_Power",
+                    "value": "3"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Tag_Error",
+                    "value": "4"
+                },
+                {
+                    "node": "entry",
+                    "name": "No_Response_From_Tag",
+                    "value": "5"
+                },
+                {
+                    "node": "entry",
+                    "name": "Nonspecific_Reader_Error",
+                    "value": "6"
+                }
+            ]
+        }
+    ],
+    "messageDefinitions": [
+        {
+            "name": "CUSTOM_MESSAGE",
+            "typeNum": "1023",
+            "required": "false",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "field",
+                    "name": "VendorIdentifier",
+                    "type": "u32"
+                },
+                {
+                    "node": "field",
+                    "name": "MessageSubtype",
+                    "type": "u8"
+                },
+                {
+                    "node": "field",
+                    "name": "Data",
+                    "type": "bytesToEnd",
+                    "format": "Hex"
+                }
+            ]
+        },
+        {
+            "name": "GET_READER_CAPABILITIES",
+            "typeNum": "1",
+            "required": "true",
+            "responseType": "GET_READER_CAPABILITIES_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "RequestedData",
+                    "type": "u8",
+                    "enumeration": "GetReaderCapabilitiesRequestedData"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "GET_READER_CAPABILITIES_RESPONSE",
+            "typeNum": "11",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "GeneralDeviceCapabilities",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "LLRPCapabilities",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "RegulatoryCapabilities",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "choice",
+                    "type": "AirProtocolLLRPCapabilities",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "ADD_ROSPEC",
+            "typeNum": "20",
+            "required": "true",
+            "responseType": "ADD_ROSPEC_RESPONSE",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "ROSpec",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "ADD_ROSPEC_RESPONSE",
+            "typeNum": "30",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "DELETE_ROSPEC",
+            "typeNum": "21",
+            "required": "true",
+            "responseType": "DELETE_ROSPEC_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "DELETE_ROSPEC_RESPONSE",
+            "typeNum": "31",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "START_ROSPEC",
+            "typeNum": "22",
+            "required": "true",
+            "responseType": "START_ROSPEC_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "START_ROSPEC_RESPONSE",
+            "typeNum": "32",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "STOP_ROSPEC",
+            "typeNum": "23",
+            "required": "true",
+            "responseType": "STOP_ROSPEC_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "STOP_ROSPEC_RESPONSE",
+            "typeNum": "33",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "ENABLE_ROSPEC",
+            "typeNum": "24",
+            "required": "true",
+            "responseType": "ENABLE_ROSPEC_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "ENABLE_ROSPEC_RESPONSE",
+            "typeNum": "34",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "DISABLE_ROSPEC",
+            "typeNum": "25",
+            "required": "true",
+            "responseType": "DISABLE_ROSPEC_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ROSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "DISABLE_ROSPEC_RESPONSE",
+            "typeNum": "35",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "GET_ROSPECS",
+            "typeNum": "26",
+            "required": "true",
+            "responseType": "GET_ROSPECS_RESPONSE",
+            "body": []
+        },
+        {
+            "name": "GET_ROSPECS_RESPONSE",
+            "typeNum": "36",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ROSpec",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "ADD_ACCESSSPEC",
+            "typeNum": "40",
+            "required": "true",
+            "responseType": "ADD_ACCESSSPEC_RESPONSE",
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "AccessSpec",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "ADD_ACCESSSPEC_RESPONSE",
+            "typeNum": "50",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "DELETE_ACCESSSPEC",
+            "typeNum": "41",
+            "required": "true",
+            "responseType": "DELETE_ACCESSSPEC_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AccessSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "DELETE_ACCESSSPEC_RESPONSE",
+            "typeNum": "51",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "ENABLE_ACCESSSPEC",
+            "typeNum": "42",
+            "required": "true",
+            "responseType": "ENABLE_ACCESSSPEC_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AccessSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "ENABLE_ACCESSSPEC_RESPONSE",
+            "typeNum": "52",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "DISABLE_ACCESSSPEC",
+            "typeNum": "43",
+            "required": "true",
+            "responseType": "DISABLE_ACCESSSPEC_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AccessSpecID",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "DISABLE_ACCESSSPEC_RESPONSE",
+            "typeNum": "53",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "GET_ACCESSSPECS",
+            "typeNum": "44",
+            "required": "true",
+            "responseType": "GET_ACCESSSPECS_RESPONSE",
+            "body": []
+        },
+        {
+            "name": "GET_ACCESSSPECS_RESPONSE",
+            "typeNum": "54",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AccessSpec",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "GET_READER_CONFIG",
+            "typeNum": "2",
+            "required": "true",
+            "responseType": "GET_READER_CONFIG_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "AntennaID",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "RequestedData",
+                    "type": "u8",
+                    "enumeration": "GetReaderConfigRequestedData"
+                },
+                {
+                    "node": "field",
+                    "name": "GPIPortNum",
+                    "type": "u16"
+                },
+                {
+                    "node": "field",
+                    "name": "GPOPortNum",
+                    "type": "u16"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "GET_READER_CONFIG_RESPONSE",
+            "typeNum": "12",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Identification",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AntennaProperties",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AntennaConfiguration",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ReaderEventNotificationSpec",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ROReportSpec",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AccessReportSpec",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "LLRPConfigurationStateValue",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "KeepaliveSpec",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "GPIPortCurrentState",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "GPOWriteData",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "EventsAndReports",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "SET_READER_CONFIG",
+            "typeNum": "3",
+            "required": "true",
+            "responseType": "SET_READER_CONFIG_RESPONSE",
+            "body": [
+                {
+                    "node": "field",
+                    "name": "ResetToFactoryDefault",
+                    "type": "u1"
+                },
+                {
+                    "node": "reserved",
+                    "bitCount": "7"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ReaderEventNotificationSpec",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AntennaProperties",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AntennaConfiguration",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "ROReportSpec",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "AccessReportSpec",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "KeepaliveSpec",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "GPOWriteData",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "GPIPortCurrentState",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "EventsAndReports",
+                    "repeat": "0-1"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "SET_READER_CONFIG_RESPONSE",
+            "typeNum": "13",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "CLOSE_CONNECTION",
+            "typeNum": "14",
+            "required": "true",
+            "responseType": "CLOSE_CONNECTION_RESPONSE",
+            "body": []
+        },
+        {
+            "name": "CLOSE_CONNECTION_RESPONSE",
+            "typeNum": "4",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "GET_REPORT",
+            "typeNum": "60",
+            "required": "true",
+            "responseType": null,
+            "body": []
+        },
+        {
+            "name": "RO_ACCESS_REPORT",
+            "typeNum": "61",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "TagReportData",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "RFSurveyReportData",
+                    "repeat": "0-N"
+                },
+                {
+                    "node": "parameter",
+                    "type": "Custom",
+                    "repeat": "0-N"
+                }
+            ]
+        },
+        {
+            "name": "KEEPALIVE",
+            "typeNum": "62",
+            "required": "true",
+            "responseType": null,
+            "body": []
+        },
+        {
+            "name": "KEEPALIVE_ACK",
+            "typeNum": "72",
+            "required": "true",
+            "responseType": null,
+            "body": []
+        },
+        {
+            "name": "READER_EVENT_NOTIFICATION",
+            "typeNum": "63",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "ReaderEventNotificationData",
+                    "repeat": "1"
+                }
+            ]
+        },
+        {
+            "name": "ENABLE_EVENTS_AND_REPORTS",
+            "typeNum": "64",
+            "required": "false",
+            "responseType": null,
+            "body": []
+        },
+        {
+            "name": "ERROR_MESSAGE",
+            "typeNum": "100",
+            "required": "true",
+            "responseType": null,
+            "body": [
+                {
+                    "node": "parameter",
+                    "type": "LLRPStatus",
+                    "repeat": "1"
+                }
+            ]
+        }
+    ],
+    "customParameterDefinitions": [],
+    "customChoiceDefinitions": [],
+    "customEnumerationDefinitions": [],
+    "customMessageDefinitions": []
+}
