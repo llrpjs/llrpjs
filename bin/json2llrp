@@ -1,8 +1,9 @@
+#!/usr/bin/env node
+
 const debug = require('debug')('llrpjs:json2llrp');
 const yargs = require('yargs');
 const fs = require('fs');
 const Encoder = require('../src/encoder');
-const llrpdef = require('../generated/llrpjs.def.json');
 
 
 const argv = yargs.command('$0 <input>', 'convert llrp json to bin', yargs=>{
@@ -21,7 +22,7 @@ const argv = yargs.command('$0 <input>', 'convert llrp json to bin', yargs=>{
 
 (()=>{
     let json = fs.readFileSync(argv.input, 'utf-8');
-    let encoder = new Encoder(llrpdef, {bufSize: 8096*1024});           // to pass all dx101 tests (dx101_c requries very large buffer size for each message)
+    let encoder = new Encoder({bufSize: 8096*1024});           // to pass all dx101 tests (dx101_c requries very large buffer size for each message)
 
     json = JSON.parse(json, bigIntParser);
 

@@ -1,9 +1,10 @@
+#!/usr/bin/env node
+
 const debug = require('debug')('llrpjs:llrp2json');
 const yargs = require('yargs');
 const fs = require('fs');
 const Scanner = require('../src/scanner');
 const Decoder = require('../src/decoder');
-const llrpdef = require('../generated/llrpjs.def.json');
 
 
 const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs=>{
@@ -23,7 +24,7 @@ const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs=>{
 (()=>{
     let buf = fs.readFileSync(argv.input);
     let scanner = new Scanner();
-    let decoder = new Decoder(llrpdef);
+    let decoder = new Decoder();
 
     scanner.add(buf);
 
