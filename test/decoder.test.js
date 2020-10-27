@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const Decoder = require('../src/decoder');
 const MgBuf = require('../src/managed-buffer');
 const {groupBy} = require('../src/tools');
-const llrpdef = require('../generated/llrpjs.def.json');
+const llrpdef = require('../definitions/core/llrp-1x0-def.json');
 const paramDefByName = groupBy(llrpdef.parameterDefinitions, "name");
 
 
@@ -11,7 +11,7 @@ describe(`decoder.js`, ()=>{
         it(`should add buffer`, ()=>{
             let testBuf = Buffer.from(`test buffer`);
 
-            let d = new Decoder(llrpdef);
+            let d = new Decoder();
             d.addBuffer(testBuf);
 
             expect(d.mBuf.buffer).to.deep.equal(testBuf);
@@ -20,7 +20,7 @@ describe(`decoder.js`, ()=>{
 
     describe(`flushBuffer`, ()=>{
         it(`should flush buffer`, ()=>{
-            let d = new Decoder(llrpdef);
+            let d = new Decoder();
             d.addBuffer(Buffer.from('whatever'));
             d.flushBuffer();
 
@@ -31,7 +31,7 @@ describe(`decoder.js`, ()=>{
     describe(`field`, ()=>{
         describe(`simple field`, ()=>{
             it(`should return field object`, ()=>{
-                let d = new Decoder(llrpdef);
+                let d = new Decoder();
                 d.addBuffer(Buffer.from(`01234567`, 'hex'));
 
                 // test ROSpecID
@@ -42,7 +42,7 @@ describe(`decoder.js`, ()=>{
 
         describe(`formatted field`, ()=>{
             it(`should return hex string`, ()=>{
-                let d = new Decoder(llrpdef);
+                let d = new Decoder();
                 d.addBuffer(Buffer.from(`00080123456789ABCDEF`, `hex`));    //2-byte length + payload bytes
 
                 // test ReaderID
@@ -51,7 +51,7 @@ describe(`decoder.js`, ()=>{
             });
 
             it(`should return datetime string`, ()=>{
-                let d = new Decoder(llrpdef);
+                let d = new Decoder();
                 d.addBuffer(Buffer.from(`0005aea90e1c6040`, 'hex'));        // Microseconds (field) from UTCTimestamp (parameter)
 
                 let fieldDef = paramDefByName.UTCTimestamp.body[0];
@@ -64,7 +64,7 @@ describe(`decoder.js`, ()=>{
 
     describe(`enumeration`, ()=>{
         it(`should return enum`, ()=>{
-            let d = new Decoder(llrpdef);
+            let d = new Decoder();
             d.addBuffer(Buffer.from(`02`, 'hex'));  //(Active state)
 
             // test CurrentState
@@ -76,7 +76,7 @@ describe(`decoder.js`, ()=>{
     describe(`parameter`, ()=>{
         describe(`TV`, ()=>{
             it(`should return simple parameter`, ()=>{
-                let d = new Decoder(llrpdef);
+                let d = new Decoder();
                 // [1] [0001000] [1010 1011 1100 1101]
                 d.addBuffer(Buffer.from(`88abcd`, `hex`));        // random example (TagSeenCount)
 
@@ -91,7 +91,7 @@ describe(`decoder.js`, ()=>{
 
         describe(`TLV`, ()=>{
             it(`should return simple parameter`, ()=>{
-                let d = new Decoder(llrpdef);
+                let d = new Decoder();
                 d.addBuffer(Buffer.from(`01010004`, 'hex'));        // Simplest TLV parameter: ConnectionCloseEvent
 
                 let paramDefRef = paramDefByName.ReaderEventNotificationData.body[11];
@@ -101,7 +101,7 @@ describe(`decoder.js`, ()=>{
 
         describe(`parameter wrapping a field`, ()=>{
             it(`should return wrapped field`, ()=>{
-                let d = new Decoder(llrpdef, {wrapperParam: true});
+                let d = new Decoder({wrapperParam: true});
                 d.addBuffer(Buffer.from(`91abcd`, 'hex'));        // wrapped parameter
 
                 let paramDefRef = paramDefByName.ReaderExceptionEvent.body[6];
@@ -113,7 +113,7 @@ describe(`decoder.js`, ()=>{
             });
 
             it(`should return unwrapped field`, ()=>{
-                let d = new Decoder(llrpdef, {wrapperParam: false});
+                let d = new Decoder({wrapperParam: false});
                 d.addBuffer(Buffer.from(`91abcd`, 'hex'));        // wrapped parameter
 
                 let paramDefRef = paramDefByName.ReaderExceptionEvent.body[6];
@@ -124,7 +124,7 @@ describe(`decoder.js`, ()=>{
 
     describe(`choice`, ()=>{
         it(`should return parameter`, ()=>{
-            let d = new Decoder(llrpdef);
+            let d = new Decoder();
             d.addBuffer(Buffer.from(`0081000c1234567890abcdef`, 'hex'));
 
             let choiceDefRef = paramDefByName.FrequencyRSSILevelEntry.body[4];
@@ -139,7 +139,7 @@ describe(`decoder.js`, ()=>{
     describe(`message`, ()=>{
         it(`should return KEEPALIVE message`, ()=>{
             let buf = Buffer.from(`043e0000000a0000abcd`, 'hex');
-            let d = new Decoder(llrpdef);
+            let d = new Decoder();
 
             d.addBuffer(buf);
 

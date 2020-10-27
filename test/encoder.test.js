@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 const Encoder = require('../src/encoder');
 const {groupBy} = require('../src/tools');
-const llrpdef = require('../generated/llrpjs.def.json');
+const llrpdef = require('../definitions/core/llrp-1x0-def.json');
 const Decoder = require('../src/decoder');
 const paramDefByName = groupBy(llrpdef.parameterDefinitions, "name");
 
@@ -9,7 +9,7 @@ describe(`encoder.js`, ()=>{
     describe(`field`, ()=>{
         describe(`simple`, ()=>{
             it(`should encode integer into buffer`, ()=>{
-                let e = new Encoder(llrpdef);
+                let e = new Encoder();
                 let def = paramDefByName["ROSpec"].body[0];
 
                 expect(e.field({ ROSpecID: 0x01234567 }, def))
@@ -19,7 +19,7 @@ describe(`encoder.js`, ()=>{
 
         describe(`formatted`, ()=>{
             it(`should encode string into buffer`, ()=>{
-                let e = new Encoder(llrpdef);
+                let e = new Encoder();
                 let def = paramDefByName["ReaderExceptionEvent"].body[0];
 
                 expect(e.field( { "Message" : "Node.js rocks!" }, def))
@@ -27,7 +27,7 @@ describe(`encoder.js`, ()=>{
             });
 
             it(`should encode hex string into buffer`, ()=>{
-                let e = new Encoder(llrpdef);
+                let e = new Encoder();
                 let def = paramDefByName["Identification"].body[1];
 
                 expect(e.field({ ReaderID: "0123456789ABCDEF" }, def))
@@ -35,7 +35,7 @@ describe(`encoder.js`, ()=>{
             });
 
             it(`should encode Datetime into buffer`, ()=>{
-                let e = new Encoder(llrpdef);
+                let e = new Encoder();
                 let def = paramDefByName["UTCTimestamp"].body[0]; // timestamp
 
                 expect(e.field({
@@ -46,7 +46,7 @@ describe(`encoder.js`, ()=>{
 
         describe(`enum`, ()=>{
             it(`should encode buffer`, ()=>{
-                let e = new Encoder(llrpdef);
+                let e = new Encoder();
                 let def = paramDefByName["ROSpec"].body[2];         // CurrentState field
 
                 expect(e.field({ CurrentState: "Active"}, def))
@@ -62,7 +62,7 @@ describe(`encoder.js`, ()=>{
     describe(`parameter`, ()=>{
         describe(`TV`, ()=>{
             it(`should return TV param encoded buffer`, ()=>{
-                let e = Encoder(llrpdef);
+                let e = Encoder();
                 let defRef = paramDefByName["TagReportData"].body[11];     // TagSeenCount
 
                 expect(e.parameter({
@@ -75,7 +75,7 @@ describe(`encoder.js`, ()=>{
 
         describe(`TLV`, ()=>{
             it(`should return TLV param encoded buffer`, ()=>{
-                let e = Encoder(llrpdef);
+                let e = Encoder();
                 let defRef = paramDefByName["ReaderEventNotificationData"].body[11];
 
                 expect(e.parameter({ ConnectionCloseEvent : {} }, defRef))
@@ -86,7 +86,7 @@ describe(`encoder.js`, ()=>{
         describe(`wrapper`, ()=>{
             describe(`wrapped field`, ()=>{
                 it(`should return TV encoded buffer`, ()=>{
-                    let e = Encoder(llrpdef);
+                    let e = Encoder();
                     let defRef = paramDefByName.ReaderExceptionEvent.body[6];
 
                     expect(e.parameter({
@@ -99,7 +99,7 @@ describe(`encoder.js`, ()=>{
 
             describe(`unwrapped field`, ()=>{
                 it(`should return TV encoded buffer`, ()=>{
-                    let e = Encoder(llrpdef);
+                    let e = Encoder();
                     let defRef = paramDefByName.ReaderExceptionEvent.body[6];
                     
                     expect(e.parameter({ OpSpecID: 0xabcd }, defRef))
@@ -111,7 +111,7 @@ describe(`encoder.js`, ()=>{
 
     describe(`choice`, ()=>{
         it(`should return encoded parameter buffer`, ()=>{
-            let e = new Encoder(llrpdef);
+            let e = new Encoder();
             let defRef = paramDefByName.FrequencyRSSILevelEntry.body[4];
 
             expect(e.choice({
@@ -125,7 +125,7 @@ describe(`encoder.js`, ()=>{
 
     describe(`message`, ()=>{
         it(`should return encoded message buffer`, ()=>{
-            let e = new Encoder(llrpdef);
+            let e = new Encoder();
             expect(e.message({
                 MessageID: 0xabcd,
                 MessageType: "KEEPALIVE",

@@ -4,8 +4,9 @@ const formatters = require('./field-formatters');
 const {isEmpty, groupBy,
     groupByFirstKey, isParamWrapper} = require('./tools');
 
+const llrpdef = require('../definitions/core/llrp-1x0-def.json');
 
-function Decoder(llrpdef, options) {
+function Decoder(options) {
     if (!(this instanceof Decoder)) return new Decoder(...arguments);
 
     let defaultOpt = {

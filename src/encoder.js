@@ -4,8 +4,9 @@ const {isEmpty, groupBy,
     groupByFirstKey, isParamWrapper, filter} = require('./tools');
 const parsers = require('./field-parsers');
 
+const llrpdef = require('../definitions/core/llrp-1x0-def.json');
 
-function Encoder(llrpdef, options) {
+function Encoder(options) {
     if (!(this instanceof Encoder)) return new Encoder(...arguments);
 
     let defaultOpt = {
