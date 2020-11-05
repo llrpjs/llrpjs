@@ -16,7 +16,7 @@
     "mocha": "^8.1.1"
   },
   "scripts": {
-    "postinstall": "scripts/xsltproc.sh",
+    "postinstall": "[ -e ./definitions/core/llrp*.schema.json ] || wget --directory-prefix=./definitions/core https://llrpjs.github.io/schema/core/encoding/json/1.0/llrp-1x0.schema.json",
     "test": "mocha"
   },
   "repository": {
