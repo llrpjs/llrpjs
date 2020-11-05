@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const JSONbig = require('json-bigint');
 const debug = require('debug')('llrpjs:json2llrp');
 const yargs = require('yargs');
 const fs = require('fs');
@@ -24,19 +25,19 @@ const argv = yargs.command('$0 <input>', 'convert llrp json to bin', yargs=>{
     let json = fs.readFileSync(argv.input, 'utf-8');
     let encoder = new Encoder({bufSize: 8096*1024});           // to pass all dx101 tests (dx101_c requries very large buffer size for each message)
 
-    json = JSON.parse(json, bigIntParser);
+    json = JSONbig.parse(json);
 
     let result = [];
     if (Array.isArray(json)) {
         for (let i in json) {
             let msg = json[i];
-            debug(JSON.stringify(msg, bigIntFormatter, 2));
+            debug(JSONbig.stringify(msg, null, 2));
             let buf = encoder.message(msg);
             debug(buf.toString('hex').match(/../g).join(' '));
             result.push(buf);
         }
     } else {
-        debug(JSON.stringify(json, bigIntFormatter, 2));
+        debug(JSONbig.stringify(json, null, 2));
         let buf = encoder.message(json);
         debug(buf.toString('hex').match(/../g).join(' '));        
         result.push(buf);
@@ -50,16 +51,3 @@ const argv = yargs.command('$0 <input>', 'convert llrp json to bin', yargs=>{
         process.stdout.write(result);
     }
 })();
-
-function bigIntParser (key, value) {
-    // Note: you lose BigInt resolution, but there's no good workaround AFAIK
-    return typeof value === 'number'
-            ? (value >= 2**32? BigInt(value): value)
-            : value;
-}
-
-function bigIntFormatter (key, value) {
-    return typeof value === 'bigint'
-            ? value.toString()
-            : value // return everything else unchanged
-}
