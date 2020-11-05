@@ -132,5 +132,29 @@ describe(`encoder.js`, ()=>{
                 MessageBody: {}
             })).to.deep.equal(Buffer.from(`043e0000000a0000abcd`, 'hex'));
         });
+
+        it(`should return a buffer of two encoded messages`, () => {
+            let e = new Encoder();
+            let msg1 = {
+                "MessageType": "CLOSE_CONNECTION",
+                "MessageID": 3233857728,
+                "MessageBody": {}
+            };
+            let msg2 = {
+                "MessageType": "CLOSE_CONNECTION_RESPONSE",
+                "MessageID": 3233857728,
+                "MessageBody": {
+                    "LLRPStatus": {
+                        "StatusCode": "M_Success",
+                        "ErrorDescription": ""
+                    }
+                }
+            };
+
+            let buf1 = e.message(msg1);
+            let buf2 = e.message(msg2);
+            expect(Buffer.concat([buf1, buf2]))
+                .to.deep.equal(Buffer.from("040e0000000ac0c0c0c0040400000012c0c0c0c0011f000800000000", 'hex'));
+        });
     });
 });
