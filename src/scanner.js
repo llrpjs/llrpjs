@@ -28,6 +28,7 @@ Scanner.prototype.nextMsg = function() {
 
     if (version != 1) {
         // bad error, user needs to know
+        debug(`header: ${mBuf.buffer.slice(0, 10).toString('hex').match(/../g).join(' ')}`);
         throw new Error(`bad header - unsupported version ${version}`);
     }
     // good start!
