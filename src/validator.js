@@ -1,12 +1,12 @@
 const Ajv = require('ajv');
+const schema = require('../definitions/core/llrp-1x0.schema.json');
 
 /**
  * Validator class
  * 
- * @param {object} schema a json schema of the LTK LLRP protocol
  * @param {object} options ajv options object
  */
-function Validator(schema, options = {}) {
+function Validator(options = {}) {
     if (!(this instanceof Validator)) return new Validator(...arguments);
 
     defaultOptions = {
@@ -15,6 +15,8 @@ function Validator(schema, options = {}) {
         useDefaults: false,
         allErrors: true
     };
+
+    this.schema = schema;
 
     this.opt = { ...defaultOptions, ...options };
     this.ajv = new Ajv(this.opt);
