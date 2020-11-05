@@ -44,6 +44,7 @@ Encoder.prototype.message = function (message) {
 
     let msgLength = this.mBuf.idx.byte;
     this.mBuf.idx.byte = 0;
+    this.mBuf.idx.bit = 0;
 
     this.mBuf.set_u16((1 << 10) | Number(def.typeNum));       // rsvd, version and type
 
@@ -54,7 +55,9 @@ Encoder.prototype.message = function (message) {
     // reset for next message
     this.mBuf.idx.byte = 0;
 
-    return this.mBuf.buffer.slice(0, msgLength);
+    let msgBuffer = Buffer.alloc(msgLength);
+    this.mBuf.buffer.copy(msgBuffer, 0, 0, msgLength);
+    return msgBuffer;
 };
 
 /**
