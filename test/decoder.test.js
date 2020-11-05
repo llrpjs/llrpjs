@@ -40,6 +40,16 @@ describe(`decoder.js`, ()=>{
             });
         });
 
+        describe(`BigInt`, ()=>{
+            it(`should return BigInt`, ()=>{
+                let d = new Decoder();
+                d.addBuffer(Buffer.from(`112210f47de98115`, 'hex'));
+
+                let fieldDef = paramDefByName.Uptime.body[0];
+                expect(d.field(fieldDef)).to.deep.equal({ Microseconds: 1234567890123456789n });
+            });
+        });
+
         describe(`formatted field`, ()=>{
             it(`should return hex string`, ()=>{
                 let d = new Decoder();
