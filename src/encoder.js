@@ -102,7 +102,7 @@ Encoder.prototype.parameter = function (parameter, defRef) {
     let name = defRef.type;
     let def = this.paramDefByName[name];
     let typeNum = Number(def.typeNum);
-
+    debug(`parameter - ${name}`);
     if (Array.isArray(parameter[name])) {
         let prevByte = this.mBuf.idx.byte;
         for (let i in parameter[name]) {
@@ -130,7 +130,7 @@ Encoder.prototype.parameter = function (parameter, defRef) {
     let prevBit = this.mBuf.idx.bit;
     if (typeNum > 127) {
         // TLV
-
+        debug(`TLV`);
         this.mBuf.idx.incByte = 4;                          // rsvd + type + length = 4 bytes
         this.definition.call(this, parameter[name], def);
 
@@ -154,6 +154,7 @@ Encoder.prototype.parameter = function (parameter, defRef) {
         this.mBuf.idx.bit = newBit;
     } else {
         // TV
+        debug(`TV`);
         this.mBuf.set_u8((1 << 7) | (0x7ff & typeNum));
         this.definition.call(this, parameter[name], def);
     }
@@ -175,6 +176,8 @@ Encoder.prototype.choice = function (element, defRef) {
     // Note: element is unfiltered, we need to iterate for all matches
     let choiceName = defRef.type;
     let choiceDef = this.choiceDefByName[choiceName];
+
+    debug(`choice - ${choiceName}`);
 
     let paramDefRefs = choiceDef.body.filter(dRef=>Object.keys(element).includes(dRef.type));
 
@@ -207,6 +210,8 @@ Encoder.prototype.field = function (obj, def) {
      * 3. calculate required buffer size
      * 4. encode it
      */
+    debug(`field - ${def.name}`);
+
     let prevByte = this.mBuf.idx.byte;
 
     let fieldValue = obj[def.name];
@@ -227,6 +232,7 @@ Encoder.prototype.field = function (obj, def) {
     let fieldOps = this._getFieldOps.call(this, def.type);
     if (!fieldOps) throw new Error(`no fieldOps for type ${def.type}`);
 
+    debug(`${def.type}`);
     fieldOps(fieldValue);   // write value to buffer
 
     // return for testing
