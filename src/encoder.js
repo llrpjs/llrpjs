@@ -118,7 +118,7 @@ Encoder.prototype.parameter = function (parameter, defRef) {
 
     if (isParamWrapper(def, defRef)) {
         // if the passed field isn't wrapped already, wrap it.
-        if (!parameter[name][name]) {
+        if (parameter[name][name] == undefined) {
             parameter = {
                 [name]: parameter
             }
