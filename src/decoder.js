@@ -14,7 +14,8 @@ function Decoder(options) {
             "u64": "iso-8601",
             "u96": "hex"
         },
-        wrapperParam: true
+        wrapperParam: true,
+        iso8601FullPrecision: false
     };
     this.opt = {...defaultOpt, ...options};
 
@@ -136,7 +137,10 @@ Decoder.prototype.field = function (def) {
 
     if (def.hasOwnProperty("format")) {
         let fieldFormatter = this._getFieldFormatter(def.type);
-        fieldValue = fieldFormatter(fieldValue, def.format);
+        if (def.format == "Datetime")
+            fieldValue = fieldFormatter(fieldValue, def.format, this.opt.iso8601FullPrecision);
+        else
+            fieldValue = fieldFormatter(fieldValue, def.format);
     }
     debug(`field: ${def.name} - ${def.type}`);
     result[def.name] = fieldValue;

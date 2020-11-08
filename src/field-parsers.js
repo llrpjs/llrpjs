@@ -1,4 +1,17 @@
 
+const ISO8601_REGEX_MICRO = /(?<=\.)\d{6}(?=Z)/;
+
+function parseIso8601Microseconds(timestamp) {
+    // seconds
+    let time = Math.floor(Date.parse(timestamp) / 1000);
+
+    const microseconds = parseInt(timestamp.match(ISO8601_REGEX_MICRO), 10);
+    if (isNaN(microseconds))
+        throw new Error(`cannot parse microseconds ${timestamp}`);
+
+    return BigInt(time * 1000000 + microseconds);
+}
+
 module.exports = {
     u1v: (value, format)=>{
         if (format == "Hex")
@@ -27,10 +40,10 @@ module.exports = {
         } else
             return value;
     },
-    u64: (value, format)=>{
+    u64: (value, format, fullPrecision)=>{
         if (format == "Datetime")
             // return microseconds
-            return BigInt(new Date(value)) * 1000n;
+            return fullPrecision? parseIso8601Microseconds(value): BigInt(new Date(value)) * 1000n;
         else
             return value;
     },

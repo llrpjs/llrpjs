@@ -14,7 +14,8 @@ function Encoder(options) {
             "u64": "iso-8601",
             "u96": "hex"
         },
-        bufSize : 128 * 1024                // default LTK buf size
+        bufSize : 128 * 1024,                // default LTK buf size
+        iso8601FullPrecision: false
     };
     this.opt = {...defaultOpt, ...options};
 
@@ -226,7 +227,10 @@ Encoder.prototype.field = function (obj, def) {
     }
     if (def.format) {
         let parser = this._getFieldParser(def.type);
-        fieldValue = parser(fieldValue, def.format);
+        if (def.format == 'Datetime')
+            fieldValue = parser(fieldValue, def.format, this.opt.iso8601FullPrecision);
+        else
+            fieldValue = parser(fieldValue, def.format);
     }
 
     let fieldOps = this._getFieldOps.call(this, def.type);
