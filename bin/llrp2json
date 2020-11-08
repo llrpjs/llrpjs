@@ -18,6 +18,12 @@ const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs=>{
         alias: 'o',
         description: 'path to output file',
         type: 'string'
+    })
+    .option('iso8601fp', {
+        alias: 'i',
+        description: 'enables datetime microsecond full precision (default: true)',
+        type: 'boolean',
+        default: true
     }).help().alias('help', 'h')
     .argv;
 
@@ -25,8 +31,9 @@ const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs=>{
 (()=>{
     let buf = fs.readFileSync(argv.input);
     let scanner = new Scanner();
-    let decoder = new Decoder();
-
+    let decoder = new Decoder({
+        iso8601FullPrecision: argv.iso8601fp
+    });
     scanner.add(buf);
 
     let result = [];
@@ -36,7 +43,7 @@ const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs=>{
             debug(msgBuf.toString('hex').match(/../g).join(' '));
             decoder.addBuffer(msgBuf);
             let msg = decoder.message(msgBuf);
-            debug(JSON.stringify(msg, bigIntFormatter, 2));
+            debug(JSONbig.stringify(msg, null, 2));
             result.push(msg);
             decoder.flushBuffer();
         }
@@ -52,9 +59,3 @@ const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs=>{
         console.log(jsonData);
     }
 })();
-
-function bigIntFormatter (key, value) {
-    return typeof value === 'bigint'
-            ? value.toString()
-            : value // return everything else unchanged
-}

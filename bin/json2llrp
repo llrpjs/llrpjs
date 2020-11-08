@@ -17,13 +17,23 @@ const argv = yargs.command('$0 <input>', 'convert llrp json to bin', yargs=>{
         alias: 'o',
         description: 'path to output binary file',
         type: 'string'
-    }).help().alias('help', 'h')
+    })
+    .option('iso8601fp', {
+        alias: 'i',
+        description: 'enables datetime microsecond full precision (default: true)',
+        type: 'boolean',
+        default: true
+    })
+    .help().alias('help', 'h')
     .argv;
 
 
 (()=>{
     let json = fs.readFileSync(argv.input, 'utf-8');
-    let encoder = new Encoder({bufSize: 8096*1024});           // to pass all dx101 tests (dx101_c requries very large buffer size for each message)
+    let encoder = new Encoder({
+        bufSize: 8192*1024,
+        iso8601FullPrecision: argv.iso8601fp
+    });           // to pass all dx101 tests (dx101_c requries very large buffer size for each message)
 
     json = JSONbig.parse(json);
 
