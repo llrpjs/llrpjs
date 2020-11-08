@@ -5,14 +5,14 @@ describe('field-formatters.js', ()=>{
     describe(`u1v`, ()=>{
         describe(`Hex`, ()=>{
             it(`should return hexstring`, ()=>{
-                let arr = [1, 0, 1, 0, 0, 1, 0, 1];
+                let arr = [0xa5];
                 let target = "a5";
                 expect(f.u1v(arr, "Hex")).to.satisfy(input=> input == target || input == target.toUpperCase());
             });
 
             it(`should return right-padded hexstring`, ()=>{
-                let arr = [1, 0, 1, 0, 0, 1];
-                let target = "a4";
+                let arr = [0x04];
+                let target = "04";
                 expect(f.u1v(arr, "Hex")).to.satisfy(input=> input == target || input == target.toUpperCase());
             });
         });

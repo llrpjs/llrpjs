@@ -3,6 +3,7 @@ const Encoder = require('../src/encoder');
 const {groupBy} = require('../src/tools');
 const llrpdef = require('../definitions/core/llrp-1x0-def.json');
 const Decoder = require('../src/decoder');
+const msgDefByName = groupBy(llrpdef.messageDefinitions, "name");
 const paramDefByName = groupBy(llrpdef.parameterDefinitions, "name");
 
 describe(`encoder.js`, ()=>{
@@ -81,6 +82,20 @@ describe(`encoder.js`, ()=>{
                 expect(e.parameter({ ConnectionCloseEvent : {} }, defRef))
                     .to.deep.equal(Buffer.from(`01010004`, 'hex'));        // Simplest TLV parameter: ConnectionCloseEvent
             });
+
+            it(`should return nested parameter`, ()=>{
+                let e = new Encoder();
+
+                let defRef = msgDefByName.RO_ACCESS_REPORT.body[0];
+                expect(e.parameter({
+                    "TagReportData": {
+                        "EPCData": {
+                            "EPC": "54"
+                        }
+                    }
+                }, defRef)).to.deep.equal(Buffer.from(`00f0000b00f10007000854`, `hex`));
+            });
+
         });
 
         describe(`wrapper`, ()=>{

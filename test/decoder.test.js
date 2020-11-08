@@ -3,6 +3,7 @@ const Decoder = require('../src/decoder');
 const MgBuf = require('../src/managed-buffer');
 const {groupBy} = require('../src/tools');
 const llrpdef = require('../definitions/core/llrp-1x0-def.json');
+const msgDefByName = groupBy(llrpdef.messageDefinitions, "name");
 const paramDefByName = groupBy(llrpdef.parameterDefinitions, "name");
 
 
@@ -106,6 +107,20 @@ describe(`decoder.js`, ()=>{
 
                 let paramDefRef = paramDefByName.ReaderEventNotificationData.body[11];
                 expect(d.parameter(paramDefRef)).to.deep.equal({ ConnectionCloseEvent: {} });
+            });
+
+            it(`should return nested parameter`, ()=>{
+                let d = new Decoder();
+                d.addBuffer(Buffer.from(`00f0000b00f10007000154`, `hex`));
+
+                let paramDefRef = msgDefByName.RO_ACCESS_REPORT.body[0];
+                expect(d.parameter(paramDefRef)).to.deep.equal({
+                    "TagReportData": {
+                        "EPCData": {
+                            "EPC": "54"
+                        }
+                    }
+                });
             });
         });
 

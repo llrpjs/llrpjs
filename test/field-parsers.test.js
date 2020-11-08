@@ -5,7 +5,7 @@ describe(`field-parsers.js`, ()=>{
     describe(`u1v`, ()=>{
         describe(`Hex`, ()=>{
             it(`should return bit array`, ()=>{
-                let target = [1, 0, 1, 0, 0, 1, 0, 1];
+                let target = [0xa5];
                 let hexString = "a5";
                 expect(p.u1v(hexString, "Hex")).to.deep.equal(target);
             });

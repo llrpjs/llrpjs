@@ -13,14 +13,7 @@ function parseIso8601Microseconds(timestamp) {
 }
 
 module.exports = {
-    u1v: (value, format)=>{
-        if (format == "Hex")
-            return value.length?
-                value.split('').map(x=>parseInt(x, 16).toString(2).padStart(4, 0)).join('').split('').map(x=>parseInt(x,2))
-                : [];
-        else
-            return value;
-    },
+    u1v: (value, format)=>{return module.exports.u8v(value, format);},
     utf8v: (value, format)=>{
         return value.toString('utf8');
     },

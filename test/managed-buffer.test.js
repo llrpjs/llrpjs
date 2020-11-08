@@ -244,8 +244,8 @@ describe('managed-buffer.js', ()=>{
                     ...u1v_value
                 ]));
                 expect(mBuf.get_u1v()).to.be.an('array').that.deep.equals([
-                    0,0,0,0,0,0,0,0,
-                    1,1,1,1,1,1,1,1
+                    0x00,
+                    0xff
                 ]);
 
             });
@@ -475,13 +475,13 @@ describe('managed-buffer.js', ()=>{
         describe('set_u1v', ()=>{
             it(`should write 16 bits`, ()=>{
                 let value = [
-                    0,0,0,0,0,0,0,0,
-                    1,1,1,1,1,1,1,1
+                    0x00,
+                    0xff
                 ];
                 let mBuf = new MgBuf(Buffer.alloc(BUFFER_SIZE));
                 mBuf.set_u1v(value);
                 expect(mBuf.buffer.readUInt16BE(0)).to.equal(16);
-                expect(mBuf.buffer.readUInt16BE(2)).to.equal(parseInt(value.join(''), 2));
+                expect(mBuf.buffer.readUInt16BE(2)).to.equal(255);
             })
         });
 

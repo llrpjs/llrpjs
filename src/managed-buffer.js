@@ -105,15 +105,17 @@ ManagedBuffer.prototype.get_u1 = function () {
     return result;
 };
 /**
- *  reads the number of bits from the first two bytes and reads off a series of bits accordingly
+ *  reads the number of bits from the first two bytes and reads off a series of payload bytes accordingly.
+ *  Note that if number of bits is below 8, the result will be an array containing one full byte.
  * 
- * @return {number[]}      returns array of 1s and 0s
+ * @return {number[]}      returns full-byte array
  */
 ManagedBuffer.prototype.get_u1v = function () {
     let bitCount = this.get_u16.call(this);
+    let byteCount = Math.floor((bitCount + 7)/ 8);
     let result = [];
-    for (let i=0; i < bitCount; i++)
-        result.push(this.get_u1.call(this));
+    for (let i=0; i < byteCount; i++)
+        result.push(this.get_u8.call(this));
     return result;
 }
 /**
@@ -395,10 +397,11 @@ ManagedBuffer.prototype.set_u2 = function (value) {
  * @return {!number}     returns the number of bits written
  */
 ManagedBuffer.prototype.set_u1v = function (value) {
-    let bitCount = value.length
+    let bitCount = value.length * 8;
+    let byteCount = Math.floor((bitCount + 7)/8);
     this.set_u16.call(this, bitCount);
-    for (let i=0; i<bitCount; i++)
-        this.set_u1.call(this, value[i]);
+    for (let i=0; i<byteCount; i++)
+        this.set_u8.call(this, value[i]);
     return bitCount;
 }
 /**

@@ -8,14 +8,7 @@ function formatIso8601Microseconds(microseconds) {
 }
 
 module.exports = {
-    u1v: (value, format)=>{
-        if (format == "Hex")
-            return value.length?
-                    value.reduce((acc, x, i)=>(i%8==0) && (i != 0)?`${acc},${x}`:`${acc}${x}`, '')
-                        .split(',').map(x=>parseInt(x.padEnd(8, 0), 2).toString(16).padStart(2, 0)).join('').toUpperCase() : "";
-        else
-            return value;
-    },
+    u1v: (value, format)=>{return module.exports.u8v(value, format);},
     utf8v: (value, format)=>{
         return value.toString('utf8');
     },
