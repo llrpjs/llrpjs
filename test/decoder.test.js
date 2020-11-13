@@ -71,16 +71,42 @@ describe(`decoder.js`, ()=>{
                 });
             });
         })
+
+        describe(`bytesToEnd`, ()=>{
+            it(`should return a hexstring`, ()=>{
+                let d = new Decoder();
+                d.addBuffer(Buffer.from(`08127583F85EAFE0815883A8A8`, `hex`));
+
+                let fieldDef = paramDefByName.Custom.body[2];
+                expect(d.field(fieldDef, 13)).to.deep.equal({
+                    "Data": "08127583F85EAFE0815883A8A8"
+                });
+            });
+        });
     });
 
     describe(`enumeration`, ()=>{
-        it(`should return enum`, ()=>{
-            let d = new Decoder();
-            d.addBuffer(Buffer.from(`02`, 'hex'));  //(Active state)
+        describe(`simple enum`, ()=>{
+            it(`should return enum`, ()=>{
+                let d = new Decoder();
+                d.addBuffer(Buffer.from(`02`, 'hex'));  //(Active state)
 
-            // test CurrentState
-            let fieldDef = paramDefByName.ROSpec.body[2];
-            expect(d.field(fieldDef)).to.deep.equal({ CurrentState: "Active" });
+                // test CurrentState
+                let fieldDef = paramDefByName.ROSpec.body[2];
+                expect(d.field(fieldDef)).to.deep.equal({ CurrentState: "Active" });
+            });
+        });
+
+        describe(`vector enum`, ()=>{
+            it(`should return array of enum`, ()=>{
+                let d = new Decoder();
+                d.addBuffer(Buffer.from(`00020001`, `hex`));
+                let fieldDef = paramDefByName.PerAntennaAirProtocol.body[1];
+
+                expect(d.field(fieldDef)).to.deep.equal({
+                    "ProtocolID": [ "Unspecified", "EPCGlobalClass1Gen2" ]
+                });
+            });
         });
     });
 
@@ -91,8 +117,7 @@ describe(`decoder.js`, ()=>{
                 // [1] [0001000] [1010 1011 1100 1101]
                 d.addBuffer(Buffer.from(`88abcd`, `hex`));        // random example (TagSeenCount)
 
-                let paramDefRef = paramDefByName.TagReportData.body[11];
-                expect(d.parameter(paramDefRef)).to.deep.equal({
+                expect(d.parameter().body).to.deep.equal({
                     TagSeenCount: {
                         TagCount: 0xabcd
                     }
@@ -105,16 +130,14 @@ describe(`decoder.js`, ()=>{
                 let d = new Decoder();
                 d.addBuffer(Buffer.from(`01010004`, 'hex'));        // Simplest TLV parameter: ConnectionCloseEvent
 
-                let paramDefRef = paramDefByName.ReaderEventNotificationData.body[11];
-                expect(d.parameter(paramDefRef)).to.deep.equal({ ConnectionCloseEvent: {} });
+                expect(d.parameter().body).to.deep.equal({ ConnectionCloseEvent: {} });
             });
 
             it(`should return nested parameter`, ()=>{
                 let d = new Decoder();
                 d.addBuffer(Buffer.from(`00f0000b00f10007000154`, `hex`));
 
-                let paramDefRef = msgDefByName.RO_ACCESS_REPORT.body[0];
-                expect(d.parameter(paramDefRef)).to.deep.equal({
+                expect(d.parameter().body).to.deep.equal({
                     "TagReportData": {
                         "EPCData": {
                             "EPC": "54"
@@ -129,8 +152,7 @@ describe(`decoder.js`, ()=>{
                 let d = new Decoder({wrapperParam: true});
                 d.addBuffer(Buffer.from(`91abcd`, 'hex'));        // wrapped parameter
 
-                let paramDefRef = paramDefByName.ReaderExceptionEvent.body[6];
-                expect(d.parameter(paramDefRef)).to.deep.equal({
+                expect(d.parameter().body).to.deep.equal({
                     OpSpecID: {
                         OpSpecID: 0xabcd
                     }
@@ -141,8 +163,7 @@ describe(`decoder.js`, ()=>{
                 let d = new Decoder({wrapperParam: false});
                 d.addBuffer(Buffer.from(`91abcd`, 'hex'));        // wrapped parameter
 
-                let paramDefRef = paramDefByName.ReaderExceptionEvent.body[6];
-                expect(d.parameter(paramDefRef)).to.deep.equal({ OpSpecID: 0xabcd });
+                expect(d.parameter().body).to.deep.equal({ OpSpecID: 0xabcd });
             });
         });
     });
@@ -152,11 +173,67 @@ describe(`decoder.js`, ()=>{
             let d = new Decoder();
             d.addBuffer(Buffer.from(`0081000c1234567890abcdef`, 'hex'));
 
-            let choiceDefRef = paramDefByName.FrequencyRSSILevelEntry.body[4];
-            expect(d.choice(choiceDefRef)).to.deep.equal({
+            expect(d.parameter().body).to.deep.equal({
                 Uptime: {
                     Microseconds: 0x1234567890abcdefn
                 }
+            });
+        });
+
+        it(`should return multiple parameters`, ()=>{
+            let d = new Decoder();
+            d.addBuffer(Buffer.concat([
+                    Buffer.from(`000000010000`, `hex`),
+                    Buffer.from(`00bb001b734e064df86722c4811800bc000d01eaaaf69d6ad84375`, `hex`),
+                    Buffer.from(`00b7001800011e0200b800090021ad2c9b00ba0007000101`, 'hex'),
+                    Buffer.from(`00b700180001f62f00b80009001bfac6c400ba0007000101`, 'hex')
+            ]));
+
+            expect(d.body({
+                def: paramDefByName.ROSpec,
+                length: d.mBuf.buffer.length
+            })).to.deep.equal({
+                "ROSpecID": 1,
+                "Priority": 0,
+                "CurrentState": "Disabled",
+                "RFSurveySpec": {
+                    "AntennaID": 29518,
+                    "StartFrequency": 105773159,
+                    "EndFrequency": 583303448,
+                    "RFSurveySpecStopTrigger": {
+                      "StopTriggerType": "Duration",
+                      "DurationPeriod": 3937072797,
+                      "N": 1792557941
+                    }
+                },
+                "AISpec": [
+                    {
+                      "AntennaIDs": [
+                        7682
+                      ],
+                      "AISpecStopTrigger": {
+                        "AISpecStopTriggerType": "Null",
+                        "DurationTrigger": 564997275
+                      },
+                      "InventoryParameterSpec": {
+                        "InventoryParameterSpecID": 1,
+                        "ProtocolID": "EPCGlobalClass1Gen2"
+                      }
+                    },
+                    {
+                        "AntennaIDs": [
+                          63023
+                        ],
+                        "AISpecStopTrigger": {
+                          "AISpecStopTriggerType": "Null",
+                          "DurationTrigger": 469419716
+                        },
+                        "InventoryParameterSpec": {
+                          "InventoryParameterSpecID": 1,
+                          "ProtocolID": "EPCGlobalClass1Gen2"
+                        }
+                    }
+                  ]
             });
         });
     });

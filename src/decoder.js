@@ -1,8 +1,7 @@
 const debug = require('debug')('llrpjs:decoder');
 const MgBuf = require('./managed-buffer');
 const formatters = require('./field-formatters');
-const {isEmpty, groupBy,
-    groupByFirstKey, isParamWrapper} = require('./tools');
+const {groupBy, isParamWrapper, merge} = require('./tools');
 
 const llrpdef = require('../definitions/core/llrp-1x0-def.json');
 
@@ -41,17 +40,23 @@ Decoder.prototype.flushBuffer = function (buf) {
     return 0;
 }
 
-/**
- * 1) read the message header and extract type
- * 2) get the definition from type
- * 3) iterate through the fields, parameters, choices, etcs
- * 4) for fields and enumurations, just read them from buffer and return their values
- * 5) in parameters and choices, get their definitions and iterate through their content similarly
- */
 
 Decoder.prototype.message = function () {
-    let msg = {};
+    let header = this.header.call(this);
 
+    debug(`msgType: ${header.def.name} - msgLen ${header.length}`);
+
+    //TODO: custom message: check if we have a definition for it, if not use the generic one
+    let body = this.body.call(this, header);
+    debug('finished');
+    return {
+        MessageID: header.msgID,
+        MessageType: header.def.name,
+        MessageBody: body
+    };
+}
+
+Decoder.prototype.header = function () {
     let typeNum = this.mBuf.get_u16();
     let version = (typeNum >>> 10) & 0x03;
     typeNum &= 0x3ff;
@@ -68,71 +73,93 @@ Decoder.prototype.message = function () {
 
     let def = this.msgDefByTypeNum[typeNum];
     if (!def)
-        throw new Error(`unknown type`);
+        throw new Error(`unknown message type ${typeNum}`);
 
-    msg["MessageType"] = def["name"];
     let messageID = this.mBuf.get_u32();
-    msg["MessageID"] = messageID;
-    debug(`msgType: ${msg['MessageType']} - msgLen ${length}`);
 
-    let body;
-    //TODO: custom message: check if we have a definition for it, if not use the generic one
-    body = this.definition.call(this, def.body);
-    msg["MessageBody"] = body;
-    debug('finished');
-    return msg;
+    return {
+        def: def,
+        msgID: messageID,
+        length: length - 10
+    };
 }
 
-Decoder.prototype.definition = function (def) {
-    let body = {}
-    for (let i in def) {
-        if (!this.mBuf.idx.bitsLeft)
-            break;
-        let defRef = def[i];
-        let node = defRef.node;
-        let decoder = this._getPropertyDecoder.call(this, node);
-        let result = {};
-        debug(node);
-        if (["parameter", "choice"].includes(node)) {
-            let resArray = [];
-            let repeat = defRef.repeat;
-            while (true) {
-                if (this.mBuf.idx.bitsLeft < 8)
-                    break;
-
-                let resItem = decoder.call(this, defRef);
-
-                if (isEmpty(resItem))
-                    break;
-                resArray.push(resItem);
-
-                if (repeat.endsWith("1"))   // max one occurence allowed
-                    break;
-            }
-            result = groupByFirstKey(resArray);
-        } else {
-            result = decoder.call(this, defRef);
+Decoder.prototype.paramHeader = function () {
+    let type = this.mBuf.get_u8();
+    let length = 0;
+    if (type & 0x80) {
+        // TV ... contains all fields no worries!
+        type &= 0x7f;
+    } else {
+        // TLV
+        type = ((type & 0x03) << 8) + this.mBuf.get_u8();
+        length = this.mBuf.get_u16();
+        if (length < 4) {
+            throw new Error(`TLV parameter length is too short ${length}`);
         }
-
-        body = {...body, ...result};
     }
-    return body;
+    // find param definition
+    let def = this.paramDefByTypeNum[type.toString()];
+    if (def == undefined) throw new Error(`unknown parameter type ${type}`);
+    debug(`typeNum ${type} - name ${def.name} - paramLen ${length}`);
+
+    return {
+        def: def,
+        length: length?length - 4:0
+    };
 }
 
-Decoder.prototype.field = function (def) {
+Decoder.prototype.body = function (header) {
+    let result = {};
+    let def = header.def;
+    let start = this.mBuf.idx.byte;
+
+    // check if we have fields/enums/reserved
+    for (let simpleDef of def.body.filter(defItem=>["field", "reserved"].includes(defItem.node))) {
+        let decoder = this._getPropertyDecoder(simpleDef.node);
+        result = {...result ,...decoder.call(this, simpleDef, start + header.length)};
+    }
+
+    // sub-parameters prospection
+    debug(`${this.mBuf.idx.byte} - ${start + header.length}`);
+    while (this.mBuf.idx.byte < start + header.length) {
+        let subParam = this.parameter.call(this);
+        // is sub-parameter allowed in this result according to the parent definition?
+        this._isParamAllowed.call(this, subParam.header.def.name, def, result);
+        // if we already have an instance, make it an array and push the new one
+        result = merge(result, subParam.body);
+    }
+    return result;
+}
+
+Decoder.prototype.parameter = function () {
+    let paramHeader = this.paramHeader.call(this);
+    let name = paramHeader.def.name;
+    debug(`parameter - ${name}`);
+
+    if (isParamWrapper(paramHeader.def) && (!this.opt.wrapperParam)) {
+        // This parameter is a wrapper to a field, return the field directly
+        return {
+            name: name,
+            body: this.body.call(this, paramHeader)
+        };
+    }
+
+    return {
+        header: paramHeader,
+        body: {
+            [name]: this.body.call(this, paramHeader)
+        }
+    };
+}
+
+Decoder.prototype.field = function (def, end=0) {
     let fieldOps = this._getFieldOps.call(this, def.type);
     if (!fieldOps) throw new Error(`no fieldOps for type ${def.type}`);
     let result = {};
-    let fieldValue = fieldOps();
+    let fieldValue = fieldOps(end);
     if (def.enumeration) {
-        // process enum
-        let enumDef = this.enumDefByName[def.enumeration];
-        if (!enumDef)
-            throw new Error(`unknown enum ${def.enumeration}`);
-        let enumDefByValue = groupBy(enumDef.entry, "value");
-        if (!enumDefByValue[fieldValue])
-            throw new Error(`unknown ${def.enumeration} enum entry ${fieldValue}`);
-        fieldValue = enumDefByValue[fieldValue].name;
+        fieldValue = this.enumeration.call(this, def, fieldValue);
     }
 
     if (def.hasOwnProperty("format")) {
@@ -147,75 +174,6 @@ Decoder.prototype.field = function (def) {
     return result;
 }
 
-Decoder.prototype.parameter = function (defRef) {
-    let repeat = defRef.repeat;
-    let startBit = this.mBuf.idx.bit;
-    let startByte = this.mBuf.idx.byte;
-    let type = this.mBuf.get_u8();
-    let length = 0;
-    if (type & 0x80) {
-        // TV ... contains all fields no worries!
-        type &= 0x7f;
-    } else {
-        // TLV
-        type = ((type & 0x03) << 8) + this.mBuf.get_u8();
-        length = this.mBuf.get_u16();
-        if (length < 4) {
-            throw new Error(`TLV parameter length is too short ${length}`);
-        }
-    }
-    let def = this.paramDefByName[defRef.type]
-
-    debug(`paramType ${defRef.type} - paramLen ${length}`);
-
-    if (def.typeNum != type) {
-        this.mBuf.idx.bit = startBit;
-        this.mBuf.idx.byte = startByte;
-        return {};
-    }
-
-    if (isParamWrapper(def, defRef) && (!this.opt.wrapperParam)) {
-        return this.definition.call(this, def.body);
-    }
-
-    return { 
-        [def.name]: this.definition.call(this, def.body)
-    };
-}
-
-Decoder.prototype.choice = function (defRef) {
-    // replace choice defRef with parameter defRef
-    let startBit = this.mBuf.idx.bit;
-    let startByte = this.mBuf.idx.byte;
-    let type = this.mBuf.get_u8();
-    let length = 0;
-    if (type & 0x80) {
-        // TV ... contains all fields no worries!
-        type &= 0x7f;
-    } else {
-        // TLV
-        type = ((type & 0x03) << 8) + this.mBuf.get_u8();
-    }
-    this.mBuf.idx.bit = startBit;
-    this.mBuf.idx.byte = startByte;
-    let paramDef = this.paramDefByTypeNum[type];
-    if (!paramDef) {
-        // well, that's probably not a parameter then
-        return {};
-    }
-    let choiceDef = this.choiceDefByName[defRef.type];
-    // check if it's really one of our parameters in the buffer
-    if (!choiceDef.body.filter(x=>x.type == paramDef.name).length) {
-        return {};
-    }
-
-    return this.parameter.call(this, {
-        node: "parameter",
-        type: paramDef.name,
-        repeat: defRef.repeat
-    });
-}
-
 Decoder.prototype.reserved = function(def) {
     this.mBuf.get_reserved(Number(def.bitCount));
     return {};
@@ -225,7 +183,6 @@ Decoder.prototype._getPropertyDecoder = function (node) {
     return {
         "field": this.field.bind(this),
         "parameter": this.parameter.bind(this),
-        "choice": this.choice.bind(this),
         "reserved": this.reserved.bind(this)
     }[node] || (()=>{throw new Error(`no decoder for node ${node}`)});
 }
@@ -267,6 +224,67 @@ Decoder.prototype._getFieldOps = function (type) {
 
 Decoder.prototype._getFieldFormatter = function(type) {
     return formatters[type] || formatters.nop;
+}
+
+Decoder.prototype._isParamAllowed = function (name, def, result) {
+    let defRef = def.body.filter(dRef=>dRef.type==name)[0];
+    if (!defRef) {
+        // either it's a choice, or an unexpected type
+        let choiceDefRef = def.body.filter(dRef=>{
+            if (dRef.node != "choice") return false;
+            let choiceDef = this.choiceDefByName[dRef.type];
+            return choiceDef.body.filter(dRef=>dRef.type==name)[0]?true: false;
+        })[0];
+
+        if (!choiceDefRef) throw new Error(`unexpected type ${name} - no reference found in ${def.name}`);
+        let repeat = choiceDefRef.repeat;
+        let choiceDef = this.choiceDefByName[choiceDefRef.type];
+        let choiceParamList = choiceDef.body.map(dRef=>dRef.type);
+        let existingParamList = choiceParamList.filter(paramName=>result.hasOwnProperty(paramName));
+
+        if (repeat.endsWith("1") && (existingParamList.length > 0)) {
+            // (1) or (0-1) only one instance allowed
+            throw new Error(`type ${name} is allowed only once in ${def.name}, one choice already exists`);
+        }
+    } else {
+        let repeat = defRef.repeat;
+        if (repeat.endsWith("1") && result.hasOwnProperty(name)) {
+            // (1) or (0-1) only one instance allowed
+            throw new Error(`type ${name} is allowed only once in ${def.name}`);
+        }
+    }
+    return;
+}
+
+Decoder.prototype._resolveChoiceReferences = function (def) {
+    return {
+        ...def,
+        body: def.body.reduce((acc, defRef)=>{
+                if(defRef.node == "field") return acc;
+                if(defRef.node == "choice") {
+                    let resBody = this.choiceDefByName[defRef.type].body.map(_defRef=>{
+                        _defRef.repeat = defRef.repeat;
+                        return _defRef;
+                    });
+                    return acc?[...acc, ...resBody]:resBody;
+                } else {
+                    return acc?[...acc, defRef]: [];
+                }
+            }, [])
+        };
+}
+
+Decoder.prototype.enumeration = function (def, data) {
+    // process enum
+    if (Array.isArray(data)) {
+        return data.map(d=>{ return this.enumeration.call(this, def, d); });
+    }
+    debug(`enum - ${data}`);
+    let enumDef = this.enumDefByName[def.enumeration];
+    let entry = enumDef.entry.filter(entry=>entry.value == data)[0];
+    if (entry == undefined)
+        throw new Error(`unexpected enum entry ${fieldValue} for field ${def.name}`);
+    return entry.name;
 }
 
 module.exports = Decoder;
