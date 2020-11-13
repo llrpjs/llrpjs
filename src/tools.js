@@ -85,11 +85,9 @@ function groupByFirstKey (array) {
  * @returns {boolean}       return true or false
  */
 
-function isParamWrapper(def, defRef) {
-    if (defRef.repeat.startsWith("0")) {    // optional
-        if (def.body.length == 1) {
-            if (def.name == def.body[0].name) return true;
-        }
+ function isParamWrapper (def) {
+    if (def.body.length == 1) {
+        if (def.name == def.body[0].name) return true;
     }
     return false;
 }
