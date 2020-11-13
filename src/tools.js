@@ -106,4 +106,27 @@ function filter(obj, key) {
         .reduce((o, k)=>{o[k] = obj[k]; return o;}, {});
 }
 
-module.exports = {isEmpty, groupBy, groupByFirstKey, isParamWrapper, filter};
+/**
+ * Merge two objects without over-writing values of the keys in common
+ * 
+ * @param {object} target the resulting object
+ * @param {object} source the source object to be merged
+ */
+
+function merge (target, source) {
+    for (let key in source ) {
+        if (target.hasOwnProperty(key)) {
+            if (Array.isArray(target[key])) {
+                target[key].push(source[key]);
+            } else {
+                target[key] = [ target[key], source[key] ];
+            }
+        } else {
+            target[key] = source[key];
+        }
+    }
+    return target;
+}
+
+
+module.exports = {isEmpty, groupBy, groupByFirstKey, isParamWrapper, filter, merge};
