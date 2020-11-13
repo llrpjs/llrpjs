@@ -155,7 +155,6 @@ ManagedBuffer.prototype.get_s8 = function () {
  * @return {number[]}      returns an array of unsigned bytes
  */
 ManagedBuffer.prototype.get_u8v = function () {
-    assertAvail(this.idx, 0, 2);
     let byteCount = this.get_u16.call(this);
     let result = [];
     for (let i=0; i < byteCount; i++)
@@ -168,7 +167,6 @@ ManagedBuffer.prototype.get_u8v = function () {
  * @return {number[]}      returns an array of signed bytes
  */
 ManagedBuffer.prototype.get_s8v = function () {
-    assertAvail(this.idx, 0, 2);
     let byteCount = this.get_u16.call(this);
     let result = [];
     for (let i=0; i < byteCount; i++)
