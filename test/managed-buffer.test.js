@@ -334,7 +334,7 @@ describe('managed-buffer.js', ()=>{
                 let mBuf = new MgBuf(Buffer.from([
                     ...bytesToEnd_value
                 ]));
-                expect(mBuf.get_bytesToEnd()).to.be.an('array').that
+                expect(mBuf.get_bytesToEnd(mBuf.buffer.length)).to.be.an('array').that
                     .deep.equals(bytesToEnd_value);
             })
         });

@@ -342,9 +342,9 @@ ManagedBuffer.prototype.get_u96 = function () {
  * 
  * @return {number[]}     returns a byte array
  */
-ManagedBuffer.prototype.get_bytesToEnd = function () {
+ManagedBuffer.prototype.get_bytesToEnd = function (end) {
     let result = [];
-    let byteCount = this.idx.bytesLeft;
+    let byteCount = end - this.idx.byte;
     for (let i=0; i < byteCount; i++)
         result.push(this.get_u8.call(this));
     return result;
