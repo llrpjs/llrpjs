@@ -6,6 +6,10 @@ const parsers = require('./field-parsers');
 
 const llrpdef = require('../definitions/core/llrp-1x0-def.json');
 
+const MSG_HEADER_SIZE = 10;
+const TLV_HEADER_SIZE = 4;
+const TV_HEADER_SIZE = 1;
+
 function Encoder(options) {
     if (!(this instanceof Encoder)) return new Encoder(...arguments);
 
@@ -27,6 +31,7 @@ function Encoder(options) {
     this.enumDefByName = groupBy(llrpdef.enumerationDefinitions, "name");
 
     this.mBuf = new MgBuf(Buffer.alloc(this.opt.bufSize));
+    this._consumed = [];
 };
 
 /**
@@ -40,18 +45,14 @@ Encoder.prototype.message = function (message) {
     if (!def)
         throw new Error(`unknown message type ${message.MessageType}`);
 
-    this.mBuf.idx.incByte = 10;                         // jump to payload (body) location
-    this.definition.call(this, message.MessageBody, def);     // process body content and fill the buffer
+    this.mBuf.idx.incByte = MSG_HEADER_SIZE;                         // jump to payload (body) location
+    this.body.call(this, def, message.MessageBody);     // process body content and fill the buffer
 
     let msgLength = this.mBuf.idx.byte;
     this.mBuf.idx.byte = 0;
     this.mBuf.idx.bit = 0;
 
-    this.mBuf.set_u16((1 << 10) | Number(def.typeNum));       // rsvd, version and type
-
-    this.mBuf.set_u32(msgLength);
-
-    this.mBuf.set_u32(Number(message.MessageID));
+    this.header.call(this, Number(def.typeNum), Number(message.MessageID), msgLength);
 
     // reset for next message
     this.mBuf.idx.byte = 0;
@@ -61,34 +62,44 @@ Encoder.prototype.message = function (message) {
     return msgBuffer;
 };
 
-/**
- * 
- * @param {!object} element 
- * @param {!object} def 
- */
+Encoder.prototype.header = function (typeNum, msgId, length) {
+    this.mBuf.set_u16((1 << 10) | typeNum);       // rsvd, version and type
 
-Encoder.prototype.definition = function (element, def) {
-    for (let i in def.body) {
-        let defRef = def.body[i];
-        let node = defRef.node;
-        let encoder = this._getPropertyEncoder.call(this, node);
-        if (node == "choice") {
-            // needs further processing to filter the target attribute, let the choice encoder decide;
-            encoder.call(this, element, defRef);
-        } else if (node == "parameter") {
-            let name = defRef.type;
-            let filtered = filter(element, name);
-            if (isEmpty(filtered)) continue;        // optional parameter
-            encoder.call(this, filtered, defRef);
-        } else if (node == "field") {
-            let name = defRef.name;
-            let filtered = filter(element, name);
-            encoder.call(this, filtered, defRef);
-        } else if (node == "reserved") {
-            encoder.call(this, defRef);
-        }
+    this.mBuf.set_u32(length);
+
+    this.mBuf.set_u32(msgId);
+
+    return this.mBuf.buffer;
+}
+
+Encoder.prototype.body = function (def, data) {
+    let prevByte = this.mBuf.idx.byte;
+    for (let defRef of def.body) {
+        let encoder = this._getPropertyEncoder(defRef.node);
+        encoder.call(this, defRef, data, def);
     }
-    return;
+    let newByte = this.mBuf.idx.byte;
+    return this.mBuf.buffer.slice(prevByte, newByte);
+}
+
+Encoder.prototype.paramHeader = function (typeNum, length) {
+    // preserve location
+    let prevByte = this.mBuf.idx.byte;
+    if (typeNum > 127) {
+        // TLV
+        debug(`TLV`);
+        this.mBuf.set_u16(0x3ff & typeNum);
+        if (length > 65535) {
+            throw new Error(`parameter payload buffer is too large`);
+        }
+        this.mBuf.set_u16(length);
+    } else {
+        // TV
+        debug(`TV`);
+        this.mBuf.set_u8((1 << 7) | (0x7ff & typeNum));
+    }
+    let newByte = this.mBuf.idx.byte;
+    return this.mBuf.buffer.slice(prevByte, newByte);
 }
 
 /**
@@ -99,68 +110,70 @@ Encoder.prototype.definition = function (element, def) {
  * @param {!object} parameter    parameter object
  * @param {!object} defRef       the parameter's definition reference object
  */
-Encoder.prototype.parameter = function (parameter, defRef) {
+Encoder.prototype.parameter = function (defRef, data) {
     let name = defRef.type;
+    let repeat = defRef.repeat;
     let def = this.paramDefByName[name];
     let typeNum = Number(def.typeNum);
+    let value = data[name];
+
+    if (this._consumed.includes(value)) {
+        debug(`already encoded - ${name}`);
+        return Buffer.alloc(0);
+    }
+
+
     debug(`parameter - ${name}`);
-    if (Array.isArray(parameter[name])) {
+
+    // check if parameter satisfies the reference
+    if (value == undefined) {
+        // not found, is it required anyway?!
+        if (repeat.startsWith("0")) {
+            debug(`optional parameter ${name} not found`);
+            return Buffer.alloc(0);
+        }
+        else throw new Error(`missing parameter ${name} - required ${repeat} times in ${def.name}`);
+    }
+
+    // if we have multiple instances, iterate them
+    if (Array.isArray(value)) {
         let prevByte = this.mBuf.idx.byte;
-        for (let i in parameter[name]) {
-            let subElement = parameter[name][i];
-            this.parameter.call(this, {
+        for (let subElement of value) {
+            this.parameter.call(this, defRef, {
                 [name]: subElement
-            }, defRef);
-            
+            });
         }
         let newByte = this.mBuf.idx.byte;
         return this.mBuf.buffer.slice(prevByte, newByte);
     }
 
-    if (isParamWrapper(def, defRef)) {
+    // is this a wrapped field? get it to form
+    if (isParamWrapper(def)) {
         // if the passed field isn't wrapped already, wrap it.
-        if (parameter[name][name] == undefined) {
-            parameter = {
-                [name]: parameter
+        if (value[name] == undefined) {
+            value = {
+                [name]: value
             }
         }
     }
 
     // preserve location
     let prevByte = this.mBuf.idx.byte;
-    let prevBit = this.mBuf.idx.bit;
-    if (typeNum > 127) {
-        // TLV
-        debug(`TLV`);
-        this.mBuf.idx.incByte = 4;                          // rsvd + type + length = 4 bytes
-        this.definition.call(this, parameter[name], def);
-
-        // preserve new location
-        let newByte = this.mBuf.idx.byte;
-        let newBit = this.mBuf.idx.bit;
-
-        // got back to param header and write rsvd, type, and length
-        this.mBuf.idx.byte = prevByte;
-        this.mBuf.idx.bit = prevBit;
-        this.mBuf.set_u16(0x3ff & typeNum);
-
-        let length = newByte - prevByte;
-        if (length > 65535) {
-            throw new Error(`parameter payload buffer is too large`);
-        }
-        this.mBuf.set_u16(length);
-
-        // restore the new location
-        this.mBuf.idx.byte = newByte;
-        this.mBuf.idx.bit = newBit;
-    } else {
-        // TV
-        debug(`TV`);
-        this.mBuf.set_u8((1 << 7) | (0x7ff & typeNum));
-        this.definition.call(this, parameter[name], def);
-    }
-
+    // encode payload
+    this.mBuf.idx.incByte = typeNum > 127? TLV_HEADER_SIZE: TV_HEADER_SIZE;
+    this.body.call(this, def, value);
     let newByte = this.mBuf.idx.byte;
+    // prepare to write header
+    let length = newByte - prevByte;
+    this.mBuf.idx.byte = prevByte;
+    // write header
+    this.paramHeader.call(this, typeNum, length);
+    // restore index
+    this.mBuf.idx.byte = newByte;
+
+    // to avoid duplicated Custom parameter encodings
+    this._consumed.push(data[defRef.type]);
+
     return this.mBuf.buffer.slice(prevByte, newByte);
 };
 
@@ -173,27 +186,38 @@ Encoder.prototype.parameter = function (parameter, defRef) {
  * @returns {Buffer}                llrp buffer
  */
 
-Encoder.prototype.choice = function (element, defRef) {
+Encoder.prototype.choice = function (defRef, data, parentDef) {
     // Note: element is unfiltered, we need to iterate for all matches
     let choiceName = defRef.type;
     let choiceDef = this.choiceDefByName[choiceName];
+    let repeat = defRef.repeat;
+    let parentParamTypes = parentDef?parentDef.body.filter(dRef=>dRef.node =="parameter")
+        .map(dRef=>dRef.type):[];
 
     debug(`choice - ${choiceName}`);
 
-    let paramDefRefs = choiceDef.body.filter(dRef=>Object.keys(element).includes(dRef.type));
-
-    let prevByte = this.mBuf.idx.byte;
-    for (let i in paramDefRefs) {
-        let name = paramDefRefs[i].type;
-        let filtered = filter(element, name);
-        this.parameter.call(this, filtered, {
-            node: "parameter",
-            type: name,
-            repeat: defRef.repeat
-        });  // { AISpec: [] }
+    let paramDefRefList = choiceDef.body.filter(dRef=>(dRef.type in data) && !parentParamTypes.includes(dRef.type));
+    if (paramDefRefList.length < 1) {
+        // no parameter of this choice found in our data, is this required anyway?
+        if (repeat.startsWith("0")) {
+            debug(`optional choice ${choiceName} not found`);
+            return Buffer.alloc(0);
+        }
+        else throw new Error(`missing parameter(s) of required choice ${name}`);
+    } else if (paramDefRefList.length > 1) {
+        if (!repeat.endsWith("N")) throw new Error(`only one choice instance is allowed, passed: ${paramDefRefList.map(ref=>ref.type)}`);
     }
-    let newByte = this.mBuf.idx.byte;
 
+    // iterate in parameter references in this choice
+    let prevByte = this.mBuf.idx.byte;
+    for (let _defRef of paramDefRefList) {
+        this.parameter.call(this, {
+            ..._defRef,
+            repeat: "0-N"
+        }, data);
+    }
+
+    let newByte = this.mBuf.idx.byte;
     return this.mBuf.buffer.slice(prevByte, newByte);
 }
 
@@ -204,7 +228,7 @@ Encoder.prototype.choice = function (element, defRef) {
  * @param {!object} def                     field definition object
  * @returns {!Buffer}                       buffer with llrp field
  */
-Encoder.prototype.field = function (obj, def) {
+Encoder.prototype.field = function (def, data) {
     /**
      * 1. is this an enum? if yes, translate it
      * 2. is this a formatted field? if yes, parse it
@@ -212,18 +236,13 @@ Encoder.prototype.field = function (obj, def) {
      * 4. encode it
      */
     debug(`field - ${def.name}`);
-
     let prevByte = this.mBuf.idx.byte;
 
-    let fieldValue = obj[def.name];
+    let fieldValue = data[def.name];
+    if (fieldValue == undefined) throw new Error(`missing field ${def.name}`);
+
     if (def.enumeration) {
-        let enumDef = this.enumDefByName[def.enumeration];
-        if (!enumDef)
-            throw new Error(`unknown enum ${def.enumeration}`);
-        let enumDefByName = groupBy(enumDef.entry, "name");
-        if (!enumDefByName[fieldValue])
-            throw new Error(`unknown ${def.enumeration} enum entry ${fieldValue}`);
-        fieldValue = enumDefByName[fieldValue].value;
+        fieldValue = this.enumeration.call(this, def, fieldValue);
     }
     if (def.format) {
         let parser = this._getFieldParser(def.type);
@@ -243,6 +262,17 @@ Encoder.prototype.field = function (obj, def) {
     let newByte = this.mBuf.idx.byte;
     return this.mBuf.buffer.slice(prevByte, newByte);
 };
+
+Encoder.prototype.enumeration = function (def, data) {
+    if (Array.isArray(data)) {
+        return data.map(d=>{ return this.enumeration.call(this, def, d) });
+    }
+    let enumDef = this.enumDefByName[def.enumeration];
+    let entry = enumDef.entry.filter(entry=>(entry.name == data) || (entry.value == data))[0];
+    if (entry == undefined)
+        throw new Error(`unexpected enum entry name ${data} for field ${def.name}`);
+    return Number(entry.value);
+}
 
 /**
  * Takes "reserved" definition object and writes reserved (zero) bits to buffer
