@@ -8,8 +8,8 @@ export class LLRPLinkable<P> extends MixinAny(
     (base: AnyConstructor) =>
         class LLRPLinkable extends base {
             parent: any;
-            prev: LLRPLinkable;
-            next: LLRPLinkable;
+            prev: LLRPLinkable | null;
+            next: LLRPLinkable | null;
 
             setParent(p: this['parent']): this {
                 this.parent = p;
@@ -20,21 +20,21 @@ export class LLRPLinkable<P> extends MixinAny(
                 return this.parent;
             }
 
-            setPrev(v: LLRPLinkable): LLRPLinkable {
+            setPrev(v: this['prev']): this {
                 this.prev = v;
                 return this;
             }
 
-            getPrev(): LLRPLinkable {
+            getPrev(): this['prev'] {
                 return this.prev;
             }
 
-            setNext(v: LLRPLinkable): LLRPLinkable {
+            setNext(v: this['next']): this {
                 this.next = v;
                 return this;
             }
 
-            getNext(): LLRPLinkable {
+            getNext(): this['next'] {
                 return this.next;
             }
         }

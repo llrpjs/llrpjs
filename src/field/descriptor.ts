@@ -58,6 +58,13 @@ export class LLRPFieldDescriptor extends Mixin(
                 return this.fd.format as GetFieldFormat<this['FT']>;
             }
 
+            isType(type: LLRPFieldType | LLRPFieldType[]): boolean {
+                if (Array.isArray(type)) {
+                    return type.includes(this.fd.type);
+                }
+                return this.fd.type == type;
+            }
+
             get isVectorType(): boolean {
                 return [
                     "u1v",
@@ -120,25 +127,3 @@ export class LLRPFieldDescriptor extends Mixin(
             }
         }
 ) { }
-
-/*
-// this
-let m = (class extends LLRPFieldDescriptor<"u64"> {}).new({fd: {
-    name: "",
-    type: "u64",
-    format: "Datetime"
-}});
-m.fd.type = "u64";
-m.fd.format = "Normal";
-
-
-// or this
-export class LLRPFieldDescriptorU32 extends LLRPFieldDescriptor<"u32"> { };
-let n = LLRPFieldDescriptorU32.new({fd : {
-    name: "",
-    type: "u32",
-    format: "Normal"
-}});
-n.fd.name = "Microseconds"
-console.log(n);
-*/

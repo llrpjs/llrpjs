@@ -14,7 +14,6 @@ export class LLRPFormatterParser<
         (base: AnyConstructor<LLRPFieldData<LLRPFieldType>, typeof LLRPFieldData>) =>
             class LLRPFormatterParser extends base {
                 fValue: any;
-                bitWidth = 0;
 
                 getFormattedValue(): this['fValue'] {
                     return this.fValue;

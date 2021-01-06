@@ -1,12 +1,10 @@
-import { BitOps } from "../bitops";
-import { Base } from "../bryntum/chronograph/Base";
+import { BitOps } from "./bitops";
 import { AnyConstructor, Mixin } from "../bryntum/chronograph/Mixin";
 import { BOOL } from "../types";
-import { LLRPFieldDescriptor } from "./descriptor";
 
 
 export interface LLRPEncDec {
-    setSize(bitSize: number): this;
+    setBitSize(bitSize: number): this;
     setStart(bit: number): this;
     getStart(): number;
     getEnd(): number;
@@ -29,10 +27,18 @@ export class LLRPEncDec extends Mixin(
             startBit: number = 0;       // starting bit of our field
 
 
-            setSize(bitSize: number): this {
+            setBitSize(bitSize: number): this {
                 this.bitSize = bitSize;
                 this.byteSize = bitSize >> 3;
                 return this;
+            }
+
+            getBitSize(): number {
+                return this.bitSize;
+            }
+
+            getByteSize(): number {
+                return this.byteSize;
             }
 
             setStart(bit: number): this {
