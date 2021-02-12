@@ -1,29 +1,32 @@
-
 import { LLRPFieldData } from "./data";
-import { LLRPFMTDate, LLRPFMTDec, LLRPFMTHex, LLRPFormat, LLRPDataType, LLRPFieldFormat, GetFieldFormat, GetFieldDataType, LLRPFieldType, GetFormatValType } from "../types";
-import { AnyConstructor, ClassUnion, Mixin } from "../bryntum/chronograph/Mixin";
-import { LLRPFieldDescriptor } from "./descriptor";
+import { LLRPFMTDate, LLRPFMTDec, LLRPFMTHex } from "../types";
+import { AnyConstructor, Mixin } from "../bryntum/chronograph/Mixin";
 
 const ISO8601_REGEX_MILLI = /(?<=\.)\d{3}(?=Z)/;
 const ISO8601_REGEX_MICRO = /(?<=\.)\d{6}(?=Z)/;
 
 
-export class LLRPFormatterParser<
-    FT extends LLRPFieldType> extends Mixin(
+export class LLRPFormatterParser extends Mixin(
         [LLRPFieldData],
-        (base: AnyConstructor<LLRPFieldData<LLRPFieldType>, typeof LLRPFieldData>) =>
+        (base: AnyConstructor<LLRPFieldData, typeof LLRPFieldData>) =>
             class LLRPFormatterParser extends base {
                 fValue: any;
+
+                setFormatValue(v: this['fValue']): this {
+                    this.fValue = v;
+                    return this;
+                }
 
                 getFormattedValue(): this['fValue'] {
                     return this.fValue;
                 }
 
-                getInitialfValue(): this['fValue'] {
-                    return (this.isNormalFormattable ? undefined
+                setDefaultFormatValue() {
+                    this.fValue = (this.isNormalFormattable ? undefined
                         : this.isDecFormattable || this.isHexFormattable ? "0"
                             : this.isDateFormattable ? new Date()
                                 : "") as this['fValue']
+                    return this;
                 }
 
                 protected static fullPrecision = true;
@@ -47,11 +50,11 @@ export class LLRPFormatterParser<
                     return BigInt(time * 1000000 + microseconds);
                 }
 
-                protected static enableFullPrecision(): void {
+                static enableFullPrecision(): void {
                     LLRPFormatterParser.fullPrecision = true;
                 }
 
-                protected static disableFullPrecision(): void {
+                static disableFullPrecision(): void {
                     LLRPFormatterParser.fullPrecision = false;
                 }
 
@@ -79,7 +82,7 @@ export class LLRPFormatterParser<
                 protected static formatDateTime(value: bigint): string {
                     return LLRPFormatterParser.fullPrecision ?
                         LLRPFormatterParser.formatIso8601Microseconds(value)
-                        : (new Date(Number(value) / 1000)).toString();
+                        : (new Date(Number(value) / 1000)).toJSON();
                 }
 
                 protected static formatUTF8(value: string): string {
@@ -123,7 +126,7 @@ export class LLRPFormatterParser<
                     } else if (this.isDecFormattable) {
 
                         this.fValue = (this.isVectorType ?
-                            LLRPFormatterParser.formatDecVector(this.iValue as (number | bigint)[])
+                            LLRPFormatterParser.formatDecVector(this.iValue as number[] | bigint[])
                             : LLRPFormatterParser.formatDec(this.iValue as number | bigint));
 
                     } else if (this.isHexFormattable) {
@@ -173,13 +176,7 @@ export class LLRPFormatterParser<
             }
     ) { }
 
-export interface LLRPFormatterParser<FT extends LLRPFieldType> {
-    FT: FT;
-    iValue: GetFieldDataType<FT>;
-    fValue: GetFormatValType<FT>;
-
-    bitWidth: Readonly<number>;
-
+export interface LLRPFormatterParser {
     format(): this;
     parse(): this;
 }

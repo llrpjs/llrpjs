@@ -1,17 +1,25 @@
-
 import { LLRPFieldData } from "./data";
-import { GetFieldDataType, LLRPDataType, LLRPFieldType } from "../types";
 import { AnyConstructor, Mixin } from "../bryntum/chronograph/Mixin";
 
 
-export class LLRPEnumerator<FT extends LLRPFieldType> extends Mixin(
+export class LLRPEnumerator extends Mixin(
     [LLRPFieldData],
-    (base: AnyConstructor<LLRPFieldData<LLRPFieldType>, typeof LLRPFieldData>) =>
+    (base: AnyConstructor<LLRPFieldData, typeof LLRPFieldData>) =>
         class LLRPEnumerator extends base {
-            eValue = this.getDefaultEnum();
+            eValue: string;
 
-            private getDefaultEnum(): string {
-                return this.fd.enumTable?.filter(entry => entry.value === 0)[0]?.name || "";
+            setDefaultEnum() {
+                this.eValue = this.fd.enumTable?.filter(entry => entry.value === 0)[0]?.name || "";
+                return this;
+            }
+
+            setEnumValue(v: this['eValue']): this {
+                this.eValue = v;
+                return this;
+            }
+
+            getEnumValue(): this['eValue'] {
+                return this.eValue;
             }
 
             convertToEnum(): this {
@@ -36,11 +44,7 @@ export class LLRPEnumerator<FT extends LLRPFieldType> extends Mixin(
         }
 ) { }
 
-export interface LLRPEnumerator<FT extends LLRPFieldType> {
-    FT: FT;
-    iValue: GetFieldDataType<FT>;
-    eValue: string;
-
+export interface LLRPEnumerator {
     convertToEnum(): this;
     convertToValue(): this;
 }

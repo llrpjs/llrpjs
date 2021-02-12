@@ -1,42 +1,13 @@
 import { LLRPFieldDescriptor } from "./descriptor";
-import { FieldDescriptor, GetFieldDataType, LLRPFieldType } from "../types";
-import { AnyConstructor, ClassUnion, Mixin } from "../bryntum/chronograph/Mixin";
-import { Base } from "../bryntum/chronograph/Base";
+import { LLRPDataType } from "../types";
+import { AnyConstructor, Mixin } from "../bryntum/chronograph/Mixin";
 
 
-const BITWIDTH: {[key in LLRPFieldType]: 0|1|2|8|16|32|64} = {
-    "u1": 1,
-    "u2": 2,
-    "u8": 8,
-    "s8": 8,
-    "u16": 16,
-    "s16": 16,
-    "u32": 32,
-    "s32": 32,
-    "u64": 64,
-    "s64": 64,
-    "u96": 8,
-    "bytesToEnd": 8,
-    "reserved": 0,
-    "u1v": 1,
-    "u8v": 8,
-    "s8v": 8,
-    "u16v": 16,
-    "s16v": 16,
-    "u32v": 32,
-    "s32v": 32,
-    "u64v": 64,
-    "s64v": 64,
-    "utf8v": 8
-}
-
-export class LLRPFieldData<
-    FT extends LLRPFieldType> extends Mixin(
+export class LLRPFieldData extends Mixin(
         [LLRPFieldDescriptor],
-        (base: ClassUnion<typeof LLRPFieldDescriptor>) =>
+        (base: AnyConstructor<LLRPFieldDescriptor, typeof LLRPFieldDescriptor>) =>
             class LLRPFieldData extends base {
-                iValue: any;
-                bitWidth: number;
+                iValue: LLRPDataType;
 
                 setDefaultValue(): void {
                     this.iValue = (this.isVectorType ?
@@ -46,10 +17,6 @@ export class LLRPFieldData<
                                 : this.isNumeric ? this.isBigInt ? 0n : 0
                                     : 0) as this['iValue']
                 };
-
-                setDefaultBitWidth(): void {
-                    this.bitWidth = BITWIDTH[this.fd.type];
-                }
 
                 setValue(v: this['iValue']): this {
                     this.iValue = v;
@@ -62,8 +29,7 @@ export class LLRPFieldData<
             }
     ) { }
 
-export interface LLRPFieldData<FT extends LLRPFieldType> {
-    FT: FT;
-    iValue: GetFieldDataType<FT>;
-    bitWidth: number;
+export interface LLRPFieldData {
+    setValue(v: this['iValue']): this;
+    getValue(): this['iValue'];
 }

@@ -1,234 +1,224 @@
-import { CRUMB } from "../types";
+import { CRUMB, FieldDescriptor, LLRPFieldType } from "../types";
 import { LLRPField } from "./field";
 
+// TODO: add buffer availability assertion before read/write ops
 
-export class LLRPU1 extends LLRPField<"u1"> {
-    fd = {...this.fd, ...{ type: "u1" }};
+class LLRPU1 extends LLRPField<"u1"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u1");
     }
 
     encode(): this {
         super.encode();
-        this.writeBit(this.iValue);
+        this.buffer.writeBit(this.iValue);
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.iValue = this.readBit();
+        this.iValue = this.buffer.readBit();
         return this;
     }
 }
 
-export class LLRPU2 extends LLRPField<"u2"> {
-    fd = {...this.fd, ...{ type: "u2" }};
+class LLRPU2 extends LLRPField<"u2"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u2");
     }
 
     encode(): this {
         super.encode();
-        this.writeNMsb(this.iValue, 2);
+        this.buffer.writeNMsb(this.iValue, 2);
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.iValue = this.readNMsb(2) as CRUMB;
+        this.iValue = this.buffer.readNMsb(2) as CRUMB;
         return this;
     }
 }
 
-export class LLRPU8 extends LLRPField<"u8"> {
-    fd = {...this.fd, ...{ type: "u8" }};
+class LLRPU8 extends LLRPField<"u8"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u8");
     }
 
     encode(): this {
         super.encode();
-        this.writeUInt8(this.iValue);
+        this.buffer.writeUInt8(this.iValue);
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.iValue = this.readUInt8();
+        this.iValue = this.buffer.readUInt8();
         return this;
     }
 }
 
-export class LLRPS8 extends LLRPField<"s8"> {
-    fd = {...this.fd, ...{ type: "s8" }};
+class LLRPS8 extends LLRPField<"s8"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("s8");
     }
 
     encode(): this {
         super.encode();
-        this.writeInt8(this.iValue);
+        this.buffer.writeInt8(this.iValue);
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.iValue = this.readInt8();
+        this.iValue = this.buffer.readInt8();
         return this;
     }
 }
 
-export class LLRPU16 extends LLRPField<"u16"> {
-    fd = {...this.fd, ...{ type: "u16" }};
+class LLRPU16 extends LLRPField<"u16"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u16");
     }
 
     encode(): this {
         super.encode();
-        this.writeUInt16(this.iValue);
+        this.buffer.writeUInt16(this.iValue);
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.iValue = this.readUInt16();
+        this.iValue = this.buffer.readUInt16();
         return this;
     }
 }
 
-export class LLRPS16 extends LLRPField<"s16"> {
-    fd = {...this.fd, ...{ type: "s16" }};
+class LLRPS16 extends LLRPField<"s16"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("s16");
     }
 
     encode(): this {
         super.encode();
-        this.writeInt16(this.iValue);
+        this.buffer.writeInt16(this.iValue);
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.iValue = this.readInt16();
+        this.iValue = this.buffer.readInt16();
         return this;
     }
 }
 
-export class LLRPU32 extends LLRPField<"u32"> {
-    fd = {...this.fd, ...{ type: "u32" }};
+class LLRPU32 extends LLRPField<"u32"> {
     iValue = 0;
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u32");
     }
 
     encode(): this {
         super.encode();
-        this.writeUInt32(this.iValue);
+        this.buffer.writeUInt32(this.iValue);
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.iValue = this.readUInt32();
+        this.iValue = this.buffer.readUInt32();
         return this;
     }
 }
 
-export class LLRPS32 extends LLRPField<"s32"> {
-    fd = {...this.fd, ...{ type: "s32" }};
+class LLRPS32 extends LLRPField<"s32"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("s32");
     }
 
     encode(): this {
         super.encode();
-        this.writeInt32(this.iValue);
+        this.buffer.writeInt32(this.iValue);
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.iValue = this.readInt32();
+        this.iValue = this.buffer.readInt32();
         return this;
     }
 }
 
-export class LLRPU64 extends LLRPField<"u64"> {
-    fd = {...this.fd, ...{ type: "u64" }};
+class LLRPU64 extends LLRPField<"u64"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u64");
     }
 
     encode(): this {
         super.encode();
-        this.writeUInt64(this.iValue);
+        this.buffer.writeUInt64(this.iValue);
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.iValue = this.readUInt64();
+        this.iValue = this.buffer.readUInt64();
         return this;
     }
 }
 
-export class LLRPS64 extends LLRPField<"s64"> {
-    fd = {...this.fd, ...{ type: "s64" }};
+class LLRPS64 extends LLRPField<"s64"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("s64");
     }
 
     encode(): this {
         super.encode();
-        this.writeInt64(this.iValue);
+        this.buffer.writeInt64(this.iValue);
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.iValue = this.readInt64();
+        this.iValue = this.buffer.readInt64();
         return this;
     }
 }
 
 
 
-export class LLRPReserved extends LLRPField<"reserved"> {
-    fd = {...this.fd, ...{ type: "reserved" }};
+class LLRPReserved extends LLRPField<"reserved"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("reserved");
     }
 
     encode(): this {
         super.encode();
-        for (let i = 0; i < this.byteSize; i++)
-            this.writeUInt8(0);
+        for (let i = 0; i < this.getByteSize(); i++)
+            this.buffer.writeUInt8(0);
 
-        this.writeNMsb(0, this.bitSize - this.byteSize * 8);
+        this.buffer.writeNMsb(0, this.getBitSize() - this.getByteSize() * 8);
         return this;
     }
 
@@ -240,37 +230,35 @@ export class LLRPReserved extends LLRPField<"reserved"> {
 
 
 
-export class LLRPUTF8V extends LLRPField<"utf8v"> {
-    fd = {...this.fd, ...{ type: "utf8v" }};
+class LLRPUTF8V extends LLRPField<"utf8v"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("utf8v");
     }
 
     encode(): this {
         super.encode();
         let n = this.iValue.length;
-        this.writeUInt16(n);
-        this.writeUTF8(this.iValue);
+        this.buffer.writeUInt16(n);
+        this.buffer.writeUTF8(this.iValue);
         return this;
     }
 
     decode(): this {
         super.decode();
-        let n = this.readUInt16();
-        this.iValue = this.readUTF8(n);
+        let n = this.buffer.readUInt16();
+        this.iValue = this.buffer.readUTF8(n);
         return this;
     }
 }
 
 
-export class LLRPU96 extends LLRPField<"u96"> {
-    fd = {...this.fd, ...{ type: "u96" }};
+class LLRPU96 extends LLRPField<"u96"> {
 
     constructor() {
         super();
-        this.setDefault();
+        this.setDefault("u96");
     }
 
     setValue(v: number[]): this {
@@ -286,7 +274,7 @@ export class LLRPU96 extends LLRPField<"u96"> {
     encode(): this {
         super.encode();
         for (let i = 0; i < this.iValue.length; i++) {
-            this.writeUInt8(this.iValue[i]);
+            this.buffer.writeUInt8(this.iValue[i]);
         }
         return this;
     }
@@ -294,33 +282,32 @@ export class LLRPU96 extends LLRPField<"u96"> {
     decode(): this {
         super.decode();
         for (let i = 0; i < 12; i++) {
-            this.iValue[i] = this.readUInt8();
+            this.iValue[i] = this.buffer.readUInt8();
         }
         return this;
     }
 }
 
-export class LLRPU1V extends LLRPField<"u1v"> {
-    fd = {...this.fd, ...{ type: "u1v" }};
+class LLRPU1V extends LLRPField<"u1v"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u1v");
     }
 
     encode(): this {
         super.encode();
         // 1) write number of bits as 16-bit integer
-        this.writeUInt16(this.bitSize);
+        this.buffer.writeUInt16(this.getBitSize());
         // 2) write all bytes first
         for (let i = 0; i < this.iValue.length; i++) {
-            this.writeUInt8(this.iValue[i]);
+            this.buffer.writeUInt8(this.iValue[i]);
         }
-        let bitCount = this.bitSize - this.byteSize * 8;
+        let bitCount = this.getBitSize() - this.getByteSize() * 8;
         // 3) write all succeeding bits
         if (bitCount > 0) {
-            let partial = this.iValue[this.byteSize];  // index of the partial is right after the last byte
-            this.writeNMsb(partial, bitCount);
+            let partial = this.iValue[this.getByteSize()];  // index of the partial is right after the last byte
+            this.buffer.writeNMsb(partial, bitCount);
         }
         return this;
     }
@@ -328,268 +315,290 @@ export class LLRPU1V extends LLRPField<"u1v"> {
     decode(): this {
         super.decode();
         // 1) get length (bits)
-        this.bitSize = this.readUInt16();
-        this.byteSize = this.bitSize >> 3;
+        let bitSize = this.buffer.readUInt16();
+        this.setBitSize(bitSize);
+        let byteSize = this.getByteSize();
         // 2) get all bytes
-        for (let i = 0; i < this.byteSize; i++) {
-            this.iValue[i] = this.readUInt8();
+        for (let i = 0; i < byteSize; i++) {
+            this.iValue[i] = this.buffer.readUInt8();
         }
         // 3) get the trailing partial (if any)
-        let bitCount = this.bitSize - this.byteSize * 8;
+        let bitCount = bitSize - byteSize * 8;
         if (bitCount) {
-            this.iValue.push(this.readNMsb(bitCount));
+            this.iValue.push(this.buffer.readNMsb(bitCount));
         }
         return this;
     }
 }
 
-export class LLRPU8V extends LLRPField<"u8v"> {
-    fd = {...this.fd, ...{ type: "u8v" }};
+class LLRPU8V extends LLRPField<"u8v"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u8v");
     }
 
     encode(): this {
         super.encode();
         let n = this.iValue.length;
-        this.writeUInt16(n);
+        this.buffer.writeUInt16(n);
         for (let i = 0; i < n; i++) {
-            this.writeUInt8(this.iValue[i]);
+            this.buffer.writeUInt8(this.iValue[i]);
         }
         return this;
     }
 
     decode(): this {
         super.decode();
-        let n = this.readUInt16();
+        let n = this.buffer.readUInt16();
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.readUInt8();
+            this.iValue[i] = this.buffer.readUInt8();
         }
         return this;
     }
 }
 
-export class LLRPS8V extends LLRPField<"s8v"> {
-    fd = {...this.fd, ...{ type: "s8v" }};
+class LLRPS8V extends LLRPField<"s8v"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("s8v");
     }
 
     encode(): this {
         super.encode();
         let n = this.iValue.length;
-        this.writeUInt16(n);
+        this.buffer.writeUInt16(n);
         for (let i = 0; i < n; i++) {
-            this.writeInt8(this.iValue[i]);
+            this.buffer.writeInt8(this.iValue[i]);
         }
         return this;
     }
 
     decode(): this {
         super.decode();
-        let n = this.readUInt16();
+        let n = this.buffer.readUInt16();
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.readInt8();
+            this.iValue[i] = this.buffer.readInt8();
         }
         return this;
     }
 }
 
-export class LLRPU16V extends LLRPField<"u16v"> {
-    fd = {...this.fd, ...{ type: "u16v" }};
+class LLRPU16V extends LLRPField<"u16v"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u16v");
     }
 
     encode(): this {
         super.encode();
         let n = this.iValue.length;
-        this.writeUInt16(n);
+        this.buffer.writeUInt16(n);
         for (let i = 0; i < n; i++) {
-            this.writeUInt16(this.iValue[i]);
+            this.buffer.writeUInt16(this.iValue[i]);
         }
         return this;
     }
 
     decode(): this {
         super.decode();
-        let n = this.readUInt16();
+        let n = this.buffer.readUInt16();
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.readUInt16();
+            this.iValue[i] = this.buffer.readUInt16();
         }
         return this;
     }
 }
 
-export class LLRPS16V extends LLRPField<"s16v"> {
-    fd = {...this.fd, ...{ type: "s16v" }};
+class LLRPS16V extends LLRPField<"s16v"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("s16v");
     }
 
     encode(): this {
         super.encode();
         let n = this.iValue.length;
-        this.writeUInt16(n);
+        this.buffer.writeUInt16(n);
         for (let i = 0; i < n; i++) {
-            this.writeInt16(this.iValue[i]);
+            this.buffer.writeInt16(this.iValue[i]);
         }
         return this;
     }
 
     decode(): this {
         super.decode();
-        let n = this.readUInt16();
+        let n = this.buffer.readUInt16();
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.readInt16();
+            this.iValue[i] = this.buffer.readInt16();
         }
         return this;
     }
 }
 
-export class LLRPU32V extends LLRPField<"u32v"> {
-    fd = {...this.fd, ...{ type: "u32v" }};
+class LLRPU32V extends LLRPField<"u32v"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u32v");
     }
 
     encode(): this {
         super.encode();
         let n = this.iValue.length;
-        this.writeUInt16(n);
+        this.buffer.writeUInt16(n);
         for (let i = 0; i < n; i++) {
-            this.writeUInt32(this.iValue[i]);
+            this.buffer.writeUInt32(this.iValue[i]);
         }
         return this;
     }
 
     decode(): this {
         super.decode();
-        let n = this.readUInt16();
+        let n = this.buffer.readUInt16();
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.readUInt32();
+            this.iValue[i] = this.buffer.readUInt32();
         }
         return this;
     }
 }
 
-export class LLRPS32V extends LLRPField<"s32v"> {
-    fd = {...this.fd, ...{ type: "s32v" }};
+class LLRPS32V extends LLRPField<"s32v"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("s32v");
     }
 
     encode(): this {
         super.encode();
         let n = this.iValue.length;
-        this.writeUInt16(n);
+        this.buffer.writeUInt16(n);
         for (let i = 0; i < n; i++) {
-            this.writeInt32(this.iValue[i]);
+            this.buffer.writeInt32(this.iValue[i]);
         }
         return this;
     }
 
     decode(): this {
         super.decode();
-        let n = this.readUInt16();
+        let n = this.buffer.readUInt16();
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.readInt32();
+            this.iValue[i] = this.buffer.readInt32();
         }
         return this;
     }
 }
 
-export class LLRPU64V extends LLRPField<"u64v"> {
-    fd = {...this.fd, ...{ type: "u64v" }};
+class LLRPU64V extends LLRPField<"u64v"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("u64v");
     }
 
     encode(): this {
         super.encode();
         let n = this.iValue.length;
-        this.writeUInt16(n);
+        this.buffer.writeUInt16(n);
         for (let i = 0; i < n; i++) {
-            this.writeUInt64(this.iValue[i]);
+            this.buffer.writeUInt64(this.iValue[i]);
         }
         return this;
     }
 
     decode(): this {
         super.decode();
-        let n = this.readUInt16();
+        let n = this.buffer.readUInt16();
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.readUInt64();
+            this.iValue[i] = this.buffer.readUInt64();
         }
         return this;
     }
 }
 
-export class LLRPS64V extends LLRPField<"s64v"> {
-    fd = {...this.fd, ...{ type: "s64v" }};
+class LLRPS64V extends LLRPField<"s64v"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("s64v");
     }
 
     encode(): this {
         super.encode();
         let n = this.iValue.length;
-        this.writeUInt16(n);
+        this.buffer.writeUInt16(n);
         for (let i = 0; i < n; i++) {
-            this.writeInt64(this.iValue[i]);
+            this.buffer.writeInt64(this.iValue[i]);
         }
         return this;
     }
 
     decode(): this {
         super.decode();
-        let n = this.readUInt16();
+        let n = this.buffer.readUInt16();
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.readInt64();
+            this.iValue[i] = this.buffer.readInt64();
         }
         return this;
     }
 }
 
-export class LLRPBytesToEnd extends LLRPField<"bytesToEnd"> {
-    fd = {...this.fd, ...{ type: "bytesToEnd" }};
+class LLRPBytesToEnd extends LLRPField<"bytesToEnd"> {
 
     constructor(...args: any[]) {
         super(...args);
-        this.setDefault();
+        this.setDefault("bytesToEnd");
     }
 
     encode(): this {
         super.encode();
-        for (let i = 0; i < this.iValue[i]; i++) {
-            this.writeUInt8(this.iValue[i]);
+        for (let i = 0; i < this.iValue.length; i++) {
+            this.buffer.writeUInt8(this.iValue[i]);
         }
         return this;
     }
 
     decode(): this {
         super.decode();
-        this.byteSize = this.getBuffer().length - this.startByte;
-        for (let i = 0; i < this.byteSize; i++) {
-            this.iValue[i] = this.readUInt8();
+        while (this.bufferHasData()) {
+            this.iValue.push(this.buffer.readUInt8());
         }
         return this;
     }
 }
 
+const Classes = {
+    "u1": LLRPU1,
+    "u2": LLRPU2,
+    "u8": LLRPU8,
+    "s8": LLRPS8,
+    "u16": LLRPU16,
+    "s16": LLRPS16,
+    "u32": LLRPU32,
+    "s32": LLRPS32,
+    "u64": LLRPU64,
+    "s64": LLRPS64,
+    "u96": LLRPU96,
+    "u1v": LLRPU1V,
+    "u8v": LLRPU8V,
+    "s8v": LLRPS8V,
+    "u16v": LLRPU16V,
+    "s16v": LLRPS16V,
+    "u32v": LLRPU32V,
+    "s32v": LLRPS32V,
+    "u64v": LLRPU64V,
+    "s64v": LLRPS64V,
+    "utf8v": LLRPUTF8V,
+    "bytesToEnd": LLRPBytesToEnd,
+    "reserved": LLRPReserved
+} as const;
+
+export function LLRPFieldFactory<FT extends LLRPFieldType>(fd: FieldDescriptor<FT>, props?: Partial<InstanceType<typeof Classes[FT]>>) {
+    const FieldClass = Classes[fd.type];
+    let f = FieldClass.new(props) as LLRPField<FT>;
+    return f.setDescriptor(fd);
+}

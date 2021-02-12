@@ -15,7 +15,8 @@
   },
   "scripts": {
     "postinstall": "[ -e ./definitions/core/llrp*.schema.json ] || wget --directory-prefix=./definitions/core https://llrpjs.github.io/schema/core/encoding/json/1.0/llrp-1x0.schema.json",
-    "test": "mocha"
+    "test": "mocha",
+    "build": "npx tsc"
   },
   "repository": {
     "type": "git",
