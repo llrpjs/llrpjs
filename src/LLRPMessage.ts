@@ -1,8 +1,8 @@
 import { LLRPMessage as _LLRPMessage, LLRPMessageI } from "./element/message";
 import { LLRPUserData } from "./types";
 
-export class LLRPMessage {
-    origin: _LLRPMessage<LLRPUserData>;
+export class LLRPMessage<T extends LLRPUserData> {
+    origin: _LLRPMessage<T>;
 
     constructor(args?: LLRPMessageI | Buffer) {
         if (args) {

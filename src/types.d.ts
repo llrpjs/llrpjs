@@ -170,7 +170,7 @@ export type TypeDefinition = Overwrite<TypeDescriptor, {
 
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
 
-export type GetCtrArgs<O extends LLRPMessage> = Omit<O['origin']['LLRPMESSAGETYPE'], "type">;
+export type GetCtrArgs<O extends LLRPMessage<LLRPUserData>> = Omit<O['origin']['LLRPMESSAGETYPE'], "type">;
 
 
 export type ChoiceAtLeastOnce<T, Keys extends keyof T = keyof T> =

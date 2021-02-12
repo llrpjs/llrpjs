@@ -1,5 +1,4 @@
 
-import { LLRPMessage as _LLRPMessage } from "./element/message";
 import { LLRPMessage } from "./LLRPMessage";
 import { ChoiceAtLeastOnce, GetCtrArgs, ParamAtLeastOnce } from "./types";
 
@@ -37,9 +36,7 @@ type LLRP_D_TEST_MESSAGE =
 
 // Messages
 
-export class LLRP_C_ADD_ROSPEC extends LLRPMessage {
-    origin: _LLRPMessage<LLRP_D_ADD_ROSPEC>;
-
+export class LLRP_C_ADD_ROSPEC extends LLRPMessage<LLRP_D_ADD_ROSPEC> {
     constructor(args?: GetCtrArgs<LLRP_C_ADD_ROSPEC>) {
         super({ ...args, ...{ type: "ADD_ROSPEC" } });
     }
@@ -55,9 +52,7 @@ export class LLRP_C_ADD_ROSPEC extends LLRPMessage {
     }
 }
 
-export class LLRP_C_ADD_ROSPEC_RESPONSE extends LLRPMessage {
-    origin: _LLRPMessage<LLRP_D_ADD_ROSPEC_RESPONSE>;
-
+export class LLRP_C_ADD_ROSPEC_RESPONSE extends LLRPMessage<LLRP_D_ADD_ROSPEC_RESPONSE> {
     constructor(args?: GetCtrArgs<LLRP_C_ADD_ROSPEC_RESPONSE>) {
         super({ ...args, ...{ type: "ADD_ROSPEC_RESPONSE" } });
     }
@@ -68,9 +63,7 @@ export class LLRP_C_ADD_ROSPEC_RESPONSE extends LLRPMessage {
 }
 
 // choice
-export class LLRP_C_TEST_MESSAGE extends LLRPMessage {
-    origin: _LLRPMessage<LLRP_D_TEST_MESSAGE>;
-
+export class LLRP_C_TEST_MESSAGE extends LLRPMessage<LLRP_D_TEST_MESSAGE> {
     constructor(args?: GetCtrArgs<LLRP_C_TEST_MESSAGE>) {
         super({ ...args, ...{ type: "TEST_MESSAGE" } });
     }
