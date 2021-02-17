@@ -83,6 +83,30 @@ export class LLRPList extends MixinAny(
                 return this;
             }
 
+            getEndBit() {
+                if (this.isEmpty) {
+                    return this.getStartBit() - 1;
+                }
+                return this.last.getEndBit();
+            }
+
+            getBitSize() {
+                return this.getEndBit() - this.getStartBit() + 1;
+            }
+
+            getEndByte() {
+                return this.getEndBit() >> 3;
+            }
+
+            getByteSize() {
+                return this.getEndByte() - this.getStartByte() + 1;
+            }
+
+            setBitSize(bit: number) {
+                throw new Error(`can't set bit size of list`);
+                return this;
+            }
+
             getBuffer() {
                 return this.buffer;
             }
@@ -101,15 +125,13 @@ export class LLRPList extends MixinAny(
                 if (this.isEmpty) {
                     v.setStartBit(this.getStartBit());
                 } else {
-                    v.setStartBit(this.getEndBit() + 1);
+                    v.setStartBit(this.last.getEndBit() + 1);
                 }
-                this.setBitSize(this.getBitSize() + v.getBitSize());
                 return this._push(v);
             }
 
             pop() {
                 let popped = this._pop();
-                this.setBitSize(this.getBitSize() - popped.getBitSize());
                 popped.setBuffer(null);
                 return popped;
             }
