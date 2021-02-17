@@ -26,6 +26,11 @@ export class LLRPBuffer {
         this.setBuffer(buffer);
     }
 
+    get hasData() {
+        let lastBitIndex = this._buffer.length - 1 + 7;
+        return this.bit <= lastBitIndex;
+    }
+
     setBuffer(buffer: Buffer): this {
         this._buffer = buffer;
         this._bitOps = new BitOps(buffer);
