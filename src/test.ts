@@ -1,26 +1,79 @@
 import { LLRPMessage } from "./LLRPMessage";
 import { TypeRegistry } from "./type-registry";
-import * as DEF from "./def";
+import * as DEF from "./def-tc";
 
 
 TypeRegistry.getInstance().build();
-let n = new DEF.LLRP_C_TEST_MESSAGE({id: 0x123456, data: {
-    ROSpec: {
-        ROSpecID: 0x123,
-        Priority: 0x45,
-        CurrentState: "Active"
-    },
-    LLRPStatus: {
-        Status: "ERROR"
-    }
-}});
-n.addROSpec({
+let n = new DEF.LLRP_C_ADD_ROSPEC();
+n.setROSpec({
     ROSpecID: 12345,
     Priority: 2,
-    CurrentState: "Disabled"
-}).encode();
+    CurrentState: "Disabled",
+    ROBoundarySpec: {
+        ROSpecStartTrigger: {
+            ROSpecStartTriggerType: "Null"
+        },
+        ROSpecStopTrigger: {
+            ROSpecStopTriggerType: "Null",
+            DurationTriggerValue: 0
+        }
+    },
+    AISpec: [
+        {
+            AntennaIDs: [1, 2, 3, 4],
+            AISpecStopTrigger: {
+                AISpecStopTriggerType: "Duration",
+                DurationTrigger: 5000
+            },
+            InventoryParameterSpec: {
+                InventoryParameterSpecID: 1,
+                ProtocolID: "EPCGlobalClass1Gen2"
+            }
+        },
+        {
+            AntennaIDs: [3, 4],
+            AISpecStopTrigger: {
+                AISpecStopTriggerType: "Null",
+                DurationTrigger: 0
+            },
+            InventoryParameterSpec: {
+                InventoryParameterSpecID: 2,
+                ProtocolID: "EPCGlobalClass1Gen2"
+            }
+        }
+    ],
+    RFSurveySpec: {
+        AntennaID: 1,
+        StartFrequency: 980000,
+        EndFrequency: 990000,
+        RFSurveySpecStopTrigger: {
+            StopTriggerType: "N_Iterations_Through_Frequency_Range",
+            DurationPeriod: 0,
+            N: 10
+        }
+    }
+});
+n.encode();
+console.log(n.getBuffer().toString('hex').replace(/(.)(.)/g, '$1$2 '));
 
-console.log(n.getBuffer());
+/**
+ * 
+04 14 00 00 00 44 00 00 00 00
+    00 b1 00 3a
+        00 00 30 39 02 00
+        00 b2 00 12
+            00 b3 00 05
+                00
+            00 b6 00 09
+                00 00 00 00 00
+        00 b7 00 1e
+            00 04 00 01 00 02 00 03 00 04
+            00 b8 00 09
+                00 00 00 00 00
+            00 ba 00 07
+                00 00 01
+
+ */
 
 let m = new LLRPMessage(n.getBuffer());
 console.log(JSON.stringify(m.toLLRPData(), null, 2));
