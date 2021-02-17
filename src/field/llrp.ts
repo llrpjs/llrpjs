@@ -318,19 +318,20 @@ class LLRPU1V extends LLRPField<"u1v"> {
 
     decode(): this {
         super.decode();
+        let result = [];
         // 1) get length (bits)
         let bitSize = this.buffer.readUInt16();
-        this.setBitSize(bitSize);
-        let byteSize = this.getByteSize();
+        let byteSize = bitSize >> 3;
         // 2) get all bytes
         for (let i = 0; i < byteSize; i++) {
-            this.iValue[i] = this.buffer.readUInt8();
+            result.push(this.buffer.readUInt8());
         }
         // 3) get the trailing partial (if any)
         let bitCount = bitSize - byteSize * 8;
         if (bitCount) {
-            this.iValue.push(this.buffer.readNMsb(bitCount));
+            result.push(this.buffer.readNMsb(bitCount));
         }
+        this.setValue(result);
         return this;
     }
 }
@@ -355,9 +356,11 @@ class LLRPU8V extends LLRPField<"u8v"> {
     decode(): this {
         super.decode();
         let n = this.buffer.readUInt16();
+        let result = [];
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.buffer.readUInt8();
+            result.push(this.buffer.readUInt8());
         }
+        this.setValue(result);
         return this;
     }
 }
@@ -382,9 +385,11 @@ class LLRPS8V extends LLRPField<"s8v"> {
     decode(): this {
         super.decode();
         let n = this.buffer.readUInt16();
+        let result = [];
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.buffer.readInt8();
+            result.push(this.buffer.readInt8());
         }
+        this.setValue(result);
         return this;
     }
 }
@@ -409,9 +414,11 @@ class LLRPU16V extends LLRPField<"u16v"> {
     decode(): this {
         super.decode();
         let n = this.buffer.readUInt16();
+        let result = [];
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.buffer.readUInt16();
+            result.push(this.buffer.readUInt16());
         }
+        this.setValue(result);
         return this;
     }
 }
@@ -436,9 +443,11 @@ class LLRPS16V extends LLRPField<"s16v"> {
     decode(): this {
         super.decode();
         let n = this.buffer.readUInt16();
+        let result = [];
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.buffer.readInt16();
+            result.push(this.buffer.readInt16());
         }
+        this.setValue(result);
         return this;
     }
 }
@@ -463,9 +472,11 @@ class LLRPU32V extends LLRPField<"u32v"> {
     decode(): this {
         super.decode();
         let n = this.buffer.readUInt16();
+        let result = [];
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.buffer.readUInt32();
+            result.push(this.buffer.readUInt32());
         }
+        this.setValue(result);
         return this;
     }
 }
@@ -490,9 +501,11 @@ class LLRPS32V extends LLRPField<"s32v"> {
     decode(): this {
         super.decode();
         let n = this.buffer.readUInt16();
+        let result = [];
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.buffer.readInt32();
+            result.push(this.buffer.readInt32());
         }
+        this.setValue(result);
         return this;
     }
 }
@@ -517,9 +530,11 @@ class LLRPU64V extends LLRPField<"u64v"> {
     decode(): this {
         super.decode();
         let n = this.buffer.readUInt16();
+        let result = [];
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.buffer.readUInt64();
+            result.push(this.buffer.readUInt64());
         }
+        this.setValue(result);
         return this;
     }
 }
@@ -544,9 +559,11 @@ class LLRPS64V extends LLRPField<"s64v"> {
     decode(): this {
         super.decode();
         let n = this.buffer.readUInt16();
+        let result = [];
         for (let i = 0; i < n; i++) {
-            this.iValue[i] = this.buffer.readInt64();
+            result.push(this.buffer.readInt64());
         }
+        this.setValue(result);
         return this;
     }
 }
@@ -568,9 +585,11 @@ class LLRPBytesToEnd extends LLRPField<"bytesToEnd"> {
 
     decode(): this {
         super.decode();
-        while (this.bufferHasData()) {
-            this.iValue.push(this.buffer.readUInt8());
+        let result = [];
+        while (this.buffer.hasData) {
+            result.push(this.buffer.readUInt8());
         }
+        this.setValue(result);
         return this;
     }
 }
