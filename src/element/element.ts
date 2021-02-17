@@ -8,8 +8,7 @@ import { LLRPFieldList } from "../field/list";
 import { LLRPNode } from "../base/node";
 import { LLRPElementList } from "./list";
 import { LLRPBuffer } from "../buffer/buffer";
-import { LLRPFieldInstanceType } from "../field/field";
-import { LLRPList } from "../base/list";
+import { LLRPField, LLRPFieldInstanceType } from "../field/field";
 
 export class LLRPElement extends MixinAny(
     [LLRPNode, LLRPTypeDescriptor, LLRPData, Base],
@@ -89,10 +88,10 @@ export class LLRPElement extends MixinAny(
 
             getSubElement(name: string) {
                 let e = this.getSubType(name);
-                if (e instanceof LLRPNode) {
-                    return e as LLRPElement;
+                if (e instanceof LLRPElement) {
+                    return e.toLLRPData();
                 }
-                return LLRPElementList.getElementList(e);
+                return (<LLRPElement[]>e).map(subElement => subElement.toLLRPData());
             }
 
             // Data <--> Pool
@@ -249,13 +248,18 @@ export class LLRPElement extends MixinAny(
                 this.subElementList.setStartBit(this.fieldList.getEndBit() + 1);
                 for (let tRef of this.getSubTypeReferences()) {
                     let name = tRef.td.name;
-                    let e = this.getSubType(name) as LLRPElement | LLRPElementList;
-                    if (e instanceof LLRPList) {
+                    let e = this.getSubType(name) as LLRPElement | LLRPElement[];
+                    if (!e) {
+                        if (this.isRequired(tRef))
+                            throw new Error(`missing parameter ${name}`);
+                        continue;
+                    }
+                    if (e instanceof LLRPElement) {
+                        this.subElementList.push(e.assemble());
+                    } else {
                         for (let subElement of e) {
                             this.subElementList.push(subElement.assemble());
                         }
-                    } else {
-                        this.subElementList.push(e.assemble());
                     }
                 }
                 return this;

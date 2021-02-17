@@ -19,7 +19,7 @@ export class LLRPTypeDescriptor extends Mixin(
             protected tRefs: { [x in TypeDescriptor['name']]: SubTypeReference } = {};
 
             protected pool: {
-                [x: string]: LLRPNode | LLRPList;
+                [x: string]: LLRPNode | LLRPNode[];
             } = {};
 
             protected buildTypeReferences() {
@@ -41,12 +41,12 @@ export class LLRPTypeDescriptor extends Mixin(
                 if (this.pool[name]) {
                     if (this.pool[name] instanceof LLRPNode) {
                         let foundNode = this.pool[name] as LLRPNode;
-                        let newList = new LLRPList();
+                        let newList = [];
                         newList.push(foundNode);
                         newList.push(v);
                         this.pool[name] = newList;
                     } else {
-                        (<LLRPList>this.pool[name]).push(v);
+                        (<LLRPNode[]>this.pool[name]).push(v);
                     }
                 } else
                     this.pool[name] = v;
