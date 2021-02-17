@@ -18,8 +18,17 @@ export class BitOps {
         return 1;
     }
 
+    readBits(offset: number, bit: number, n: number) {
+        return (this.buffer[offset] & (0xff >> bit)) >> (8 - bit - n);
+    }
+
+    writeBits(value: number, offset: number, bit: number, n: number) {
+        // Do we need this?!
+        return 0;
+    }
+
     readNMsbBE(offset: number = 0, n: number = 0): number {
-        return this.buffer[offset] >> n;
+        return this.buffer[offset] >> (8- n);
     }
 
     readNLsbBE(offset: number = 0, n: number = 0): number {

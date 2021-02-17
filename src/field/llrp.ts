@@ -218,12 +218,16 @@ class LLRPReserved extends LLRPField<"reserved"> {
         for (let i = 0; i < this.getByteSize(); i++)
             this.buffer.writeUInt8(0);
 
-        this.buffer.writeNMsb(0, this.getBitSize() - this.getByteSize() * 8);
+        this.buffer.writeBits(0, this.getBitSize() - this.getByteSize() * 8);
         return this;
     }
 
     decode(): this {
         super.decode();
+        for (let i = 0; i < this.getByteSize(); i++)
+            this.buffer.readUInt8();
+
+        this.buffer.readBits(this.getBitSize() - this.getByteSize() * 8);
         return this;
     }
 }

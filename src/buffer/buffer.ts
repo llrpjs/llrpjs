@@ -50,19 +50,36 @@ export class LLRPBuffer {
 
     // LLRPField is BE protocol
     readBit(): BOOL {
-        return this._bitOps.readBit(this.byte, this.bit) as BOOL;
+        return this._bitOps.readBit(this.byte, this.bit++) as BOOL;
     }
 
     writeBit(v: BOOL): number {
-        return this._bitOps.writeBit(v ? 1 : 0, this.byte, this.bit);
+        return this._bitOps.writeBit(v ? 1 : 0, this.byte, this.bit++);
+    }
+
+    readBits(n: number) {
+        let result = this._bitOps.readBits(this.byte, this.bit, n);
+        this.bit += n;
+        return result;
+    }
+
+    writeBits(value: number, n: number) {
+        let result = this._bitOps.writeBits(value, this.byte, this.bit, n);
+        this.bit += n;
+        return result;
     }
 
     readNMsb(n: number): number {
-        return this._bitOps.readNMsbBE(this.byte, n);
+        n = n;
+        let result = this._bitOps.readNMsbBE(this.byte, n);
+        this.bit += n;
+        return result;
     }
 
     writeNMsb(v: number, n: number): number {
-        return this._bitOps.writeNMsbBE(v, this.byte, n);
+        let result =  this._bitOps.writeNMsbBE(v, this.byte, n);
+        this.bit += n;
+        return result;
     }
 
     readUInt8(): number {
