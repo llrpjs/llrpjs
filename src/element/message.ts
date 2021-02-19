@@ -48,7 +48,7 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
         format: "Normal"
     });
 
-    get id() { return this.messageId.getValue() }
+    get id() { return this.messageId.getValue() as number }
     set id(v: number) { this.messageId.setValue(v) }
     get type() { return this.getName() };
     set type(v: this['td']['name']) { this.setType(v); };
@@ -134,7 +134,7 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
     }
 
     getMessageLength() {
-        return this.messageLength.getValue();
+        return this.messageLength.getValue() as number;
     }
 
     setMessageTypeNum(typeNum: number) {
@@ -143,7 +143,7 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
     }
 
     getMessageTypeNum() {
-        return this.rsvdVersionType.getValue() & 0x3ff;
+        return <number>this.rsvdVersionType.getValue() & 0x3ff;
     }
 
     setMessageId(id: number) {
@@ -156,7 +156,7 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
     }
 
     getVersion() {
-        return (this.rsvdVersionType.getValue() & 0x1c00) >>> 10;
+        return (<number>this.rsvdVersionType.getValue() & 0x1c00) >>> 10;
     }
 
     toLLRPData(): this['LLRPMESSAGETYPE'] {

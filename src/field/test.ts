@@ -9,8 +9,7 @@ let epc96 = LLRPFieldFactory({
     name: "EPC96",
     type: "u96",
     format: "Hex"
-}).setValue([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-    .format()
+}).setValue([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 
 
 let llrpStatus = LLRPFieldFactory({
@@ -27,7 +26,7 @@ let llrpStatus = LLRPFieldFactory({
             value: 1
         }
     ]
-}).setValue(1).convertToEnum()
+}).setValue("ERROR");
 
 let readerHostname = LLRPFieldFactory({
     name: "ReaderHostname",
@@ -42,7 +41,7 @@ let microSeconds = LLRPFieldFactory({
     name: "Microseconds",
     type: "u64",
     format: "Datetime"
-}).setValue(9812387384343n).format();
+}).setValue("2021-02-18T16:17:06.691123Z");
 
 let fieldList = new LLRPFieldList();
 fieldList.setStartBit(0);
@@ -54,7 +53,7 @@ fieldList.push(microSeconds);
 let buf = new LLRPBuffer(Buffer.alloc(fieldList.getByteSize()));
 fieldList.setBuffer(buf).encode();
 
-epc96.setValue([38,3,1,2,3,5,4,8,8,1,2,3]);
+epc96.setFormat("Normal").setValue([38, 3, 1, 2, 3, 5, 4, 8, 8, 1, 2, 3]);
 
 fieldList.decode();
 

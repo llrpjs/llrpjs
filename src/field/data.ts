@@ -1,35 +1,32 @@
 import { LLRPFieldDescriptor } from "./descriptor";
-import { LLRPDataType } from "../types";
+import { LLRPRawDataType } from "../types";
 import { AnyConstructor, Mixin } from "../bryntum/chronograph/Mixin";
 
-
 export class LLRPFieldData extends Mixin(
-        [LLRPFieldDescriptor],
-        (base: AnyConstructor<LLRPFieldDescriptor, typeof LLRPFieldDescriptor>) =>
-            class LLRPFieldData extends base {
-                iValue: LLRPDataType;
+    [LLRPFieldDescriptor],
+    (base: AnyConstructor<LLRPFieldDescriptor, typeof LLRPFieldDescriptor>) =>
+    class LLRPFieldData extends base {
+        RV: LLRPRawDataType
+        protected rValue: this['RV'];
 
-                setDefaultValue(): void {
-                    this.iValue = (this.isVectorType ?
-                        this.fd.type == "u96" ? Array(12).fill(0) : []
-                        : this.isReserved ? undefined
-                            : this.isString ? ""
-                                : this.isNumeric ? this.isBigInt ? 0n : 0
-                                    : 0) as this['iValue']
-                };
+        setDefaultRawValue(): void {
+            this.rValue = (this.isVectorType ?
+                this.fd.type == "u96" ? Array(12).fill(0) : []
+                : this.isReserved ? undefined
+                    : this.isString ? ""
+                        : this.isNumeric ? this.isBigInt ? 0n : 0
+                            : 0);
+        };
 
-                setValue(v: this['iValue']): this {
-                    this.iValue = v;
-                    return this;
-                }
+        setRawValue(v: this['RV']): this {
+            this.rValue = v;
+            return this;
+        }
 
-                getValue(): this['iValue'] {
-                    return this.iValue;
-                }
-            }
-    ) { }
+        getRawValue(): this['RV'] {
+            return this.rValue;
+        }
+    }
+) { }
 
-export interface LLRPFieldData {
-    setValue(v: this['iValue']): this;
-    getValue(): this['iValue'];
-}
+export interface LLRPFieldData { }

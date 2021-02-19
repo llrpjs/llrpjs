@@ -1,10 +1,8 @@
-import { LLRPMessage } from "./LLRPMessage";
 
 /** Buffer base types */
 export type BOOL = boolean | 0 | 1;
 export type CRUMB = 0 | 1 | 2 | 3;
-/** LLRP intermediary types */
-export type LLRPDataType = BOOL | CRUMB | number | bigint | string | number[] | bigint[] | void
+export type LLRPRawDataType = BOOL | CRUMB | number | bigint | string | number[] | bigint[] | void
 
 export type LLRPSimpleFieldType =
   | "u1" | "u2"
@@ -37,7 +35,7 @@ export type LLRPBigIntVector = "u64v" | "s64v";
 export type LLRPString = "utf8v";
 export type LLRPVoid = "reserved";
 
-export type GetFieldType<T extends LLRPDataType> =
+export type GetFieldType<T extends LLRPRawDataType> =
   T extends BOOL ? LLRPBool
   : T extends CRUMB ? LLRPCrumb
   : T extends number ? LLRPNumber
@@ -54,9 +52,15 @@ export type LLRPFMTDec = string;  // decimals
 export type LLRPFMTHex = string;  // hex
 export type LLRPFMTUTF8 = string; // strings
 export type LLRPFMTDate = Date | string;  // dates
-export type LLRPFormat = LLRPFMTNormal | LLRPFMTDec | LLRPFMTHex | LLRPFMTUTF8 | LLRPFMTDate;
+export type LLRPFormatType = LLRPFMTNormal | LLRPFMTDec | LLRPFMTHex | LLRPFMTUTF8 | LLRPFMTDate;
 
+/** LLRP Enum types */
+export type LLRPEnumType = string | string[] | number | number[];
 
+/** LLRP Field data type */
+export type LLRPDataType = LLRPRawDataType | LLRPFormatType | LLRPEnumType;
+
+/** LLRP Field Descriptor tools */
 export type LLRPFieldFormat =
   | "Normal"
   | "Dec"
@@ -76,22 +80,13 @@ export interface EnumEntry {
   value: number
 }
 
-/** Field */
-/*
-export interface FieldDescriptor {
-  name: string;
-  type: LLRPFieldType;
-  format: LLRPFieldFormat;
-  enumTable?: EnumEntry[];
-  bitCount?: number;
-}
-*/
+/** Field Descriptor */
 
 export type FieldDescriptor<FT extends LLRPFieldType> = {
   name: string;
   type: FT;
   format: GetFieldFormat<FT>;
-  enumTable?: EnumEntry[];
+  enumTable?: GetEnumTable<FT>;
   bitCount?: number;
 }
 
@@ -102,8 +97,20 @@ export type GetFieldFormat<T extends LLRPFieldType> =
   : T extends LLRPStringFieldType ? "UTF8"
   : never;
 
-export type GetFormatValType<T extends LLRPDataType> = T extends void ? void : string;
+export type GetEnumTable<T extends LLRPFieldType> =
+  T extends LLRPBool | LLRPCrumb | LLRPNumber | Exclude<LLRPNumberVector, "u96" | "bytesToEnd"> ? EnumEntry[] : undefined;
+export type GetBitCount<T extends LLRPFieldType> = T extends "reserved" ? number : never;
 
+
+export type GetFieldFormatValue<T extends LLRPFieldType> =
+  T extends "u64" ? Date | string
+  : T extends LLRPNumberVector ? string
+  : never;
+
+export type GetEnumValue<T extends LLRPFieldType> =
+  T extends LLRPNumber | LLRPBool | LLRPCrumb ? string
+  : T extends Exclude<LLRPNumberVector, "u96" | "bytesToEnd"> ? string[]
+  : never;
 
 export type GetFieldDataType<T extends LLRPFieldType> =
   T extends LLRPVoidFieldType ? void
@@ -114,7 +121,9 @@ export type GetFieldDataType<T extends LLRPFieldType> =
   : T extends LLRPSimpleFieldType ? number
   : T extends "u64v" | "s64v" ? bigint[]
   : T extends LLRPVectorFieldType ? number[]
-  : any;
+  : never;
+
+/** Complex types */
 
 export interface SubTypeReference {
   td: TypeDescriptor;
@@ -152,6 +161,7 @@ export interface NamespaceDescriptor {
   schemaLocation: string;
 }
 
+/** User data type (message and parameter data passed by/presented to users) */
 export type LLRPUserData = {
   [x: string]: LLRPUserDataValue;
 }
@@ -159,42 +169,14 @@ export type LLRPUserData = {
 export type LLRPUserDataValue = LLRPDataType | LLRPUserData | LLRPUserData[];
 
 // Type registry tools
+type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
+
 export type SubTypeRefDefinition = Overwrite<SubTypeReference, {
   td: string;
   choices?: string[];
 }>;
+
 export type TypeDefinition = Overwrite<TypeDescriptor, {
   responseType?: string;
   subTypeRefs: SubTypeRefDefinition[];
 }>;
-
-type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
-
-export type GetCtrArgs<O extends LLRPMessage<LLRPUserData>> = Omit<O['origin']['LLRPMESSAGETYPE'], "type">;
-
-
-export type ChoiceAtLeastOnce<T, Keys extends keyof T = keyof T> =
-    Pick<T, Exclude<keyof T, Keys>>
-    & {
-        [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
-    }[Keys];
-
-export type ChoiceOnlyOnce<T, Keys extends keyof T = keyof T> =
-    Pick<T, Exclude<keyof T, Keys>>
-    & { [K in Keys]-?:
-        Required<Pick<T, K>>
-        & Partial<Record<Exclude<Keys, K>, undefined>>
-    }[Keys];
-
-export type NonEmptyArray<T> = [T, ...T[]];
-
-export type ParamOnlyOnce<T> = Required<T>;
-export type ParamAtLeastOnce<T, Keys extends keyof T = keyof T> = {
-  [x in Keys]-?: T[x] | NonEmptyArray<T[x]>;
-};
-/**
- * 1:     {key: value}
- * 1-N:   {key: value | NonEmptyArray<value>}
- * 0-N:   {key?: value | NonEmptyArray<value>}
- * 0-1:   {key?: value}
- */

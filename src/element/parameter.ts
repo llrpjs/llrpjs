@@ -61,7 +61,7 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
     }
 
     assembleHeader() {
-        this.header.setStartBit(this.getStartBit())
+        super.assembleHeader();
         if (this.isTV) {
             this.assembleTVHeader();
             this.setTVTypeNum(this.getTypeNum());
@@ -85,7 +85,7 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
         let typeNum = this.tvType.setBuffer(this.getBuffer())
             .setStartBit(this.getStartBit())
             .decode()
-            .getValue();
+            .getValue() as number;
         if (typeNum & 0x80) {
             // TV
             typeNum &= 0x7f;
@@ -97,7 +97,7 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
         typeNum = this.rsvdType.setBuffer(this.getBuffer())
             .setStartBit(this.getStartBit())
             .decode()
-            .getValue();
+            .getValue() as number;
 
         this.setTypeByNumber(typeNum & 0x3ff);
         this.assembleTLVHeader();
@@ -134,7 +134,7 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
     }
 
     getTLVLength() {
-        return this.paramLength.getValue();
+        return <number>this.paramLength.getValue();
     }
 
     toLLRPData() {

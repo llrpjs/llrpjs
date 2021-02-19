@@ -1,6 +1,6 @@
 import { Base } from "../bryntum/chronograph/Base";
 import { ClassUnion, MixinAny } from "../bryntum/chronograph/Mixin";
-import { LLRPDataType, LLRPUserData } from "../types";
+import { LLRPDataType, LLRPFieldType, LLRPUserData } from "../types";
 import { LLRPData } from "./data";
 import { LLRPFieldFactory } from "../field/llrp";
 import { LLRPTypeDescriptor } from "./type-descriptor";
@@ -51,17 +51,16 @@ export class LLRPElement extends MixinAny(
             setField(name: string, data: LLRPDataType) {
                 let f = this.getSubType(name) as LLRPFieldInstanceType;
                 if (!f) throw new Error(`field ${name} not found in type ${this.getName()}`);
-                if (f.fd.format != "Normal") {
-                    f.setFormatValue(data as string).parse();
-                } else if (f.fd.enumTable) {
-                    f.setEnumValue(data as string).convertToValue();
-                } else
-                    f.setValue(data as LLRPFieldInstanceType['iValue']);
+                f.setValue(data);
                 return this;
             }
 
             getField(name: string) {
-                return this.getSubType(name) as LLRPFieldInstanceType;
+                let f = this.getSubType(name);
+                if (f instanceof LLRPField) {
+                    return (<LLRPFieldInstanceType>f).getValue();
+                }
+                throw new Error(`name ${name} is not a field (${f.constructor.name})`);
             }
 
             addSubElement(name: string, data: LLRPUserData) {
@@ -108,15 +107,6 @@ export class LLRPElement extends MixinAny(
                     if (rawData === undefined) throw new Error(`missing field ${name}`);
                     // get class
                     let f = LLRPFieldFactory(fd).setValue(rawData);
-
-                    if (format !== "Normal") {
-                        f.setFormatValue(rawData as string)
-                            .parse();
-                    }
-                    if (enumTable) {
-                        f.setEnumValue(rawData as string)
-                            .convertToValue();
-                    }
                     this.addSubType(name, f);
                 }
                 return this;
@@ -187,15 +177,7 @@ export class LLRPElement extends MixinAny(
             marshalFields() {
                 for (let f of this.fieldList) {
                     if (f.getType() === "reserved") continue;
-                    if (f.fd.format !== "Normal") {
-                        f.format();
-                        this.setDataKey(f.getName(), f.getFormattedValue());
-                    } else if (f.fd.enumTable) {
-                        f.convertToEnum();
-                        this.setDataKey(f.getName(), f.getEnumValue());
-                    } else {
-                        this.setDataKey(f.getName(), f.getValue());
-                    }
+                    this.setDataKey(f.getName(), f.getValue());
                 }
                 return this;
             }
@@ -232,7 +214,7 @@ export class LLRPElement extends MixinAny(
                 this.fieldList.setStartBit(this.header.getEndBit() + 1);
                 for (let fd of this.getFieldDescriptors()) {
                     if (fd.type !== "reserved") {
-                        let f = this.getSubType(fd.name) as LLRPFieldInstanceType;  //FIXME: use instanceof to ensure this is a field (not a parameter)
+                        let f = this.getSubType(fd.name) as LLRPFieldInstanceType;
                         this.fieldList.push(f);
                     } else {
                         // reserved
