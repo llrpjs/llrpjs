@@ -11,8 +11,30 @@ export class LLRPMessage<T extends LLRPUserData> {
     }
 
     setMessageId(v: number) {
-        this.origin.setMessageId(v);
+        this.origin.id = v;
         return this;
+    }
+
+    getMessageId() {
+        return this.origin.id;
+    }
+
+    setMessageType(v: string) {
+        this.origin.type = v;
+        return this;
+    }
+
+    getMessageType() {
+        return this.origin.type;
+    }
+
+    setMessageData(v: T) {
+        this.origin.setData(v);
+        return this;
+    }
+
+    getMessageData() {
+        return this.origin.getData();
     }
 
     encode() {
