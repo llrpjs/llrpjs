@@ -295,7 +295,6 @@ export class LLRPElement extends MixinAny(
                         if (this.isMaxOfOneRepeat(tRef)) break;
                     }
                 }
-                this.setBitSize(this.getBitSize() + this.subElementList.getBitSize());
                 return this;
             }
 
