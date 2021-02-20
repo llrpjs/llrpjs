@@ -334,7 +334,6 @@ export class LLRPElement extends MixinAny(
             }
 
             toLLRPData(): any {
-                this.marshal();
                 return this.getData();
             }
         }

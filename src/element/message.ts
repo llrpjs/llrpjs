@@ -160,7 +160,6 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
     }
 
     toLLRPData(): this['LLRPMESSAGETYPE'] {
-        this.marshal();
         return {
             id: this.id,
             type: this.type,
@@ -172,77 +171,3 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
 export interface LLRPMessage<T extends LLRPUserData> {
     LLRPDATATYPE: T;
 }
-
-// let msg = new LLRPMessage({
-//     MessageID: 123,
-//     MessageType: "ADD_ROSPEC"
-// });
-// console.log(msg);
-
-// // Example 1:
-
-// let msg = new Message({MessageID=123, MessageType="ADD_ROSPEC"});
-// msg.addROSpec({
-//     ROSpecID: 1,
-//     Priority: 1,
-//     ...
-// }).encode();
-
-// // Example 2:
-// let msg = new Message({MessageID=123, MessageType="ADD_ROSPEC", MessageBody={
-//     ROSpec: {
-//         ROSpecID: 1,
-//         Priority: 1,
-//         ...
-//     }
-// }})
-
-// // Example 3:
-// let msg = new Message({MessageID=123, MessageType="ADD_ROSPEC"})
-// let roSpec = new ROSpec({
-//     ROSpecID: 1,
-//     Priority: 1,
-//     ...
-// });
-// msg.addROSpec(roSpec);
-
-
-// // Example 4:
-// let msg = new CADD_ROSPEC({
-//     ROSpec: {
-//         ROSpecID: 1,
-//         Priority: 1,
-//         ...
-//     }
-// });
-
-
-// // Example 5:
-// let msg = (new CADD_ROSPEC());
-// msg.getROSpec()
-//     .setROSpecID(1)
-//     .setPriority(1);
-
-// // Decode
-// let buffer = Buffer.from("LLRP Binary Message!");
-// let msg = LLRPMessage.new();
-// let data = msg.setBuffer(buffer)
-//     .setStartBit(0)
-//     .decode()
-//     .marshal()
-//     .getData();
-
-// console.log(data);
-
-// // encode
-// msg = new LLRPMessage();
-// buffer = msg.setType("ADD_ROSPEC")
-//     .setData({
-//         ROSpec: {
-//             ROSpecID: 1
-//         }
-//     })
-//     .unmarshal()
-//     .setBuffer(Buffer.alloc(msg.getByteSize()))
-//     .encode()
-//     .getBuffer();
