@@ -79,9 +79,7 @@ export class LLRPElement extends MixinAny(
 
                 if (this.getSubType(tRef.td.name)) this.removeSubType(tRef.td.name);
 
-                let subElement = this.createElement();
-                this.addSubType(tRef.td.name, subElement);
-                subElement.setType(name).setData(data).unmarshal();
+                this.unmarshalSubElement(name, data, tRef.td.name);
                 return this;
             }
 
