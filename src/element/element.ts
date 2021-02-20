@@ -96,15 +96,13 @@ export class LLRPElement extends MixinAny(
                 for (let fd of this.getFieldDescriptors()) {
                     let name = fd.name;
                     let type = fd.type;
-                    let format = fd.format;
-                    let enumTable = fd.enumTable;
 
                     if (type === "reserved") continue;  // skip reserved, they can be added on assembly
 
-                    let rawData = this.getDataKey(name) as LLRPDataType;
-                    if (rawData === undefined) throw new Error(`missing field ${name}`);
+                    let value = this.getDataKey(name) as any;
+                    if (value === undefined) continue;
                     // get class
-                    let f = LLRPFieldFactory(fd).setValue(rawData);
+                    let f = LLRPFieldFactory(fd).setValue(value);
                     this.addSubType(name, f);
                 }
                 return this;
@@ -128,38 +126,19 @@ export class LLRPElement extends MixinAny(
             }
 
             unmarshalSubElements() {
-                this.subElementList.setStartBit(this.fieldList.getEndBit() + 1);
-                for (let ref of this.getSubTypeReferences()) {
-                    let data: LLRPUserData;
-                    let name = ref.td.name;
+                for (let name in this.getData()) {
+                    let value = this.getDataKey(name);
+                    let ref = this.getSubTypeRefByName(name);
+                    if (!ref) continue;
                     // go on and check data
                     if (this.isChoice(ref)) {
-                        let choiceName = name;
-                        // get type descriptors (from choices) that have keys in our data
-                        let typeDescList = ref.choices.filter(td => this.getDataKey(td.name) !== undefined);
-                        if (!typeDescList.length) {
-                            // no data found
-                            if (this.isRequired(choiceName))
-                                throw new Error(`required element "${choiceName}" is missing from the provided data`);
-                            continue;
-                        }
-                        for (let td of typeDescList) {
-                            let paramName = td.name;
-                            data = this.getDataKey(paramName);
-                            if (this.isAllowedIn(ref))
-                                this.unmarshalSubElement(paramName, data, choiceName);  // record it under the choice name
-                        }
+                        let choiceName = ref.td.name;
+                        if (this.isAllowedIn(ref))
+                            this.unmarshalSubElement(name, value, choiceName);  // record it under the choice name
                     } else {
                         // normal
-                        data = this.getDataKey(name);
-                        if (!data) {
-                            // no data found
-                            if (this.isRequired(name)) continue;
-                            throw new Error(`required element "${name}" is missing from the provided data`);
-                        } else {
-                            if (this.isAllowedIn(ref))
-                                this.unmarshalSubElement(name, data);
-                        }
+                        if (this.isAllowedIn(ref))
+                            this.unmarshalSubElement(name, value);
                     }
                 }
                 return this;
@@ -213,6 +192,7 @@ export class LLRPElement extends MixinAny(
                 for (let fd of this.getFieldDescriptors()) {
                     if (fd.type !== "reserved") {
                         let f = this.getSubType(fd.name) as LLRPFieldInstanceType;
+                        if (!f) throw new Error(`missing field ${fd.name}`);
                         this.fieldList.push(f);
                     } else {
                         // reserved
