@@ -31,11 +31,11 @@ export class LLRPData extends Mixin(
             }
 
             getDataKey(k: string) {
-                return this.data[k];
+                return this.data[k] as LLRPUserData;
             }
 
             hasDataKey(k: string) {
-                return !!this.data[k];
+                return this.data.hasOwnProperty(k);
             }
         }
 ) { }
