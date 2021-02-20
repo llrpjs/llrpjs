@@ -295,7 +295,7 @@ export class LLRPElement extends MixinAny(
                  *      b) our decoded header has no reference in our records (error)
                  */
                 for (let tRef of this.getSubTypeReferences()) {
-                    while (this.isAllowedIn(tRef) && this.bufferHasData()) {
+                    while (this.isAllowedIn(tRef) && this.withinBoundLimits) {
                         let e = this.createElement();
                         e.setBuffer(this.getBuffer())
                             .setStartBit(this.subElementList.getEndBit() + 1)   // pickup from where we left off

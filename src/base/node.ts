@@ -39,10 +39,7 @@ export class LLRPNode extends Mixin(
                 return this;
             }
 
-            bufferHasData(bits?: number) {
-                if (bits !== undefined) {
-                    return bits <= this.getEndBit() - this.buffer.getBitIndex() + 1;    // current index included
-                }
+            get withinBoundLimits () {
                 return this.buffer.getBitIndex() <= this.getEndBit();
             }
         }
