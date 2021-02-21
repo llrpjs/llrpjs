@@ -576,7 +576,7 @@ class LLRPBytesToEnd extends LLRPField<"bytesToEnd"> {
     decode(): this {
         super.decode();
         let result = [];
-        while (this.buffer.hasData) {
+        while (this.buffer.hasData(8)) {
             result.push(this.buffer.readUInt8());
         }
         this.setValue(result);

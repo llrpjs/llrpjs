@@ -26,9 +26,10 @@ export class LLRPBuffer {
         this.setBuffer(buffer);
     }
 
-    get hasData() {
-        let lastBitIndex = this._buffer.length - 1 + 7;
-        return this.bit <= lastBitIndex;
+    hasData(bitSize: number) {
+        const lastBitIndex = this._buffer.length * 8 - 1;
+        const availableSize = lastBitIndex - this.bit + 1;
+        return availableSize >= bitSize;
     }
 
     setBuffer(buffer: Buffer): this {
