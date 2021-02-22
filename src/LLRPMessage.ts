@@ -4,9 +4,12 @@ import { LLRPUserData } from "./types";
 export class LLRPMessage<T extends LLRPUserData> {
     origin: _LLRPMessage<T>;
 
-    constructor(args?: LLRPMessageI | Buffer) {
-        if (args) {
-            this.origin = new _LLRPMessage(args);
+    constructor(args?: LLRPMessageI);
+    constructor(b?: Buffer);
+
+    constructor(_?: LLRPMessageI | Buffer) {
+        if (_) {
+            this.origin = new _LLRPMessage(_);
         }
     }
 
