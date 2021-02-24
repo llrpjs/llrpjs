@@ -1,6 +1,7 @@
 import { LLRPMessage } from "./LLRPMessage";
 import { TypeRegistry } from "./type-registry";
 import * as DEF from "./def-tc";
+import { LLRPScanner } from "./LLRPScanner";
 
 
 TypeRegistry.getInstance().build();
@@ -75,8 +76,17 @@ console.log(n.getBuffer().toString('hex').replace(/(.)(.)/g, '$1$2 '));
 
  */
 
-let m = new LLRPMessage(n.getBuffer());
-console.log(JSON.stringify(m.toLLRPData(), null, 2));
+let scanner = new LLRPScanner();
+let b: Buffer = n.getBuffer();
+
+scanner.addBuffer(b);
+scanner.addBuffer(b);
+scanner.addBuffer(b);
+
+while (b = scanner.getNext()) {
+    let m = new LLRPMessage(b);
+    console.log(JSON.stringify(m.toLLRPData(), null, 2));
+}
 
 // let n = new LLRP_C_ADD_ROSPEC();
 // n.setMessageId(0x12345678)
