@@ -1,26 +1,12 @@
+import { LLRP_TD_RSVD_TYPENUM, LLRP_TD_TV_TYPENUM } from "../const-td";
 import { LLRPFieldFactory } from "../field/llrp";
 import { LLRPUserData } from "../types";
 import { LLRPElement } from "./element";
+import { LLRPParameterHeader } from "./header";
 
 
 export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
-    // TLV
-    protected rsvdType = LLRPFieldFactory({
-        name: "RsvdTypeNum",
-        type: "u16",
-        format: "Normal"
-    });
-    protected paramLength = LLRPFieldFactory({
-        name: "paramLength",
-        type: "u16",
-        format: "Normal"
-    });
-    // TV
-    protected tvType = LLRPFieldFactory({
-        name: "TVType",
-        type: "u8",
-        format: "Normal"
-    });
+    header = new LLRPParameterHeader;
 
     get type() { return this.getName() };
     set type(v: this['td']['name']) { this.setType(v); };
@@ -39,35 +25,20 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
     setType(type: string) {
         super.setType(type);
         if (this.isTV)
-            this.setTVTypeNum(this.getTypeNum());
+            this.header.setTVTypeNum(this.getTypeNum());
         else
-            this.setTLVTypeNum(this.getTypeNum());
-        return this;
-    }
-
-    assembleTLVHeader() {
-        if (this.header.isEmpty) {
-            this.header.push(this.rsvdType);
-            this.header.push(this.paramLength);
-        }
-        return this;
-    }
-
-    assembleTVHeader() {
-        if (this.header.isEmpty) {
-            this.header.push(this.tvType);
-        }
+            this.header.setTLVTypeNum(this.getTypeNum());
         return this;
     }
 
     assembleHeader() {
         super.assembleHeader();
         if (this.isTV) {
-            this.assembleTVHeader();
-            this.setTVTypeNum(this.getTypeNum());
+            this.header.buildTV();
+            this.header.setTVTypeNum(this.getTypeNum());
         } else {
-            this.assembleTLVHeader();
-            this.setTLVTypeNum(this.getTypeNum());
+            this.header.buildTLV();
+            this.header.setTLVTypeNum(this.getTypeNum());
         }
         return this;
     }
@@ -75,14 +46,13 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
     assemble() {
         super.assemble();
         if (!this.isTV)
-            this.setTLVLength(this.getByteSize());
+            this.header.setTLVLength(this.getByteSize());
         return this;
     }
 
     decodeHeader() {
         this.header.setStartBit(this.getStartBit());
-
-        let typeNum = this.tvType.setBuffer(this.getBuffer())
+        let typeNum = LLRPFieldFactory(LLRP_TD_TV_TYPENUM).setBuffer(this.getBuffer())
             .setStartBit(this.getStartBit())
             .decode()
             .getValue() as number;
@@ -90,20 +60,20 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
             // TV
             typeNum &= 0x7f;
             this.setTypeByNumber(typeNum);
-            this.assembleTVHeader();
+            this.header.buildTV();
             return this;
         }
         // TLV ? Message ?
-        typeNum = this.rsvdType.setBuffer(this.getBuffer())
+        typeNum = LLRPFieldFactory(LLRP_TD_RSVD_TYPENUM).setBuffer(this.getBuffer())
             .setStartBit(this.getStartBit())
             .decode()
             .getValue() as number;
 
         this.setTypeByNumber(typeNum & 0x3ff);
-        this.assembleTLVHeader();
+        this.header.buildTLV();
         this.header.decode();
 
-        this.setBitSize(this.getTLVLength() * 8);
+        this.setBitSize(this.header.getTLVLength() * 8);
         return this;
     }
 
@@ -114,27 +84,6 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
             this.setBitSize(this.header.getBitSize() + fieldSize);
         }
         return this;
-    }
-
-    // Parameter tools
-
-    setTVTypeNum(v: number) {
-        this.tvType.setValue(0x80 | v);
-        return this;
-    }
-
-    setTLVTypeNum(v: number) {
-        this.rsvdType.setValue(v & 0x3ff);
-        return this;
-    }
-
-    setTLVLength(v: number) {
-        this.paramLength.setValue(v);
-        return this;
-    }
-
-    getTLVLength() {
-        return <number>this.paramLength.getValue();
     }
 
     toLLRPData() {

@@ -1,9 +1,8 @@
 import { LLRPParameter } from "./parameter";
-
 import { LLRPElement } from "./element";
 import { LLRPUserData, Overwrite } from "../types";
-import { LLRPFieldFactory } from "../field/llrp";
 import { LLRPBuffer } from "../buffer/buffer";
+import { LLRPMessageHeader } from "./header";
 
 
 export interface LLRPMessageI {
@@ -19,11 +18,12 @@ type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
 
 // expands object types recursively
 type ExpandRecursively<T> = T extends object
-  ? T extends infer O ? { [K in keyof O]: ExpandRecursively<O[K]> } : never
-  : T;
+    ? T extends infer O ? { [K in keyof O]: ExpandRecursively<O[K]> } : never
+    : T;
 
 
 export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
+    LLRPDATATYPE: T;
     LLRPMESSAGETYPE: ExpandRecursively<Overwrite<Required<LLRPMessageI>, Encapsulate<this['LLRPDATATYPE']>>>;
 
     static readonly version: 1 = 1;
@@ -32,24 +32,10 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
         return this.idCounter++;
     }
 
-    protected rsvdVersionType = LLRPFieldFactory({
-        name: "RsvdVersionTypeNum",
-        type: "u16",
-        format: "Normal"
-    });
-    protected messageLength = LLRPFieldFactory({
-        name: "MessageLength",
-        type: "u32",
-        format: "Normal"
-    });
-    protected messageId = LLRPFieldFactory({
-        name: "MessageID",
-        type: "u32",
-        format: "Normal"
-    });
+    header = new LLRPMessageHeader;
 
-    get id() { return this.messageId.getValue() as number }
-    set id(v: number) { this.messageId.setValue(v) }
+    get id() { return this.header.getMessageId() as number }
+    set id(v: number) { this.header.setMessageId(v) }
     get type() { return this.getName() };
     set type(v: this['td']['name']) { this.setType(v); };
 
@@ -83,24 +69,20 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
 
     setType(type: string) {
         super.setType(type);
-        this.setMessageTypeNum(this.getTypeNum());
+        this.header.setMessageTypeNum(this.getTypeNum());
         return this;
     }
 
     assembleHeader() {
         super.assembleHeader();
-        if (this.header.isEmpty) {
-            this.header.push(this.rsvdVersionType);
-            this.header.push(this.messageLength.setStartBit(this.rsvdVersionType.getBitSize()));
-            this.header.push(this.messageId.setStartBit(this.messageLength.getBitSize()));
-        }
+        this.header.build();
         return this;
     }
 
     assemble() {
         super.assemble();
         const byteSize = this.getByteSize();
-        this.setMessageLength(byteSize);
+        this.header.setMessageLength(byteSize);
         this.setBuffer(new LLRPBuffer(Buffer.alloc(byteSize)));
         return this;
     }
@@ -110,53 +92,19 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
         this.assembleHeader();
         this.header.decode();
 
-        let version = this.getVersion();
-        if (version !== LLRPMessage.version)
+        let version = this.header.getVersion();
+        if (version !== LLRPMessageHeader.version)
             throw new Error(`unsupported version ${version}`);
 
-        this.setTypeByNumber(this.getMessageTypeNum());
+        this.setTypeByNumber(this.header.getMessageTypeNum());
 
-        let length = this.getMessageLength();
+        let length = this.header.getMessageLength();
         if (length < 10)
             throw new Error(`invalid message length ${length}`);
 
         this.setBitSize(length * 8);
 
         return this;
-    }
-
-
-    // Message tools
-
-    setMessageLength(length: number) {
-        this.messageLength.setValue(length);
-        return this;
-    }
-
-    getMessageLength() {
-        return this.messageLength.getValue() as number;
-    }
-
-    setMessageTypeNum(typeNum: number) {
-        this.rsvdVersionType.setValue((LLRPMessage.version << 10) + typeNum);
-        return this;
-    }
-
-    getMessageTypeNum() {
-        return <number>this.rsvdVersionType.getValue() & 0x3ff;
-    }
-
-    setMessageId(id: number) {
-        this.messageId.setValue(id);
-        return this;
-    }
-
-    getMessageId() {
-        return this.messageId.getValue();
-    }
-
-    getVersion() {
-        return (<number>this.rsvdVersionType.getValue() & 0x1c00) >>> 10;
     }
 
     toLLRPData(): this['LLRPMESSAGETYPE'] {
@@ -168,6 +116,4 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
     }
 }
 
-export interface LLRPMessage<T extends LLRPUserData> {
-    LLRPDATATYPE: T;
-}
+export interface LLRPMessage<T extends LLRPUserData> { }
