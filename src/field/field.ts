@@ -1,11 +1,11 @@
 import { ClassUnion, MixinAny } from "../bryntum/chronograph/Mixin";
-import { FieldDescriptor, GetEnumValue, GetFieldDataType, GetFieldFormatValue, LLRPFieldType } from "../types";
+import { FieldDescriptor, GetFieldRawValue, GetFieldFormatValue, LLRPFieldType, GetEnumValue } from "../types";
 import { LLRPEnumerator } from "./enumerator";
 import { LLRPFormatterParser } from "./formatter";
 import { LLRPNode } from "../base/node";
 import { LLRPFieldData } from "./data";
 
-export class LLRPField<FT extends LLRPFieldType> extends MixinAny(
+export class LLRPField<FD extends FieldDescriptor> extends MixinAny(
     [LLRPFieldData, LLRPFormatterParser, LLRPEnumerator, LLRPNode],
     (base: ClassUnion<
         typeof LLRPFieldData,
@@ -18,9 +18,9 @@ export class LLRPField<FT extends LLRPFieldType> extends MixinAny(
          * Do all the stuff in common between derived (user) LLRP field classes
          */
         RV: any;
-        FMT: any;
-        ET: any;
-        EV: any;      // end-user value type: raw | formatted | enumerated
+        FMTV: any;
+        ETV: any;
+        EV: this['RV'] | this['FMTV'] | this['ETV'];      // end-user value type: raw | formatted | enumerated
 
         private isEVFormattable(v: this['EV']) {
             if (this.isUtf8Formattable) return true;
@@ -74,7 +74,7 @@ export class LLRPField<FT extends LLRPFieldType> extends MixinAny(
             return this;
         }
 
-        setDefault(type: LLRPFieldType): this {
+        setDefault(type: this['fd']['type']): this {
             this.setDefaultDescriptor();
             this.setType(type);
             this.setStartBit(0);               // default buf start
@@ -83,18 +83,28 @@ export class LLRPField<FT extends LLRPFieldType> extends MixinAny(
             return this;
         }
     }
-) { }
+) {
+    static ofType<C extends typeof LLRPField, FT extends LLRPFieldType, FD extends FieldDescriptor<FT>>(this: C, type: FT) {
+        return class _LLRPField extends LLRPField<FD> {
+            constructor(...args: any[]) {
+                super(...args);
+                this.setDefault(type);
+            }
+        };
+    }
+}
 
-export interface LLRPField<FT extends LLRPFieldType> {
-    fd: FieldDescriptor<FT>;
-    RV: GetFieldDataType<FT>;
-    FMT: GetFieldFormatValue<FT>;
-    ET: GetEnumValue<FT>;
-    EV: this['RV'] | this['FMT'] | this['ET'];
+export interface LLRPField<FD extends FieldDescriptor> {
+    fd: FD;
+    RV: GetFieldRawValue<FD['type']>;
+    FMTV: GetFieldFormatValue<FD['format']>;
+    ETV: GetEnumValue<FD['type']>;
 
-    prev: LLRPField<LLRPFieldType>;
-    next: LLRPField<LLRPFieldType>;
+    prev: LLRPField<FieldDescriptor>;
+    next: LLRPField<FieldDescriptor>;
 }
 
 export const LLRPFieldInstanceType = LLRPField;
-export type LLRPFieldInstanceType = LLRPField<LLRPFieldType>;
+export type LLRPFieldInstanceType = LLRPField<FieldDescriptor>;
+
+

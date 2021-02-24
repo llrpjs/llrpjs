@@ -1,15 +1,9 @@
-import { CRUMB, FieldDescriptor, LLRPFieldType } from "../types";
+import { CRUMB, FieldDescriptor, GetEnumTable, GetFieldFormat, LLRPFieldType } from "../types";
 import { LLRPField } from "./field";
 
 // TODO: add buffer availability assertion before read/write ops
 
-class LLRPU1 extends LLRPField<"u1"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u1");
-    }
-
+class LLRPU1 extends LLRPField.ofType("u1") {
     encode(): this {
         super.encode();
         this.buffer.writeBit(this.rValue);
@@ -23,13 +17,7 @@ class LLRPU1 extends LLRPField<"u1"> {
     }
 }
 
-class LLRPU2 extends LLRPField<"u2"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u2");
-    }
-
+class LLRPU2 extends LLRPField.ofType("u2") {
     encode(): this {
         super.encode();
         this.buffer.writeNMsb(this.rValue, 2);
@@ -43,13 +31,7 @@ class LLRPU2 extends LLRPField<"u2"> {
     }
 }
 
-class LLRPU8 extends LLRPField<"u8"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u8");
-    }
-
+class LLRPU8 extends LLRPField.ofType("u8") {
     encode(): this {
         super.encode();
         this.buffer.writeUInt8(this.rValue);
@@ -63,13 +45,7 @@ class LLRPU8 extends LLRPField<"u8"> {
     }
 }
 
-class LLRPS8 extends LLRPField<"s8"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("s8");
-    }
-
+class LLRPS8 extends LLRPField.ofType("s8") {
     encode(): this {
         super.encode();
         this.buffer.writeInt8(this.rValue);
@@ -83,13 +59,7 @@ class LLRPS8 extends LLRPField<"s8"> {
     }
 }
 
-class LLRPU16 extends LLRPField<"u16"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u16");
-    }
-
+class LLRPU16 extends LLRPField.ofType("u16") {
     encode(): this {
         super.encode();
         this.buffer.writeUInt16(this.rValue);
@@ -103,13 +73,7 @@ class LLRPU16 extends LLRPField<"u16"> {
     }
 }
 
-class LLRPS16 extends LLRPField<"s16"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("s16");
-    }
-
+class LLRPS16 extends LLRPField.ofType("s16") {
     encode(): this {
         super.encode();
         this.buffer.writeInt16(this.rValue);
@@ -123,14 +87,8 @@ class LLRPS16 extends LLRPField<"s16"> {
     }
 }
 
-class LLRPU32 extends LLRPField<"u32"> {
+class LLRPU32 extends LLRPField.ofType("u32") {
     rValue = 0;
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u32");
-    }
-
     encode(): this {
         super.encode();
         this.buffer.writeUInt32(this.rValue);
@@ -144,13 +102,7 @@ class LLRPU32 extends LLRPField<"u32"> {
     }
 }
 
-class LLRPS32 extends LLRPField<"s32"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("s32");
-    }
-
+class LLRPS32 extends LLRPField.ofType("s32") {
     encode(): this {
         super.encode();
         this.buffer.writeInt32(this.rValue);
@@ -164,13 +116,7 @@ class LLRPS32 extends LLRPField<"s32"> {
     }
 }
 
-class LLRPU64 extends LLRPField<"u64"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u64");
-    }
-
+class LLRPU64 extends LLRPField.ofType("u64") {
     encode(): this {
         super.encode();
         this.buffer.writeUInt64(this.rValue);
@@ -184,13 +130,7 @@ class LLRPU64 extends LLRPField<"u64"> {
     }
 }
 
-class LLRPS64 extends LLRPField<"s64"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("s64");
-    }
-
+class LLRPS64 extends LLRPField.ofType("s64") {
     encode(): this {
         super.encode();
         this.buffer.writeInt64(this.rValue);
@@ -206,13 +146,7 @@ class LLRPS64 extends LLRPField<"s64"> {
 
 
 
-class LLRPReserved extends LLRPField<"reserved"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("reserved");
-    }
-
+class LLRPReserved extends LLRPField.ofType("reserved") {
     encode(): this {
         super.encode();
         for (let i = 0; i < this.getByteSize(); i++)
@@ -234,13 +168,7 @@ class LLRPReserved extends LLRPField<"reserved"> {
 
 
 
-class LLRPUTF8V extends LLRPField<"utf8v"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("utf8v");
-    }
-
+class LLRPUTF8V extends LLRPField.ofType("utf8v") {
     encode(): this {
         super.encode();
         let n = this.rValue.length;
@@ -258,7 +186,7 @@ class LLRPUTF8V extends LLRPField<"utf8v"> {
 }
 
 
-class LLRPU96 extends LLRPField<"u96"> {
+class LLRPU96 extends LLRPField.ofType("u96") {
 
     constructor() {
         super();
@@ -282,13 +210,7 @@ class LLRPU96 extends LLRPField<"u96"> {
     }
 }
 
-class LLRPU1V extends LLRPField<"u1v"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u1v");
-    }
-
+class LLRPU1V extends LLRPField.ofType("u1v") {
     encode(): this {
         super.encode();
         // 1) write number of bits as 16-bit integer
@@ -326,13 +248,7 @@ class LLRPU1V extends LLRPField<"u1v"> {
     }
 }
 
-class LLRPU8V extends LLRPField<"u8v"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u8v");
-    }
-
+class LLRPU8V extends LLRPField.ofType("u8v") {
     encode(): this {
         super.encode();
         let n = this.rValue.length;
@@ -355,13 +271,7 @@ class LLRPU8V extends LLRPField<"u8v"> {
     }
 }
 
-class LLRPS8V extends LLRPField<"s8v"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("s8v");
-    }
-
+class LLRPS8V extends LLRPField.ofType("s8v") {
     encode(): this {
         super.encode();
         let n = this.rValue.length;
@@ -384,13 +294,7 @@ class LLRPS8V extends LLRPField<"s8v"> {
     }
 }
 
-class LLRPU16V extends LLRPField<"u16v"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u16v");
-    }
-
+class LLRPU16V extends LLRPField.ofType("u16v") {
     encode(): this {
         super.encode();
         let n = this.rValue.length;
@@ -413,13 +317,7 @@ class LLRPU16V extends LLRPField<"u16v"> {
     }
 }
 
-class LLRPS16V extends LLRPField<"s16v"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("s16v");
-    }
-
+class LLRPS16V extends LLRPField.ofType("s16v") {
     encode(): this {
         super.encode();
         let n = this.rValue.length;
@@ -442,13 +340,7 @@ class LLRPS16V extends LLRPField<"s16v"> {
     }
 }
 
-class LLRPU32V extends LLRPField<"u32v"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u32v");
-    }
-
+class LLRPU32V extends LLRPField.ofType("u32v") {
     encode(): this {
         super.encode();
         let n = this.rValue.length;
@@ -471,13 +363,7 @@ class LLRPU32V extends LLRPField<"u32v"> {
     }
 }
 
-class LLRPS32V extends LLRPField<"s32v"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("s32v");
-    }
-
+class LLRPS32V extends LLRPField.ofType("s32v") {
     encode(): this {
         super.encode();
         let n = this.rValue.length;
@@ -500,13 +386,7 @@ class LLRPS32V extends LLRPField<"s32v"> {
     }
 }
 
-class LLRPU64V extends LLRPField<"u64v"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("u64v");
-    }
-
+class LLRPU64V extends LLRPField.ofType("u64v") {
     encode(): this {
         super.encode();
         let n = this.rValue.length;
@@ -529,13 +409,7 @@ class LLRPU64V extends LLRPField<"u64v"> {
     }
 }
 
-class LLRPS64V extends LLRPField<"s64v"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("s64v");
-    }
-
+class LLRPS64V extends LLRPField.ofType("s64v") {
     encode(): this {
         super.encode();
         let n = this.rValue.length;
@@ -558,13 +432,7 @@ class LLRPS64V extends LLRPField<"s64v"> {
     }
 }
 
-class LLRPBytesToEnd extends LLRPField<"bytesToEnd"> {
-
-    constructor(...args: any[]) {
-        super(...args);
-        this.setDefault("bytesToEnd");
-    }
-
+class LLRPBytesToEnd extends LLRPField.ofType("bytesToEnd") {
     encode(): this {
         super.encode();
         for (let i = 0; i < this.rValue.length; i++) {
@@ -610,8 +478,11 @@ const Classes = {
     "reserved": LLRPReserved
 } as const;
 
-export function LLRPFieldFactory<FT extends LLRPFieldType>(fd: FieldDescriptor<FT>) {
+export function LLRPFieldFactory<
+    FT extends LLRPFieldType,
+    FMT extends GetFieldFormat<FT>,
+    ET extends GetEnumTable<FT>>(fd: FieldDescriptor<FT, FMT, ET>) {
     const FieldClass = Classes[fd.type];
-    let f = new FieldClass as LLRPField<FT>;
+    let f = new FieldClass as LLRPField<typeof fd>;
     return f.setDescriptor(fd);
 }

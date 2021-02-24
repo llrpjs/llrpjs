@@ -1,5 +1,5 @@
 import { AnyConstructor, Mixin } from "../bryntum/chronograph/Mixin";
-import { FieldDescriptor, LLRPFieldType } from "../types";
+import { FieldDescriptor, LLRPFieldType} from "../types";
 
 const BITWIDTH: {[key in LLRPFieldType]: 0|1|2|8|16|32|64} = {
     "u1": 1,
@@ -31,7 +31,7 @@ export class LLRPFieldDescriptor extends Mixin(
     [],
     (base: AnyConstructor) =>
     class LLRPFieldDescriptor extends base {
-        fd: FieldDescriptor<LLRPFieldType>;
+        fd: FieldDescriptor;
 
         setDefaultDescriptor() {
             this.fd = {
@@ -48,12 +48,12 @@ export class LLRPFieldDescriptor extends Mixin(
         }
 
         // name
-        setName(name: string): this {
+        setName(name: this['fd']['name']): this {
             this.fd.name = name;
             return this;
         }
 
-        getName(): string {
+        getName() {
             return this.fd.name;
         }
 
@@ -167,5 +167,5 @@ export class LLRPFieldDescriptor extends Mixin(
 ) { }
 
 export interface LLRPFieldDescriptor {
-    fd: FieldDescriptor<LLRPFieldType>;
+    fd: FieldDescriptor;
 }

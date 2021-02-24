@@ -11,7 +11,7 @@ export class LLRPFormatterParser extends Mixin(
     (base: AnyConstructor<LLRPFieldDescriptor, typeof LLRPFieldDescriptor>) =>
     class LLRPFormatterParser extends base {
         RV: any;
-        FMT: any;
+        FMTV: any;
 
         protected static fullPrecision = true;
 
@@ -110,7 +110,7 @@ export class LLRPFormatterParser extends Mixin(
 
         /** methods */
         public getFormatted(v: this['RV']) {
-            let res: this['FMT'];
+            let res: this['FMTV'];
             if (this.isNormalFormattable)
                 res = LLRPFormatterParser.formatNormal(v);   // void
 
@@ -133,7 +133,7 @@ export class LLRPFormatterParser extends Mixin(
             return res;
         }
 
-        public getParsed(v: this['FMT']) {
+        public getParsed(v: this['FMTV']) {
             let res: this['RV'];
             if (this.isNormalFormattable)
                 res = LLRPFormatterParser.parseNormal(v);

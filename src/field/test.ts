@@ -20,11 +20,11 @@ let llrpStatus = LLRPFieldFactory({
         {
             name: "OK",
             value: 0
-        },
+        } as const,
         {
             name: "ERROR",
             value: 1
-        }
+        } as const
     ]
 }).setValue("ERROR");
 
@@ -53,7 +53,7 @@ fieldList.push(microSeconds);
 let buf = new LLRPBuffer(Buffer.alloc(fieldList.getByteSize()));
 fieldList.setBuffer(buf).encode();
 
-epc96.setFormat("Normal").setValue([38, 3, 1, 2, 3, 5, 4, 8, 8, 1, 2, 3]);
+epc96.setValue([38, 3, 1, 2, 3, 5, 4, 8, 8, 1, 2, 3]);
 
 fieldList.decode();
 

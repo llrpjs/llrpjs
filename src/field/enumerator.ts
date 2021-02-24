@@ -7,10 +7,10 @@ export class LLRPEnumerator extends Mixin(
     (base: AnyConstructor<LLRPFieldDescriptor, typeof LLRPFieldDescriptor>) =>
     class LLRPEnumerator extends base {
         RV: any;
-        ET: any;
+        ETV: any;
 
         getEnumName(value: this['RV']) {
-            let res: this['ET'];
+            let res: this['ETV'];
             if (this.isVectorType)
                 res = (<number[]>value).map(v =>
                     this.fd.enumTable?.filter(entry => entry.value === v)[0]?.name || ""
@@ -20,7 +20,7 @@ export class LLRPEnumerator extends Mixin(
             return res;
         }
 
-        getEnumValue(name: this['ET']) {
+        getEnumValue(name: this['ETV']) {
             let res: this['RV'];
             if (this.isVectorType)
                 res = (<string[]>name).map(n =>

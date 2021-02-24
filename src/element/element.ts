@@ -1,6 +1,6 @@
 import { Base } from "../bryntum/chronograph/Base";
 import { ClassUnion, MixinAny } from "../bryntum/chronograph/Mixin";
-import { LLRPDataType, LLRPFieldType, LLRPUserData } from "../types";
+import { LLRPDataValue, LLRPUserData } from "../types";
 import { LLRPData } from "./data";
 import { LLRPFieldFactory } from "../field/llrp";
 import { LLRPTypeDescriptor } from "./type-descriptor";
@@ -48,7 +48,7 @@ export class LLRPElement extends MixinAny(
                 return this;
             }
 
-            setField(name: string, data: LLRPDataType) {
+            setField(name: string, data: LLRPDataValue) {
                 let f = this.getSubType(name) as LLRPFieldInstanceType;
                 if (!f) throw new Error(`field ${name} not found in type ${this.getName()}`);
                 f.setValue(data);

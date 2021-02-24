@@ -2,7 +2,7 @@
 /** Buffer base types */
 export type BOOL = boolean | 0 | 1;
 export type CRUMB = 0 | 1 | 2 | 3;
-export type LLRPRawDataType = BOOL | CRUMB | number | bigint | string | number[] | bigint[] | void
+export type LLRPRawDataValue = BOOL | CRUMB | number | bigint | string | number[] | bigint[] | void
 
 export type LLRPSimpleFieldType =
   | "u1" | "u2"
@@ -35,7 +35,7 @@ export type LLRPBigIntVector = "u64v" | "s64v";
 export type LLRPString = "utf8v";
 export type LLRPVoid = "reserved";
 
-export type GetFieldType<T extends LLRPRawDataType> =
+export type GetFieldType<T extends LLRPRawDataValue> =
   T extends BOOL ? LLRPBool
   : T extends CRUMB ? LLRPCrumb
   : T extends number ? LLRPNumber
@@ -47,18 +47,18 @@ export type GetFieldType<T extends LLRPRawDataType> =
   : any;
 
 /** LLRP Formats */
-export type LLRPFMTNormal = void;
+export type LLRPFMTNormal = never;
 export type LLRPFMTDec = string;  // decimals
 export type LLRPFMTHex = string;  // hex
 export type LLRPFMTUTF8 = string; // strings
 export type LLRPFMTDate = Date | string;  // dates
-export type LLRPFormatType = LLRPFMTNormal | LLRPFMTDec | LLRPFMTHex | LLRPFMTUTF8 | LLRPFMTDate;
+export type LLRPFormatValue = LLRPFMTNormal | LLRPFMTDec | LLRPFMTHex | LLRPFMTUTF8 | LLRPFMTDate;
 
 /** LLRP Enum types */
-export type LLRPEnumType = string | string[] | number | number[];
+export type LLRPEnumValue = string | string[];
 
 /** LLRP Field data type */
-export type LLRPDataType = LLRPRawDataType | LLRPFormatType | LLRPEnumType;
+export type LLRPDataValue = LLRPRawDataValue | LLRPFormatValue | LLRPEnumValue;
 
 /** LLRP Field Descriptor tools */
 export type LLRPFieldFormat =
@@ -80,39 +80,45 @@ export interface EnumEntry {
   value: number
 }
 
+export type LLRPEnumTableType = never | EnumEntry[];
+
 /** Field Descriptor */
 
-export type FieldDescriptor<FT extends LLRPFieldType> = {
-  name: string;
-  type: FT;
-  format: GetFieldFormat<FT>;
-  enumTable?: GetEnumTable<FT>;
-  bitCount?: number;
-}
+export type FieldDescriptor<
+  FT extends LLRPFieldType = LLRPFieldType,
+  FMT extends LLRPFieldFormat = LLRPFieldFormat,
+  ET extends LLRPEnumTableType = LLRPEnumTableType> = {
+    name: string;
+    type: FT;
+    format: FMT;
+    enumTable?: Readonly<ET>;
+    bitCount?: number;
+  }
 
-export type GetFieldFormat<T extends LLRPFieldType> =
+export type GetFieldFormat<T> =
   T extends "u64" ? "Normal" | "Datetime"
   : T extends LLRPSimpleFieldType | LLRPVoidFieldType ? "Normal"
   : T extends LLRPVectorFieldType ? "Normal" | "Dec" | "Hex"
   : T extends LLRPStringFieldType ? "UTF8"
-  : never;
+  : "Normal";
 
 export type GetEnumTable<T extends LLRPFieldType> =
-  T extends LLRPBool | LLRPCrumb | LLRPNumber | Exclude<LLRPNumberVector, "u96" | "bytesToEnd"> ? EnumEntry[] : undefined;
-export type GetBitCount<T extends LLRPFieldType> = T extends "reserved" ? number : never;
+  T extends LLRPBool | LLRPCrumb | LLRPNumber | Exclude<LLRPNumberVector, "u96" | "bytesToEnd"> ? EnumEntry[] : never;
 
-
-export type GetFieldFormatValue<T extends LLRPFieldType> =
-  T extends "u64" ? Date | string
-  : T extends LLRPNumberVector ? string
+export type GetFieldFormatValue<T extends LLRPFieldFormat> =
+  T extends "Datetime" ? LLRPFMTDate
+  : T extends "Normal" ? LLRPFMTNormal
+  : T extends "UTF8V" ? LLRPFMTUTF8
+  : T extends "Hex" ? LLRPFMTHex
+  : T extends "Dec" ? LLRPFMTDec
   : never;
 
 export type GetEnumValue<T extends LLRPFieldType> =
-  T extends LLRPNumber | LLRPBool | LLRPCrumb ? string
-  : T extends Exclude<LLRPNumberVector, "u96" | "bytesToEnd"> ? string[]
-  : never;
+  T extends LLRPNumber | LLRPBool | LLRPCrumb ?
+  T extends Exclude<LLRPNumberVector, "u96" | "bytesToEnd"> ? never : string
+  : T extends Exclude<LLRPNumberVector, "u96" | "bytesToEnd"> ? string[] : never;
 
-export type GetFieldDataType<T extends LLRPFieldType> =
+export type GetFieldRawValue<T extends LLRPFieldType> =
   T extends LLRPVoidFieldType ? void
   : T extends "u64" | "s64" ? bigint
   : T extends "u1" ? BOOL
@@ -166,7 +172,7 @@ export type LLRPUserData = {
   [x: string]: LLRPUserDataValue;
 }
 
-export type LLRPUserDataValue = LLRPDataType | LLRPUserData | LLRPUserData[];
+export type LLRPUserDataValue = LLRPDataValue | LLRPUserData | LLRPUserData[];
 
 // Type registry tools
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;

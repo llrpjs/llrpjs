@@ -1,12 +1,12 @@
 import { LLRPFieldDescriptor } from "./descriptor";
-import { LLRPRawDataType } from "../types";
+import { LLRPRawDataValue } from "../types";
 import { AnyConstructor, Mixin } from "../bryntum/chronograph/Mixin";
 
 export class LLRPFieldData extends Mixin(
     [LLRPFieldDescriptor],
     (base: AnyConstructor<LLRPFieldDescriptor, typeof LLRPFieldDescriptor>) =>
     class LLRPFieldData extends base {
-        RV: LLRPRawDataType
+        RV: LLRPRawDataValue
         protected rValue: this['RV'];
 
         setDefaultRawValue(): void {
