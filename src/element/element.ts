@@ -272,9 +272,9 @@ export class LLRPElement extends MixinAny(
                  *      a) our decoded header has another reference in our records (allowedIn)
                  *      b) our decoded header has no reference in our records (error)
                  */
+                let e = this.createElement();
                 for (let tRef of this.getSubTypeReferences()) {
                     while (this.isAllowedIn(tRef) && this.withinBoundLimits) {
-                        let e = this.createElement();
                         e.setBuffer(this.getBuffer())
                             .setStartBit(this.subElementList.getEndBit() + 1)   // pickup from where we left off
                             .decodeHeader();
@@ -290,6 +290,7 @@ export class LLRPElement extends MixinAny(
                         else
                             this.addSubType(e.getName(), e);
                         this.subElementList.push(e);
+                        e = this.createElement();
 
                         if (this.isMaxOfOneRepeat(tRef)) break;
                     }
