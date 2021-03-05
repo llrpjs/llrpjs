@@ -1,6 +1,7 @@
 import { AnyConstructor, MixinAny } from "../bryntum/chronograph/Mixin";
 import { LLRPBound } from "../buffer/bound";
 import { LLRPBuffer } from "../buffer/buffer";
+import { LLRPError } from "./error";
 import { LLRPNode } from "./node";
 
 
@@ -102,9 +103,8 @@ export class LLRPList extends MixinAny(
                 return this.getEndByte() - this.getStartByte() + 1;
             }
 
-            setBitSize(bit: number) {
-                throw new Error(`can't set bit size of list`);
-                return this;
+            setBitSize(bit: number): any {
+                throw new LLRPError("ERR_LLRP_INTERNAL", `setBitSize is not allowed for list`);
             }
 
             getBuffer() {
@@ -136,11 +136,6 @@ export class LLRPList extends MixinAny(
                 return popped;
             }
 
-            concat(v: this) {
-                v.setStartBit(this.getBitSize());
-                return this._concat(v);
-            }
-
             clear() {
                 this.first = null;
                 this.last = null;
@@ -159,6 +154,9 @@ export class LLRPList extends MixinAny(
             decode(): this {
                 for (let i = this.first; !!i; i = i.next) {
                     i.decode();
+                    if (i.next) {
+                        i.next.setStartBit(i.getEndBit() + 1);
+                    }
                 }
                 return this;
             }
