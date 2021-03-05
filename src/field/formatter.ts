@@ -95,8 +95,8 @@ export class LLRPFormatterParser extends Mixin(
 
         protected static parseHexVector(v: string, bitWidth: number): number[] {
             let n = bitWidth / 4;
-            return v.split('').reduce((acc, x, i) => (i % n == 0) && (i != 0) ? `${acc},${x}` : `${acc}${x}`, '')
-                .split(',').map(x => parseInt(x.padEnd(2, "0"), 16))
+            v = v.trim().split('').reduce((acc, x, i) => (i % n == 0) && (i != 0) ? `${acc},${x}` : `${acc}${x}`, '');
+            return v.length ? v.split(',').map(x => parseInt(x.padEnd(2, "0"), 16)) : [];
         }
 
         protected static parseDateTime(v: LLRPFMTDate): bigint {
