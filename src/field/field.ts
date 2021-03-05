@@ -74,6 +74,12 @@ export class LLRPField<FD extends FieldDescriptor> extends MixinAny(
             return this;
         }
 
+        setDescriptor(fd: FieldDescriptor) {
+            super.setDescriptor(fd);
+            this.updateBitSize();
+            return this;
+        }
+
         setDefault(type: this['fd']['type']): this {
             this.setDefaultDescriptor();
             this.setType(type);
