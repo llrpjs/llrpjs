@@ -149,15 +149,17 @@ class LLRPS64 extends LLRPField.ofType("s64") {
 class LLRPReserved extends LLRPField.ofType("reserved") {
     encode(): this {
         super.encode();
+        // write orphaned bits first (just in case we're not at bit 0)
+        this.buffer.writeBits(0, this.getBitSize() - this.getByteSize() * 8);
+        // write whole bytes if any
         for (let i = 0; i < this.getByteSize(); i++)
             this.buffer.writeUInt8(0);
-
-        this.buffer.writeBits(0, this.getBitSize() - this.getByteSize() * 8);
         return this;
     }
 
     decode(): this {
         super.decode();
+        // order doesn't matter here (merely moving indices)
         for (let i = 0; i < this.getByteSize(); i++)
             this.buffer.readUInt8();
 
@@ -180,7 +182,7 @@ class LLRPUTF8V extends LLRPField.ofType("utf8v") {
     decode(): this {
         super.decode();
         let n = this.buffer.readUInt16();
-        this.rValue = this.buffer.readUTF8(n);
+        this.setValue(this.buffer.readUTF8(n));
         return this;
     }
 }
@@ -195,17 +197,20 @@ class LLRPU96 extends LLRPField.ofType("u96") {
 
     encode(): this {
         super.encode();
-        for (let i = 0; i < this.rValue.length; i++) {
-            this.buffer.writeUInt8(this.rValue[i]);
+        let rValue = this.getRawValue();
+        for (let i = 0; i < this.getByteSize(); i++) {
+            this.buffer.writeUInt8(rValue[i]);
         }
         return this;
     }
 
     decode(): this {
         super.decode();
-        for (let i = 0; i < 12; i++) {
-            this.rValue[i] = this.buffer.readUInt8();
+        let rValue = [];
+        for (let i = 0; i < this.getByteSize(); i++) {
+            rValue.push(this.buffer.readUInt8());
         }
+        this.setValue(rValue);
         return this;
     }
 }
@@ -213,17 +218,12 @@ class LLRPU96 extends LLRPField.ofType("u96") {
 class LLRPU1V extends LLRPField.ofType("u1v") {
     encode(): this {
         super.encode();
+        let rValue = this.getRawValue();
         // 1) write number of bits as 16-bit integer
-        this.buffer.writeUInt16(this.getBitSize());
+        this.buffer.writeUInt16(rValue.length * 8);
         // 2) write all bytes first
         for (let i = 0; i < this.rValue.length; i++) {
-            this.buffer.writeUInt8(this.rValue[i]);
-        }
-        let bitCount = this.getBitSize() - this.getByteSize() * 8;
-        // 3) write all succeeding bits
-        if (bitCount > 0) {
-            let partial = this.rValue[this.getByteSize()];  // index of the partial is right after the last byte
-            this.buffer.writeNMsb(partial, bitCount);
+            this.buffer.writeUInt8(rValue[i]);
         }
         return this;
     }
@@ -233,15 +233,10 @@ class LLRPU1V extends LLRPField.ofType("u1v") {
         let result = [];
         // 1) get length (bits)
         let bitSize = this.buffer.readUInt16();
-        let byteSize = bitSize >> 3;
+        let byteSize = Math.floor((bitSize + 7)/ 8);
         // 2) get all bytes
         for (let i = 0; i < byteSize; i++) {
             result.push(this.buffer.readUInt8());
-        }
-        // 3) get the trailing partial (if any)
-        let bitCount = bitSize - byteSize * 8;
-        if (bitCount) {
-            result.push(this.buffer.readNMsb(bitCount));
         }
         this.setValue(result);
         return this;

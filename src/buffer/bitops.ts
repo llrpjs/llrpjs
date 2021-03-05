@@ -7,14 +7,14 @@ export class BitOps {
     }
     /** big-endian bit ops */
     readBit(offset: number = 0, bit: number = 0): number {
-        return (this.buffer[offset] >> (7 - bit & 7)) & 1;
+        return (this.buffer[offset] >> (7 - (bit & 7))) & 1;
     }
 
     writeBit(value: number, offset: number = 0, bit: number = 0): number {
         value = value ? 1 : 0;
         if (this.readBit(offset, bit) === value)
             return 0;
-        this.buffer[offset] ^= 1 << (7 - bit & 7);
+        this.buffer[offset] ^= 1 << (7 - (bit & 7));
         return 1;
     }
 
@@ -28,7 +28,7 @@ export class BitOps {
     }
 
     readNMsbBE(offset: number = 0, n: number = 0): number {
-        return this.buffer[offset] >> (8- n);
+        return this.buffer[offset] >> (8 - n);
     }
 
     readNLsbBE(offset: number = 0, n: number = 0): number {
@@ -37,6 +37,7 @@ export class BitOps {
 
     writeNMsbBE(value: number, offset: number = 0, n: number = 0): number {
         /** 2x buff I/O ops */
+        value = 0xff & (value << (8 - n));
         let mask = 0xff >> n;
         this.buffer[offset] = (value & ~mask) | (this.buffer[offset] & mask);
         return 1;

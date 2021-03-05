@@ -76,14 +76,13 @@ export class LLRPBuffer {
     }
 
     readNMsb(n: number): number {
-        n = n;
         let result = this._bitOps.readNMsbBE(this.byte, n);
         this.bit += n;
         return result;
     }
 
     writeNMsb(v: number, n: number): number {
-        let result =  this._bitOps.writeNMsbBE(v, this.byte, n);
+        let result = this._bitOps.writeNMsbBE(v, this.byte, n);
         this.bit += n;
         return result;
     }

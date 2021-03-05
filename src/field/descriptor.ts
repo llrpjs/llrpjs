@@ -15,7 +15,7 @@ const BITWIDTH: {[key in LLRPFieldType]: 0|1|2|8|16|32|64} = {
     "u96": 8,
     "bytesToEnd": 8,
     "reserved": 0,
-    "u1v": 1,
+    "u1v": 8,
     "u8v": 8,
     "s8v": 8,
     "u16v": 16,
