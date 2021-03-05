@@ -44,7 +44,8 @@ export class LLRPField<FD extends FieldDescriptor> extends MixinAny(
             } else if (this.isEVEnumerable(v)) {
                 value = this.getEnumValue(v);
             } else {
-                value = v;
+                if (this.isBigInt) value = BigInt(v);       // in case data is coming from JSON (to avoid bigint coercion into a number)
+                else value = v;
             }
             this.setRawValue(value);
             this.updateBitSize();     // update size in case of vectors and strings
