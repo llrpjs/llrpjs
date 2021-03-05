@@ -280,8 +280,7 @@ export class LLRPElement extends MixinAny(
                             .decodeHeader();
 
                         if (!this.isReferenced(e.getName(), tRef)) {  // sanity check
-                            if (this.isRequired(tRef))
-                                throw new Error(`type ${e.getName()} has no reference in ${this.getName()} records`);
+                            // it probably belongs to the next parameter
                             break;
                         }
 
