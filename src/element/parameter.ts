@@ -1,3 +1,4 @@
+import { LLRPError } from "../base/error";
 import { LLRP_TD_RSVD_TYPENUM, LLRP_TD_TV_TYPENUM } from "../const-td";
 import { LLRPFieldFactory } from "../field/llrp";
 import { LLRPUserData } from "../types";
@@ -17,7 +18,7 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
 
     setTypeByNumber(type: number) {
         let td = this.tr.getParamTypeByTypeNum(type);
-        if (!td) throw new Error(`typeNum not found ${type}`);
+        if (!td) throw new LLRPError("ERR_LLRP_BAD_TYPENUM", `typeNum not found ${type}`);
         this.setTypeDescriptor(td);
         return this;
     }
@@ -73,7 +74,11 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
         this.header.buildTLV();
         this.header.decode();
 
-        this.setBitSize(this.header.getTLVLength() * 8);
+        const length = this.header.getTLVLength();
+        if (length < 4) throw new LLRPError("ERR_LLRP_INVALID_LENGTH",
+            `invalid parameter length ${length}`);
+
+        this.setBitSize(length * 8);
         return this;
     }
 

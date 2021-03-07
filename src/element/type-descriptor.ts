@@ -3,6 +3,7 @@ import { TypeRegistry } from "../type-registry";
 import { LLRPRepeat, SubTypeReference, TypeDescriptor } from "../types";
 import { LLRPList } from "../base/list";
 import { LLRPNode } from "../base/node";
+import { LLRPError } from "../base/error";
 
 const MaxOfOneRepeat: LLRPRepeat[] = ["0-1", "1"];
 const UnlimitedRepeat: LLRPRepeat[] = ["0-N", "1-N"];
@@ -69,7 +70,7 @@ export class LLRPTypeDescriptor extends Mixin(
 
             setType(type: this['type']) {
                 let td = this.tr.getTypeDescByName(type);
-                if (!td) throw new Error(`type not found ${type}`);
+                if (!td) throw new LLRPError("ERR_LLRP_BAD_TYPENUM", `type not found ${type}`);
                 this.setTypeDescriptor(td);
                 return this;
             }
@@ -156,12 +157,6 @@ export class LLRPTypeDescriptor extends Mixin(
             getSubTypeRefByName(name: string) {
                 return this.tRefs[name] || null;
             }
-
-            // isTypeNumMessage(typeNum: number) {
-            //     let td = this.tr.getMsgTypeByTypeNum(typeNum);
-            //     if (!td) throw Error(`typeNum ${typeNum} not found`);
-            //     return td.isMessage;
-            // }
 
             get isMessage(): boolean {
                 return this.td?.isMessage || false;

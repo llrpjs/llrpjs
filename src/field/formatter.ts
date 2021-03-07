@@ -1,6 +1,7 @@
 import { LLRPFMTDate, LLRPFMTDec, LLRPFMTHex } from "../types";
 import { AnyConstructor, Mixin } from "../bryntum/chronograph/Mixin";
 import { LLRPFieldDescriptor } from "./descriptor";
+import { LLRPError } from "../base/error";
 
 const ISO8601_REGEX_MILLI = /(?<=\.)\d{3}(?=Z)/;
 const ISO8601_REGEX_MICRO = /(?<=\.)\d{6}(?=Z)/;
@@ -32,7 +33,7 @@ export class LLRPFormatterParser extends Mixin(
                 microseconds = parseInt(timestamp.match(ISO8601_REGEX_MILLI)?.toString() || "", 10) * 1000;
 
             if (isNaN(microseconds))
-                throw new Error(`cannot parse microseconds ${timestamp}`);
+                throw new LLRPError("ERR_LLRP_BAD_FORMAT", `cannot parse microseconds ${timestamp}`);
 
             return BigInt(time * 1000000 + microseconds);
         }

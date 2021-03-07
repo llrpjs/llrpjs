@@ -3,6 +3,7 @@ import { LLRPElement } from "./element";
 import { LLRPUserData, Overwrite } from "../types";
 import { LLRPBuffer } from "../buffer/buffer";
 import { LLRPMessageHeader } from "./header";
+import { LLRPError } from "../base/error";
 
 
 export interface LLRPMessageI {
@@ -62,7 +63,7 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
 
     setTypeByNumber(type: number) {
         let td = this.tr.getMsgTypeByTypeNum(type);
-        if (!td) throw new Error(`typeNum not found ${type}`);
+        if (!td) throw new LLRPError("ERR_LLRP_BAD_TYPENUM", `typeNum not found ${type}`);
         this.setTypeDescriptor(td);
         return this;
     }
@@ -94,13 +95,13 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
 
         let version = this.header.getVersion();
         if (version !== LLRPMessageHeader.version)
-            throw new Error(`unsupported version ${version}`);
+            throw new LLRPError("ERR_LLRP_UNSUPPORTED_VERSION", `unsupported version ${version}`);
 
         this.setTypeByNumber(this.header.getMessageTypeNum());
 
         let length = this.header.getMessageLength();
-        if (length < 10)
-            throw new Error(`invalid message length ${length}`);
+        if (length < 10) throw new LLRPError("ERR_LLRP_INVALID_LENGTH",
+            `invalid message length ${length}`);
 
         this.setBitSize(length * 8);
 

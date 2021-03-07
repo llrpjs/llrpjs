@@ -1,6 +1,7 @@
 import { AnyConstructor, Mixin } from "../bryntum/chronograph/Mixin";
 import { LLRPBound } from "../buffer/bound";
 import { LLRPBuffer } from "../buffer/buffer";
+import { LLRPError } from "./error";
 
 export class LLRPNode extends Mixin(
     [LLRPBound],
@@ -36,6 +37,9 @@ export class LLRPNode extends Mixin(
     
             decode() {
                 this.buffer.setBitIndex(this.getStartBit());
+                if (!this.buffer.hasData(this.getBitSize()))
+                    throw new LLRPError("ERR_LLRP_NO_DATA_IN_BUF",
+                        `no data left in buffer. index = ${this.buffer.getByteIndex()}, maxIndex = ${this.getEndByte()}, requiredSize ${this.getByteSize()}`);
                 return this;
             }
 

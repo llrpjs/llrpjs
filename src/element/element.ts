@@ -9,6 +9,7 @@ import { LLRPNode } from "../base/node";
 import { LLRPElementList } from "./list";
 import { LLRPBuffer } from "../buffer/buffer";
 import { LLRPField, LLRPFieldInstanceType } from "../field/field";
+import { LLRPError } from "../base/error";
 
 export class LLRPElement extends MixinAny(
     [LLRPNode, LLRPTypeDescriptor, LLRPData, Base],
@@ -50,7 +51,7 @@ export class LLRPElement extends MixinAny(
 
             setField(name: string, data: LLRPDataValue) {
                 let f = this.getSubType(name) as LLRPFieldInstanceType;
-                if (!f) throw new Error(`field ${name} not found in type ${this.getName()}`);
+                if (!f) throw new LLRPError("ERR_LLRP_FIELD_NOT_ALLOWED", `field ${name} not allowed in type ${this.getName()}`);
                 f.setValue(data);
                 return this;
             }
@@ -60,13 +61,17 @@ export class LLRPElement extends MixinAny(
                 if (f instanceof LLRPField) {
                     return (<LLRPFieldInstanceType>f).getValue();
                 }
-                throw new Error(`name ${name} is not a field (${f.constructor.name})`);
+                return null;
             }
 
             addSubElement(name: string, data: LLRPUserData) {
                 let tRef = this.getSubTypeRefByName(name);
-                if (!tRef) throw new Error(`name ${name} is not allowed in type ${this.getName()}`);
-                if (!this.isAllowedIn(tRef)) throw new Error(`name ${name} is not allowed in type ${this.getName()}`);
+                if (!tRef)
+                    throw new LLRPError("ERR_LLRP_PARAM_NOT_ALLOWED",
+                        `name ${name} is not allowed in type ${this.getName()}`);
+                if (!this.isAllowedIn(tRef))
+                    throw new LLRPError("ERR_LLRP_PARAM_NOT_ALLOWED",
+                        `no more ${name} instances are allowed in type ${this.getName()}`);
 
                 this.unmarshalSubElement(name, data, tRef.td.name);
                 return this;
@@ -74,8 +79,12 @@ export class LLRPElement extends MixinAny(
 
             setSubElement(name: string, data: LLRPUserData) {
                 let tRef = this.getSubTypeRefByName(name);
-                if (!tRef) throw new Error(`name ${name} is not allowed in type ${this.getName()}`);
-                if (!this.isAllowedIn(tRef)) throw new Error(`name ${name} is not allowed in type ${this.getName()}`);
+                if (!tRef)
+                    throw new LLRPError("ERR_LLRP_PARAM_NOT_ALLOWED",
+                        `name ${name} is not allowed in type ${this.getName()}`);
+                if (!this.isAllowedIn(tRef))
+                    throw new LLRPError("ERR_LLRP_PARAM_NOT_ALLOWED",
+                        `no more ${name} instances are allowed in type ${this.getName()}`);
 
                 if (this.getSubType(tRef.td.name)) this.removeSubType(tRef.td.name);
 
@@ -192,7 +201,7 @@ export class LLRPElement extends MixinAny(
                 for (let fd of this.getFieldDescriptors()) {
                     if (fd.type !== "reserved") {
                         let f = this.getSubType(fd.name) as LLRPFieldInstanceType;
-                        if (!f) throw new Error(`missing field ${fd.name}`);
+                        if (!f) throw new LLRPError("ERR_LLRP_MISSING_FIELD", `missing field ${fd.name}`);
                         this.fieldList.push(f);
                     } else {
                         // reserved
@@ -211,7 +220,7 @@ export class LLRPElement extends MixinAny(
                     let e = this.getSubType(name) as LLRPElement | LLRPElement[];
                     if (!e) {
                         if (this.isRequired(tRef))
-                            throw new Error(`missing parameter ${name}`);
+                            throw new LLRPError("ERR_LLRP_MISSING_PARAM", `missing parameter ${name}`);
                         continue;
                     }
                     if (e instanceof LLRPElement) {
