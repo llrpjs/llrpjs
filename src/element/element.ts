@@ -11,6 +11,11 @@ import { LLRPBuffer } from "../buffer/buffer";
 import { LLRPField, LLRPFieldInstanceType } from "../field/field";
 import { LLRPError } from "../base/error";
 
+export interface LLRPElementI<T extends LLRPUserData> {
+    type: string,
+    data: T
+}
+
 export class LLRPElement extends MixinAny(
     [LLRPNode, LLRPTypeDescriptor, LLRPData, Base],
     (base: ClassUnion<
@@ -27,7 +32,7 @@ export class LLRPElement extends MixinAny(
 
             subElementList: LLRPElementList = new LLRPElementList();
 
-            createElement() {
+            createElement(args: LLRPElementI<LLRPUserData> | LLRPBuffer) {
                 /** couldn't find a way to morph this on class level while passing the sub-class's method version in main class's methods */
                 return new LLRPElement();
             }
@@ -121,14 +126,15 @@ export class LLRPElement extends MixinAny(
                 let subElement: LLRPElement;
                 if (Array.isArray(data)) {
                     for (let d of data) {
-                        subElement = this.createElement();
-                        subElement.setType(name).setData(d).unmarshal();
+                        subElement = this.createElement({
+                            type: name,
+                            data: d
+                        });
                         this.addSubType(recordName, subElement);
                         if (!this.isAllowedIn(recordName)) break;
                     }
                 } else {
-                    subElement = this.createElement();
-                    subElement.setType(name).setData(data).unmarshal();
+                    subElement = this.createElement({type: name, data});
                     this.addSubType(recordName, subElement);
                 }
                 return this;
@@ -281,11 +287,10 @@ export class LLRPElement extends MixinAny(
                  *      a) our decoded header has another reference in our records (allowedIn)
                  *      b) our decoded header has no reference in our records (error)
                  */
-                let e = this.createElement();
+                let e = this.createElement(this.getBuffer());
                 for (let tRef of this.getSubTypeReferences()) {
                     while (this.isAllowedIn(tRef) && this.withinBoundLimits) {
-                        e.setBuffer(this.getBuffer())
-                            .setStartBit(this.subElementList.getEndBit() + 1)   // pickup from where we left off
+                        e.setStartBit(this.subElementList.getEndBit() + 1)   // pickup from where we left off
                             .decodeHeader();
 
                         if (!this.isReferenced(e.getName(), tRef)) {  // sanity check
@@ -299,7 +304,7 @@ export class LLRPElement extends MixinAny(
                         else
                             this.addSubType(e.getName(), e);
                         this.subElementList.push(e);
-                        e = this.createElement();
+                        e = this.createElement(this.getBuffer());
 
                         if (this.isMaxOfOneRepeat(tRef)) break;
                     }

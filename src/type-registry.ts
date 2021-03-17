@@ -1,5 +1,6 @@
 import { SubTypeReference, TypeDefinition, TypeDescriptor } from "./types";
-import * as TypeDefinitions from "./def-td";
+import {LLRPDefinition} from "./def-td";
+const TypeDefinitions = LLRPDefinition.LLRPTypeDefinitions;
 
 type TypeByName<T> = { [name: string]: T };
 type TypeByNum<T> = { [name: number]: T };
@@ -41,7 +42,7 @@ export class TypeRegistry {
             ...def,
             responseType: undefined,
             subTypeRefs: [] as SubTypeReference[]
-        };
+        } as TypeDescriptor;
         if (def.responseType) {
             let responseType = this.getTypeDefinitionByName(def.responseType);
             if (!responseType) throw new Error(`no response definition found for message ${def.name}`);

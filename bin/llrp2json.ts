@@ -4,7 +4,7 @@ import JSONbig from 'json-bigint';
 import yargs from 'yargs';
 import fs from 'fs'
 import { LLRPScanner } from '../src/LLRPScanner';
-import { LLRPMessage } from '../src/element/message';
+import { LLRPMessage } from '../src/LLRPMessage';
 import { TypeRegistry } from '../src/type-registry';
 
 const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs => {
@@ -36,7 +36,7 @@ TypeRegistry.getInstance().build();
     let result = [];
     while (buf = scanner.getNext()) {
         let msg = new LLRPMessage(buf);
-        result.push(msg.toLLRPData());
+        result.push(msg.decode().toLLRPData());
     }
 
     let jsonData = JSONbig.stringify(result, null, 2);

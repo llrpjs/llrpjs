@@ -1,10 +1,12 @@
 import { LLRPError } from "../base/error";
+import { LLRPBuffer } from "../buffer/buffer";
 import { LLRP_TD_RSVD_TYPENUM, LLRP_TD_TV_TYPENUM } from "../const-td";
 import { LLRPFieldFactory } from "../field/llrp";
 import { LLRPUserData } from "../types";
-import { LLRPElement } from "./element";
+import { LLRPElement, LLRPElementI } from "./element";
 import { LLRPParameterHeader } from "./header";
 
+export interface LLRPParameterI<T extends LLRPUserData> extends LLRPElementI<T> { }
 
 export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
     header = new LLRPParameterHeader;
@@ -12,8 +14,20 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
     get type() { return this.getName() };
     set type(v: this['td']['name']) { this.setType(v); };
 
-    createElement() {
-        return new LLRPParameter();
+    constructor(arg: LLRPParameterI<T> | LLRPBuffer) {
+        super();
+        if (arg instanceof LLRPBuffer) {
+            this.setBuffer(arg);
+        } else {
+            this.type = arg.type;
+            this.setData(arg.data);
+            this.unmarshal();
+        }
+        this.setStartBit(0);
+    }
+
+    createElement(args: LLRPParameterI<LLRPUserData> | LLRPBuffer) {
+        return new LLRPParameter(args);
     }
 
     setTypeByNumber(type: number) {
@@ -92,7 +106,6 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
     }
 
     toLLRPData() {
-        this.marshal();
         return this.getData();
     }
 }

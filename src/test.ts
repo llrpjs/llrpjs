@@ -1,56 +1,59 @@
 import { LLRPMessage } from "./LLRPMessage";
 import { TypeRegistry } from "./type-registry";
-import * as DEF from "./def-tc";
 import { LLRPScanner } from "./LLRPScanner";
-
+import { LLRPCoreMessages as Core } from "./LLRPCoreMessage";
 
 TypeRegistry.getInstance().build();
-let n = new DEF.LLRP_C_ADD_ROSPEC();
-n.setROSpec({
-    ROSpecID: 12345,
-    Priority: 2,
-    CurrentState: "Disabled",
-    ROBoundarySpec: {
-        ROSpecStartTrigger: {
-            ROSpecStartTriggerType: "Null"
-        },
-        ROSpecStopTrigger: {
-            ROSpecStopTriggerType: "Null",
-            DurationTriggerValue: 0
-        }
-    },
-    AISpec: [
-        {
-            AntennaIDs: [1, 2, 3, 4],
-            AISpecStopTrigger: {
-                AISpecStopTriggerType: "Duration",
-                DurationTrigger: 5000
+let n = new LLRPMessage({
+    type: "ADD_ROSPEC",
+    data: {
+        ROSpec: {
+            ROSpecID: 12345,
+            Priority: 2,
+            CurrentState: "Disabled",
+            ROBoundarySpec: {
+                ROSpecStartTrigger: {
+                    ROSpecStartTriggerType: "Null"
+                },
+                ROSpecStopTrigger: {
+                    ROSpecStopTriggerType: "Null",
+                    DurationTriggerValue: 0
+                }
             },
-            InventoryParameterSpec: {
-                InventoryParameterSpecID: 1,
-                ProtocolID: "EPCGlobalClass1Gen2"
+            AISpec: [
+                {
+                    AntennaIDs: [1, 2, 3, 4],
+                    AISpecStopTrigger: {
+                        AISpecStopTriggerType: "Duration",
+                        DurationTrigger: 5000
+                    },
+                    InventoryParameterSpec: {
+                        InventoryParameterSpecID: 1,
+                        ProtocolID: "EPCGlobalClass1Gen2"
+                    }
+                },
+                {
+                    AntennaIDs: [3, 4],
+                    AISpecStopTrigger: {
+                        AISpecStopTriggerType: "Null",
+                        DurationTrigger: 0
+                    },
+                    InventoryParameterSpec: {
+                        InventoryParameterSpecID: 2,
+                        ProtocolID: "EPCGlobalClass1Gen2"
+                    }
+                }
+            ],
+            RFSurveySpec: {
+                AntennaID: 1,
+                StartFrequency: 980000,
+                EndFrequency: 990000,
+                RFSurveySpecStopTrigger: {
+                    StopTriggerType: "N_Iterations_Through_Frequency_Range",
+                    DurationPeriod: 0,
+                    N: 10
+                }
             }
-        },
-        {
-            AntennaIDs: [3, 4],
-            AISpecStopTrigger: {
-                AISpecStopTriggerType: "Null",
-                DurationTrigger: 0
-            },
-            InventoryParameterSpec: {
-                InventoryParameterSpecID: 2,
-                ProtocolID: "EPCGlobalClass1Gen2"
-            }
-        }
-    ],
-    RFSurveySpec: {
-        AntennaID: 1,
-        StartFrequency: 980000,
-        EndFrequency: 990000,
-        RFSurveySpecStopTrigger: {
-            StopTriggerType: "N_Iterations_Through_Frequency_Range",
-            DurationPeriod: 0,
-            N: 10
         }
     }
 });
@@ -85,7 +88,7 @@ scanner.addBuffer(b);
 
 while (b = scanner.getNext()) {
     let m = new LLRPMessage(b);
-    console.log(JSON.stringify(m.toLLRPData(), null, 2));
+    console.log(JSON.stringify(m.decode().toLLRPData(), null, 2));
 }
 
 // let n = new LLRP_C_ADD_ROSPEC();

@@ -1,15 +1,19 @@
+import { LLRPBuffer } from "./buffer/buffer";
 import { LLRPMessage as _LLRPMessage, LLRPMessageI } from "./element/message";
 import { LLRPUserData } from "./types";
 
 export class LLRPMessage<T extends LLRPUserData> {
     origin: _LLRPMessage<T>;
 
-    constructor(args?: LLRPMessageI);
+    constructor(m?: LLRPMessageI<T>);
     constructor(b?: Buffer);
 
-    constructor(_?: LLRPMessageI | Buffer) {
+    constructor(_?: LLRPMessageI<T> | Buffer) {
         if (_) {
-            this.origin = new _LLRPMessage(_);
+            if (_ instanceof Buffer)
+                this.origin = new _LLRPMessage(new LLRPBuffer(_));
+            else
+                this.origin = new _LLRPMessage(_);
         }
     }
 
@@ -46,12 +50,12 @@ export class LLRPMessage<T extends LLRPUserData> {
     }
 
     decode() {
-        this.origin.decode().marshal();
+        this.origin.decode().marshal(); // convert buffer to elements (TODO: this needs to be optimized to decode and marshal in one shot)
         return this;
     }
 
     toLLRPData() {
-        return this.origin.toLLRPData() as this['origin']['LLRPMESSAGETYPE'];
+        return this.origin.toLLRPData();
     }
 
     getBuffer() {

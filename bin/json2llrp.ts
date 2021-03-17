@@ -31,7 +31,7 @@ TypeRegistry.getInstance().build();
 
 (() => {
     let json = fs.readFileSync(argv.input as any, 'utf-8');
-    let obj: LLRPMessageI | LLRPMessageI[] = JSONbig.parse(json);
+    let obj: LLRPMessageI<{}> | LLRPMessageI<{}>[] = JSONbig.parse(json);
 
     let result: Buffer[] = [];
     if (Array.isArray(obj)) {

@@ -1,31 +1,18 @@
-import { LLRPParameter } from "./parameter";
-import { LLRPElement } from "./element";
-import { LLRPUserData, Overwrite } from "../types";
+import { LLRPParameter, LLRPParameterI } from "./parameter";
+import { LLRPElement, LLRPElementI } from "./element";
+import { ExpandRecursively, LLRPUserData, Overwrite } from "../types";
 import { LLRPBuffer } from "../buffer/buffer";
 import { LLRPMessageHeader } from "./header";
 import { LLRPError } from "../base/error";
 
 
-export interface LLRPMessageI {
+export interface LLRPMessageI<T extends LLRPUserData> extends LLRPElementI<T> {
     id?: number,
-    type: string,
-    data?: LLRPUserData
 }
-
-type Encapsulate<T> = { data: T };
-
-// expands object types one level deep
-type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
-
-// expands object types recursively
-type ExpandRecursively<T> = T extends object
-    ? T extends infer O ? { [K in keyof O]: ExpandRecursively<O[K]> } : never
-    : T;
-
 
 export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
     LLRPDATATYPE: T;
-    LLRPMESSAGETYPE: ExpandRecursively<Overwrite<Required<LLRPMessageI>, Encapsulate<this['LLRPDATATYPE']>>>;
+    LLRPMESSAGETYPE: ExpandRecursively<LLRPMessageI<T>>;
 
     static readonly version: 1 = 1;
     static idCounter = 0;
@@ -41,24 +28,22 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
     set type(v: this['td']['name']) { this.setType(v); };
 
 
-    constructor(arg: LLRPMessageI | Buffer) {
+    constructor(arg: LLRPMessageI<T> | LLRPBuffer) {
         super();
-        if (arg instanceof Buffer) {
-            this.setBuffer(new LLRPBuffer(arg));
-            this.setStartBit(0);
-            this.decode().marshal();  // convert this buffer to elements (TODO: this needs to be optimized to decode and marshal in one shot)
+        if (arg instanceof LLRPBuffer) {
+            this.setBuffer(arg);
         } else {
             // unmarshalHeader
             this.id = arg.id ?? LLRPMessage.getId();
             this.type = arg.type;
-            if (arg.data) this.setData(arg.data as T);
+            this.setData(arg.data);
             this.unmarshal();   // convert this data to elements
         }
         this.setStartBit(0);
     }
 
-    createElement(): LLRPParameter<LLRPUserData> {
-        return new LLRPParameter();
+    createElement(args: LLRPParameterI<LLRPUserData> | LLRPBuffer ) {
+        return new LLRPParameter(args);
     }
 
     setTypeByNumber(type: number) {

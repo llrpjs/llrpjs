@@ -80,7 +80,7 @@ export interface EnumEntry {
   value: number
 }
 
-export type LLRPEnumTableType = never | EnumEntry[];
+export type LLRPEnumTableType = Readonly<EnumEntry[]>;
 
 /** Field Descriptor */
 
@@ -91,7 +91,7 @@ export type FieldDescriptor<
     name: string;
     type: FT;
     format: FMT;
-    enumTable?: Readonly<ET>;
+    enumTable?: ET;
     bitCount?: number;
   }
 
@@ -103,7 +103,7 @@ export type GetFieldFormat<T> =
   : "Normal";
 
 export type GetEnumTable<T extends LLRPFieldType> =
-  T extends LLRPBool | LLRPCrumb | LLRPNumber | Exclude<LLRPNumberVector, "u96" | "bytesToEnd"> ? EnumEntry[] : never;
+  T extends LLRPBool | LLRPCrumb | LLRPNumber | Exclude<LLRPNumberVector, "u96" | "bytesToEnd"> ? LLRPEnumTableType : never;
 
 export type GetFieldFormatValue<T extends LLRPFieldFormat> =
   T extends "Datetime" ? LLRPFMTDate
@@ -177,12 +177,30 @@ export type LLRPUserDataValue = LLRPDataValue | LLRPUserData | LLRPUserData[];
 // Type registry tools
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
 
-export type SubTypeRefDefinition = Overwrite<SubTypeReference, {
+export type SubTypeRefDefinition = Readonly<Overwrite<SubTypeReference, {
   td: string;
-  choices?: string[];
-}>;
+  choices?: Readonly<string[]>;
+}>>;
 
-export type TypeDefinition = Overwrite<TypeDescriptor, {
+export type TypeDefinition<T extends string = string> = Readonly<Overwrite<TypeDescriptor, {
+  name: T;
+  fieldDescriptors: ExpandRecursively< Readonly<Overwrite<FieldDescriptor, {enumTable: LLRPEnumTableType}>[]>>;
   responseType?: string;
-  subTypeRefs: SubTypeRefDefinition[];
-}>;
+  subTypeRefs: Readonly<SubTypeRefDefinition[]>;
+}>>;
+
+export type LLRPDefinition = {
+  LLRPTypeDefinitions: {
+      [x in string] : TypeDefinition
+  };
+  LLRPMessageNames: Readonly<string[]>;
+  LLRPParamNames: Readonly<string[]>;
+}
+
+// expands object types one level deep
+export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
+
+// expands object types recursively
+export type ExpandRecursively<T> = T extends object
+    ? T extends infer O ? { [K in keyof O]: ExpandRecursively<O[K]> } : never
+    : T;

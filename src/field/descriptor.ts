@@ -161,7 +161,7 @@ export class LLRPFieldDescriptor extends Mixin(
         }
 
         get isEnumerable() {
-            return this.isUnsigned && !this.isBigInt && !!this.fd.enumTable;
+            return this.isUnsigned && !this.isBigInt && !!this.fd.enumTable?.length;
         }
     }
 ) { }
