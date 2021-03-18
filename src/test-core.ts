@@ -1,5 +1,6 @@
 
-import {LLRPCoreMessages} from "./LLRPCoreMessage"
+import { LLRPBuffer } from "./buffer/buffer";
+import {LLRPCoreMessages, LLRPCoreParameters} from "./LLRPCore"
 import { TypeRegistry } from "./type-registry";
 
 TypeRegistry.getInstance().build();
@@ -30,6 +31,49 @@ let c = new LLRPCoreMessages.GET_READER_CONFIG({
     }
 });
 
-c.encode();
+let d = new LLRPCoreParameters.ROSpec({
+    data: {
+        ROSpecID: 0x123,
+        Priority: 1,
+        CurrentState: "Disabled",
+        ROBoundarySpec: {
+            ROSpecStartTrigger: {
+                ROSpecStartTriggerType: "Null"
+            },
+            ROSpecStopTrigger: {
+                ROSpecStopTriggerType: "Duration",
+                DurationTriggerValue: 100,
+            }
+        },
+        AISpec: [
+            {
+                AntennaIDs: [1,2,3,4],
+                AISpecStopTrigger: {
+                    AISpecStopTriggerType: "Null",
+                    DurationTrigger: 100
+                },
+                InventoryParameterSpec: {
+                    InventoryParameterSpecID: 0x1234,
+                    ProtocolID: "EPCGlobalClass1Gen2"
+                }
+            },
+            {
+                AntennaIDs: [1,2,3,4],
+                AISpecStopTrigger: {
+                    AISpecStopTriggerType: "Null",
+                    DurationTrigger: 100
+                },
+                InventoryParameterSpec: {
+                    InventoryParameterSpecID: 0x1234,
+                    ProtocolID: "EPCGlobalClass1Gen2"
+                }
+            }
+        ]
+    }
+});
 
-console.log(c);
+const p = d.setROSpecID(0x321);
+
+console.log(p);
+
+console.log(d.encode());

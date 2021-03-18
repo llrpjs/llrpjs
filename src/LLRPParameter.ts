@@ -5,7 +5,7 @@ import { LLRPDataValue, LLRPUserData } from "./types";
 export class LLRPParameter<T extends LLRPUserData> {
     origin: _LLRPParameter<T>;
 
-    constructor(m?: LLRPParameterI<T>);
+    constructor(p?: LLRPParameterI<T>);
     constructor(b?: Buffer);
 
     constructor(_?: LLRPParameterI<T> | Buffer) {
@@ -58,5 +58,9 @@ export class LLRPParameter<T extends LLRPUserData> {
 
     toLLRPData() {
         return this.origin.toLLRPData();
+    }
+
+    getBuffer() {
+        return this.origin.getBuffer().getBuffer();
     }
 }

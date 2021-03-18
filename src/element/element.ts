@@ -69,7 +69,7 @@ export class LLRPElement extends MixinAny(
                 return null;
             }
 
-            addSubElement(name: string, data: LLRPUserData) {
+            addSubElement(name: string, element: LLRPElement) {
                 let tRef = this.getSubTypeRefByName(name);
                 if (!tRef)
                     throw new LLRPError("ERR_LLRP_PARAM_NOT_ALLOWED",
@@ -78,11 +78,11 @@ export class LLRPElement extends MixinAny(
                     throw new LLRPError("ERR_LLRP_PARAM_NOT_ALLOWED",
                         `no more ${name} instances are allowed in type ${this.getName()}`);
 
-                this.unmarshalSubElement(name, data, tRef.td.name);
+                this.addSubType(tRef.td.name, element);
                 return this;
             }
 
-            setSubElement(name: string, data: LLRPUserData) {
+            setSubElement(name: string, element: LLRPElement) {
                 let tRef = this.getSubTypeRefByName(name);
                 if (!tRef)
                     throw new LLRPError("ERR_LLRP_PARAM_NOT_ALLOWED",
@@ -93,16 +93,19 @@ export class LLRPElement extends MixinAny(
 
                 if (this.getSubType(tRef.td.name)) this.removeSubType(tRef.td.name);
 
-                this.unmarshalSubElement(name, data, tRef.td.name);
+                this.addSubType(tRef.td.name, element);
                 return this;
             }
 
             getSubElement(name: string) {
                 let e = this.getSubType(name);
                 if (e instanceof LLRPElement) {
-                    return e.toLLRPData();
+                    return e;
                 }
-                return (<LLRPElement[]>e).map(subElement => subElement.toLLRPData());
+                if (Array.isArray(e)) {
+                    return <LLRPElement[]>e;
+                }
+                return null;
             }
 
             // Data <--> Pool

@@ -62,6 +62,8 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
         super.assemble();
         if (!this.isTV)
             this.header.setTLVLength(this.getByteSize());
+        if (!this.getBuffer())  // in case we are testing a parameter alone
+            this.setBuffer(new LLRPBuffer(Buffer.alloc(this.getByteSize())))
         return this;
     }
 

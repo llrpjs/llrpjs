@@ -131,7 +131,7 @@ export class LLRPTypeDescriptor extends Mixin(
             }
 
             isChoice(ref: SubTypeReference): boolean {
-                return !!ref.choices;
+                return !!ref.choices?.length;
             }
 
             getName() {

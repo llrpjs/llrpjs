@@ -169,19 +169,31 @@ const LLRP_TD_GeneralDeviceCapabilities = {
 
         {
             td: "ReceiveSensitivityTableEntry",
-            repeat: "1-N"
+            repeat: "1-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "PerAntennaReceiveSensitivityRange",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "GPIOCapabilities",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "PerAntennaAirProtocol",
-            repeat: "1-N"
+            repeat: "1-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -514,11 +526,17 @@ const LLRP_TD_RegulatoryCapabilities = {
 
         {
             td: "UHFBandCapabilities",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -537,11 +555,17 @@ const LLRP_TD_UHFBandCapabilities = {
 
         {
             td: "TransmitPowerLevelTableEntry",
-            repeat: "1-N"
+            repeat: "1-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "FrequencyInformation",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AirProtocolUHFRFModeTable",
@@ -614,11 +638,17 @@ const LLRP_TD_FrequencyInformation = {
 
         {
             td: "FrequencyHopTable",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "FixedFrequencyTable",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -734,7 +764,10 @@ const LLRP_TD_ROSpec = {
 
         {
             td: "ROBoundarySpec",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "SpecParameter",
@@ -748,7 +781,10 @@ const LLRP_TD_ROSpec = {
         },
         {
             td: "ROReportSpec",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -767,11 +803,17 @@ const LLRP_TD_ROBoundarySpec = {
 
         {
             td: "ROSpecStartTrigger",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ROSpecStopTrigger",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -814,11 +856,17 @@ const LLRP_TD_ROSpecStartTrigger = {
 
         {
             td: "PeriodicTriggerValue",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "GPITriggerValue",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -853,7 +901,10 @@ const LLRP_TD_PeriodicTriggerValue = {
 
         {
             td: "UTCTimestamp",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -946,7 +997,10 @@ const LLRP_TD_ROSpecStopTrigger = {
 
         {
             td: "GPITriggerValue",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -973,15 +1027,24 @@ const LLRP_TD_AISpec = {
 
         {
             td: "AISpecStopTrigger",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "InventoryParameterSpec",
-            repeat: "1-N"
+            repeat: "1-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -1032,11 +1095,17 @@ const LLRP_TD_AISpecStopTrigger = {
 
         {
             td: "GPITriggerValue",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "TagObservationTrigger",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -1153,11 +1222,17 @@ const LLRP_TD_InventoryParameterSpec = {
 
         {
             td: "AntennaConfiguration",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -1200,11 +1275,17 @@ const LLRP_TD_RFSurveySpec = {
 
         {
             td: "RFSurveySpecStopTrigger",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -1337,19 +1418,31 @@ const LLRP_TD_AccessSpec = {
 
         {
             td: "AccessSpecStopTrigger",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AccessCommand",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AccessReportSpec",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -1429,7 +1522,10 @@ const LLRP_TD_AccessCommand = {
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -1641,11 +1737,17 @@ const LLRP_TD_AntennaConfiguration = {
 
         {
             td: "RFReceiver",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "RFTransmitter",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AirProtocolInventoryCommandSettings",
@@ -1850,11 +1952,17 @@ const LLRP_TD_ROReportSpec = {
 
         {
             td: "TagReportContentSelector",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -2023,47 +2131,80 @@ const LLRP_TD_TagReportData = {
         },
         {
             td: "ROSpecID",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "SpecIndex",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "InventoryParameterSpecID",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AntennaID",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "PeakRSSI",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ChannelIndex",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "FirstSeenTimestampUTC",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "FirstSeenTimestampUptime",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "LastSeenTimestampUTC",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "LastSeenTimestampUptime",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "TagSeenCount",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AirProtocolTagData",
@@ -2076,7 +2217,10 @@ const LLRP_TD_TagReportData = {
         },
         {
             td: "AccessSpecID",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AccessCommandOpSpecResult",
@@ -2094,7 +2238,10 @@ const LLRP_TD_TagReportData = {
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -2435,19 +2582,31 @@ const LLRP_TD_RFSurveyReportData = {
 
         {
             td: "ROSpecID",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "SpecIndex",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "FrequencyRSSILevelEntry",
-            repeat: "1-N"
+            repeat: "1-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -2522,7 +2681,10 @@ const LLRP_TD_ReaderEventNotificationSpec = {
 
         {
             td: "EventNotificationState",
-            repeat: "1-N"
+            repeat: "1-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -2624,51 +2786,87 @@ const LLRP_TD_ReaderEventNotificationData = {
         },
         {
             td: "HoppingEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "GPIEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ROSpecEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ReportBufferLevelWarningEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ReportBufferOverflowErrorEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ReaderExceptionEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "RFSurveyEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AISpecEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AntennaEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ConnectionAttemptEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ConnectionCloseEvent",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -2853,31 +3051,52 @@ const LLRP_TD_ReaderExceptionEvent = {
 
         {
             td: "ROSpecID",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "SpecIndex",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "InventoryParameterSpecID",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AntennaID",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AccessSpecID",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "OpSpecID",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -3234,11 +3453,17 @@ const LLRP_TD_LLRPStatus = {
 
         {
             td: "FieldError",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ParameterError",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -3512,11 +3737,17 @@ const LLRP_TD_ParameterError = {
 
         {
             td: "FieldError",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ParameterError",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -3581,7 +3812,10 @@ const LLRP_TD_C1G2UHFRFModeTable = {
 
         {
             td: "C1G2UHFRFModeTableEntry",
-            repeat: "1-N"
+            repeat: "1-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -3777,19 +4011,31 @@ const LLRP_TD_C1G2InventoryCommand = {
 
         {
             td: "C1G2Filter",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "C1G2RFControl",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "C1G2SingulationControl",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -3835,15 +4081,24 @@ const LLRP_TD_C1G2Filter = {
 
         {
             td: "C1G2TagInventoryMask",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "C1G2TagInventoryStateAwareFilterAction",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "C1G2TagInventoryStateUnawareFilterAction",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -4100,7 +4355,10 @@ const LLRP_TD_C1G2SingulationControl = {
 
         {
             td: "C1G2TagInventoryStateAwareSingulationAction",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -4173,7 +4431,10 @@ const LLRP_TD_C1G2TagSpec = {
 
         {
             td: "C1G2TargetTag",
-            repeat: "1-N"
+            repeat: "1-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -4425,7 +4686,10 @@ const LLRP_TD_C1G2Lock = {
 
         {
             td: "C1G2LockPayload",
-            repeat: "1-N"
+            repeat: "1-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5307,7 +5571,10 @@ const LLRP_TD_GET_READER_CAPABILITIES = {
 
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5326,19 +5593,31 @@ const LLRP_TD_GET_READER_CAPABILITIES_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "GeneralDeviceCapabilities",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "LLRPCapabilities",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "RegulatoryCapabilities",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AirProtocolLLRPCapabilities",
@@ -5350,7 +5629,10 @@ const LLRP_TD_GET_READER_CAPABILITIES_RESPONSE = {
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5369,7 +5651,10 @@ const LLRP_TD_ADD_ROSPEC = {
 
         {
             td: "ROSpec",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5388,7 +5673,10 @@ const LLRP_TD_ADD_ROSPEC_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5430,7 +5718,10 @@ const LLRP_TD_DELETE_ROSPEC_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5472,7 +5763,10 @@ const LLRP_TD_START_ROSPEC_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5514,7 +5808,10 @@ const LLRP_TD_STOP_ROSPEC_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5556,7 +5853,10 @@ const LLRP_TD_ENABLE_ROSPEC_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5598,7 +5898,10 @@ const LLRP_TD_DISABLE_ROSPEC_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5632,11 +5935,17 @@ const LLRP_TD_GET_ROSPECS_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ROSpec",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5655,7 +5964,10 @@ const LLRP_TD_ADD_ACCESSSPEC = {
 
         {
             td: "AccessSpec",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5674,7 +5986,10 @@ const LLRP_TD_ADD_ACCESSSPEC_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5716,7 +6031,10 @@ const LLRP_TD_DELETE_ACCESSSPEC_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5758,7 +6076,10 @@ const LLRP_TD_ENABLE_ACCESSSPEC_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5800,7 +6121,10 @@ const LLRP_TD_DISABLE_ACCESSSPEC_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5834,11 +6158,17 @@ const LLRP_TD_GET_ACCESSSPECS_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AccessSpec",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5937,7 +6267,10 @@ const LLRP_TD_GET_READER_CONFIG = {
 
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -5956,55 +6289,94 @@ const LLRP_TD_GET_READER_CONFIG_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         },
         {
             td: "Identification",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AntennaProperties",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "AntennaConfiguration",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "ReaderEventNotificationSpec",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "ROReportSpec",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AccessReportSpec",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "LLRPConfigurationStateValue",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "KeepaliveSpec",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "GPIPortCurrentState",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "GPOWriteData",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "EventsAndReports",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -6038,43 +6410,73 @@ const LLRP_TD_SET_READER_CONFIG = {
 
         {
             td: "ReaderEventNotificationSpec",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AntennaProperties",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "AntennaConfiguration",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "ROReportSpec",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "AccessReportSpec",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "KeepaliveSpec",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "GPOWriteData",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "GPIPortCurrentState",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "EventsAndReports",
-            repeat: "0-1"
+            repeat: "0-1",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -6093,7 +6495,10 @@ const LLRP_TD_SET_READER_CONFIG_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -6127,7 +6532,10 @@ const LLRP_TD_CLOSE_CONNECTION_RESPONSE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -6161,15 +6569,24 @@ const LLRP_TD_RO_ACCESS_REPORT = {
 
         {
             td: "TagReportData",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "RFSurveyReportData",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         },
         {
             td: "Custom",
-            repeat: "0-N"
+            repeat: "0-N",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -6218,7 +6635,10 @@ const LLRP_TD_READER_EVENT_NOTIFICATION = {
 
         {
             td: "ReaderEventNotificationData",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
@@ -6252,7 +6672,10 @@ const LLRP_TD_ERROR_MESSAGE = {
 
         {
             td: "LLRPStatus",
-            repeat: "1"
+            repeat: "1",
+            choices: [
+
+            ] as const
         }
     ] as const
 } as const;
