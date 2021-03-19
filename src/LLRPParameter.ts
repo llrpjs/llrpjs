@@ -7,12 +7,15 @@ export class LLRPParameter<T extends LLRPUserData> {
 
     constructor(p?: LLRPParameterI<T>);
     constructor(b?: Buffer);
+    constructor(o?: _LLRPParameter<T>);
 
-    constructor(_?: LLRPParameterI<T> | Buffer) {
+    constructor(_?: LLRPParameterI<T> | Buffer | _LLRPParameter<T>) {
         if (_) {
             if (_ instanceof Buffer)
                 this.origin = new _LLRPParameter(new LLRPBuffer(_));
-            else
+            else if (_ instanceof _LLRPParameter) {
+                this.origin = _;
+            } else
                 this.origin = new _LLRPParameter(_);
         }
     }
@@ -25,7 +28,24 @@ export class LLRPParameter<T extends LLRPUserData> {
         return this.origin.getField(name);
     }
 
-    addSubParameter(p: LLRPParameter<LLRPUserData>) {
+    addSubParameter(name: string, p: LLRPParameter<LLRPUserData>) {
+        this.origin.addSubElement(name, p.origin);
+        return this;
+    }
+
+    setSubParameter(name: string, p: LLRPParameter<LLRPUserData>) {
+        this.origin.setSubElement(name, p.origin);
+        return this;
+    }
+
+    getSubParameter(name: string) {
+        const originP = this.origin.getSubElement(name) as _LLRPParameter<LLRPUserData> | _LLRPParameter<LLRPUserData>[];
+        if (!originP) return null;
+        // wrap it
+        if (Array.isArray(originP)) {
+            return originP.map(p => new LLRPParameter(p));
+        }
+        return new LLRPParameter(originP);
     }
 
     setParamType(v: string) {

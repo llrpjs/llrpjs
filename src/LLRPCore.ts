@@ -1,4 +1,4 @@
-import * as Def from "./def-td";
+import * as Def from "./def";
 import { LLRPMessageI } from "./element/message";
 import { LLRPParameterI } from "./element/parameter";
 

@@ -1,5 +1,6 @@
 import { SubTypeReference, TypeDefinition, TypeDescriptor } from "./types";
-import {LLRPDefinition} from "./def-td";
+import {LLRPDefinition} from "./def";
+import { LLRPError } from "./base/error";
 const TypeDefinitions = LLRPDefinition.LLRPTypeDefinitions;
 
 type TypeByName<T> = { [name: string]: T };
@@ -45,7 +46,7 @@ export class TypeRegistry {
         } as TypeDescriptor;
         if (def.responseType) {
             let responseType = this.getTypeDefinitionByName(def.responseType);
-            if (!responseType) throw new Error(`no response definition found for message ${def.name}`);
+            if (!responseType) throw new LLRPError("ERR_LLRP_INTERNAL", `no response definition found for message ${def.name}`);
             td.responseType = responseType as any;
         }
         for (let tRefDef of def.subTypeRefs) {
@@ -55,14 +56,14 @@ export class TypeRegistry {
                 choices: undefined
             }
             let subTd = this.getTypeDefinitionByName(tRefDef.td);
-            if (!subTd) throw new Error(`no type definition found for sub-ref ${tRefDef.td}`);
+            if (!subTd) throw new LLRPError("ERR_LLRP_INTERNAL", `no type definition found for sub-ref ${tRefDef.td}`);
             tRef.td = subTd as any;
 
             if (tRefDef.choices) {
                 tRef['choices'] = [];
                 for (let choiceName of tRefDef.choices) {
                     let choiceTd = this.getTypeDefinitionByName(choiceName);
-                    if (!choiceTd) throw new Error(`no type definition found for choice ${choiceName}`);
+                    if (!choiceTd) throw new LLRPError("ERR_LLRP_INTERNAL", `no type definition found for choice ${choiceName}`);
                     tRef.choices.push(choiceTd as any);
                 }
             } else {
@@ -145,7 +146,7 @@ export class TypeRegistry {
 
     enrollCustomDef(tDef: TypeDefinition) {
         if (tDef.typeNum > 1023 || tDef.typeNum < 0)
-            throw new Error(`Bad typeNum ${tDef.typeNum}`);
+            throw new LLRPError("ERR_LLRP_INTERNAL", `bad definition typeNum ${tDef.typeNum}`);
         let vendorId = tDef.vendorDescriptor.vendorID;
         if (!this.customTypeDefinitions[vendorId]) {
             this.customTypeDefinitions[vendorId] = {};
