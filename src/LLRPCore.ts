@@ -4,7 +4,6 @@ import { LLRPParameterI } from "./element/parameter";
 
 import { LLRPMessage } from "./LLRPMessage";
 import { LLRPParameter } from "./LLRPParameter";
-import { LLRPParameter as _LLRPParameter } from "./element/parameter";
 import { ExpandRecursively, GetFieldFormatValue, GetFieldRawValue, LLRPUserData, TypeDefinition } from "./types";
 
 class LLRPCoreMessage extends LLRPMessage<LLRPUserData> {
@@ -17,6 +16,7 @@ class LLRPCoreMessage extends LLRPMessage<LLRPUserData> {
         // TODO: add setters/getters dynamically?
         // you add the methods dynamically here
         for (let fd of td.fieldDescriptors) {
+            if (fd.type === "reserved") continue;
             LLRPTypedMessage.prototype[`set${fd.name}`] = function <T extends LLRPTypedMessage>(this: T, v: any) {
                 this.origin.setField(fd.name, v);
                 return this;
@@ -41,17 +41,24 @@ class LLRPCoreMessage extends LLRPMessage<LLRPUserData> {
             }
 
             LLRPTypedMessage.prototype[`get${name}`] = function <T extends LLRPTypedMessage>(this: T) {
-                const originP = this.origin.getSubElement(name) as _LLRPParameter<LLRPUserData> | _LLRPParameter<LLRPUserData>[];
+                const originP = this.origin.getSubElement(name);
+                if (!originP) return null;
                 // wrap it
                 if (Array.isArray(originP)) {
                     return originP.map(p => {
-                        const param = new LLRPParameter();
-                        param.origin = p;
+                        const tDef = Def.LLRPDefinition.LLRPTypeDefinitions[p.getName()];
+                        const LLRPTypedParameter = LLRPCoreParameter.ofType(tDef);
+
+                        const param = new LLRPTypedParameter({data: p.getData()});
+                        param.origin = p as typeof param.origin;
                         return param;
                     })
                 }
-                const param = new LLRPParameter();
-                param.origin = originP;
+                const tDef = Def.LLRPDefinition.LLRPTypeDefinitions[originP.getName()];
+                const LLRPTypedParameter = LLRPCoreParameter.ofType(tDef);
+
+                const param = new LLRPTypedParameter({data: originP.getData()});
+                param.origin = originP as typeof param.origin;
                 return param;
             }
         }
@@ -68,6 +75,7 @@ class LLRPCoreParameter extends LLRPParameter<LLRPUserData> {
         }
         // Fields
         for (let fd of td.fieldDescriptors) {
+            if (fd.type === "reserved") continue;
             LLRPTypedParameter.prototype[`set${fd.name}`] = function <T extends LLRPTypedParameter>(this: T, v: any) {
                 return this.origin.setField(fd.name, v);
             }
@@ -91,17 +99,24 @@ class LLRPCoreParameter extends LLRPParameter<LLRPUserData> {
             }
 
             LLRPTypedParameter.prototype[`get${name}`] = function <T extends LLRPTypedParameter>(this: T) {
-                const originP = this.origin.getSubElement(name) as _LLRPParameter<LLRPUserData> | _LLRPParameter<LLRPUserData>[];
+                const originP = this.origin.getSubElement(name);
+                if (!originP) return null;
                 // wrap it
                 if (Array.isArray(originP)) {
                     return originP.map(p => {
-                        const param = new LLRPParameter();
-                        param.origin = p;
+                        const tDef = Def.LLRPDefinition.LLRPTypeDefinitions[p.getName()];
+                        const LLRPTypedParameter = LLRPCoreParameter.ofType(tDef);
+
+                        const param = new LLRPTypedParameter({data: p.getData()});
+                        param.origin = p as typeof param.origin;
                         return param;
                     })
                 }
-                const param = new LLRPParameter();
-                param.origin = originP;
+                const tDef = Def.LLRPDefinition.LLRPTypeDefinitions[originP.getName()];
+                const LLRPTypedParameter = LLRPCoreParameter.ofType(tDef);
+
+                const param = new LLRPTypedParameter({data: originP.getData()});
+                param.origin = originP as typeof param.origin;
                 return param;
             }
         }
@@ -156,7 +171,7 @@ type GetParamClassType<T extends Def.LLRPParamNames,
     FD extends GetFieldDescriptors<T> = GetFieldDescriptors<T>
     > =
     new (args?: ExpandRecursively<GetParamCtrArgs<Def.GetDataTypeByName<T>>>) => P
-    & GetFieldSettersGetters<FD>
+    & GetFieldSettersGetters<Exclude<FD, {type : "reserved"}>>
     & GetAllSubParamSettersGetters<GetSubTypeRefs<T>>;
 
 // Field Setters/Getters tools
@@ -185,38 +200,38 @@ type GetOnceSettersGetters<Ref extends GetSubTypeRefs<LLRPAllNames>,
     choiceRef extends Exclude<Ref, { td: Def.LLRPParamNames }> = Exclude<Ref, { td: Def.LLRPParamNames }>,
     normalRef extends Exclude<Ref, { td: LLRPChoiceNames }> = Exclude<Ref, { td: LLRPChoiceNames }>> =
     {
-        [x in `set${choiceRef['td']}`]: SubChoiceSetter<Extract<choiceRef, { td: Trim<x, "set"> }>>
+        [x in `set${choiceRef['td']}`]: SubChoiceSetter<GetChoices<Extract<choiceRef, { td: Trim<x, "set"> }>>>
     } & {
-        [x in `set${normalRef['td']}`]: SubParameterSetter<Def.GetDataTypeByName<Extract<Ref, { td: Trim<x, "set"> }>['td']>>
+        [x in `set${normalRef['td']}`]: SubParameterSetter<Extract<Ref, { td: Trim<x, "set"> }>['td']>
     } & {
-        [x in `get${choiceRef['td']}`]: SubChoiceGetter<Extract<choiceRef, { td: Trim<x, "get"> }>>
+        [x in `get${choiceRef['td']}`]: SubChoiceGetter<GetChoices<Extract<choiceRef, { td: Trim<x, "get"> }>>>
     } & {
-        [x in `get${normalRef['td']}`]: SubParameterGetter<Def.GetDataTypeByName<Extract<Ref, { td: Trim<x, "get"> }>['td']>>
+        [x in `get${normalRef['td']}`]: SubParameterGetter<Extract<Ref, { td: Trim<x, "get"> }>['td']>
     };
 
 type GetManySettersGetters<Ref extends GetSubTypeRefs<LLRPAllNames>,
     choiceRef extends Exclude<Ref, { td: Def.LLRPParamNames }> = Exclude<Ref, { td: Def.LLRPParamNames }>,
     normalRef extends Exclude<Ref, { td: LLRPChoiceNames }> = Exclude<Ref, { td: LLRPChoiceNames }>> =
     {
-        [x in `add${choiceRef['td']}`]: SubChoiceSetter<Extract<choiceRef, { td: Trim<x, "add"> }>>
+        [x in `add${choiceRef['td']}`]: SubChoiceSetter<GetChoices<Extract<choiceRef, { td: Trim<x, "add"> }>>>
     } & {
-        [x in `add${normalRef['td']}`]: SubParameterSetter<Def.GetDataTypeByName<Extract<Ref, { td: Trim<x, "add"> }>['td']>>
+        [x in `add${normalRef['td']}`]: SubParameterSetter<Extract<Ref, { td: Trim<x, "add"> }>['td']>
     } & {
-        [x in `get${choiceRef['td']}`]: SubChoiceManyGetter<Extract<choiceRef, { td: Trim<x, "get"> }>>
+        [x in `get${choiceRef['td']}`]: SubChoiceManyGetter<GetChoices<Extract<choiceRef, { td: Trim<x, "get"> }>>>
     } & {
-        [x in `get${normalRef['td']}`]: SubParamManyGetter<Def.GetDataTypeByName<Extract<Ref, { td: Trim<x, "get"> }>['td']>>
+        [x in `get${normalRef['td']}`]: SubParamManyGetter<Extract<Ref, { td: Trim<x, "get"> }>['td']>
     }
 
-type SubParameterSetter<T extends Def.GetDataTypeByName<LLRPAllNames>> = <U>(this: U, p: LLRPParameter<T>) => U;
-type SubParameterGetter<T extends Def.GetDataTypeByName<LLRPAllNames>> = <U>(this: U) => LLRPParameter<T>;
-type SubChoiceSetter<Ref extends GetSubTypeRefs<LLRPAllNames>> = <U>(this: U, p: GetLLRPParameterUnion<Ref>) => U;
-type SubChoiceGetter<Ref extends GetSubTypeRefs<LLRPAllNames>> = <U>(this: U) => GetLLRPParameterUnion<Ref>;
+type SubParameterSetter<T extends Def.LLRPParamNames> = <U>(this: U, p: InstanceType<GetParamClassType<T>> ) => U;
+type SubParameterGetter<T extends Def.LLRPParamNames> = <U>(this: U) => InstanceType<GetParamClassType<T>> | null;
+type SubChoiceSetter<T extends Def.LLRPParamNames> = <U>(this: U, p: GetLLRPParameterUnion<T>) => U;
+type SubChoiceGetter<T extends Def.LLRPParamNames> = <U>(this: U) => GetLLRPParameterUnion<T> | null;
 
-type SubParamManyGetter<T extends Def.GetDataTypeByName<LLRPAllNames>> = <U>(this: U) => LLRPParameter<T> | LLRPParameter<T>[];
-type SubChoiceManyGetter<Ref extends GetSubTypeRefs<LLRPAllNames>> = <U>(this: U) => GetLLRPParameterUnion<Ref> | GetLLRPParameterUnion<Ref>[];
+type SubParamManyGetter<T extends Def.LLRPParamNames> = <U>(this: U) => GetLLRPParameterUnion<T> | GetLLRPParameterUnion<T>[];
+type SubChoiceManyGetter<T extends Def.LLRPParamNames> = <U>(this: U) => GetLLRPParameterUnion<T> | GetLLRPParameterUnion<T>[];
 
 
-type GetLLRPParameterUnion<Ref extends GetSubTypeRefs<LLRPAllNames>, K extends GetChoices<Ref> = GetChoices<Ref>> = {
-    [x in K]: LLRPParameter<Def.GetDataTypeByName<Extract<GetChoices<Ref>, x>>>
+type GetLLRPParameterUnion<K extends Def.LLRPParamNames> = {
+    [x in K]: InstanceType<GetParamClassType<Extract<K, x>>>
 }[K];
 
