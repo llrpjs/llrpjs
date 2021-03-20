@@ -1,6 +1,6 @@
 import { LLRPError } from "../base/error";
 import { LLRPBuffer } from "../buffer/buffer";
-import { LLRP_TD_RSVD_TYPENUM, LLRP_TD_TV_TYPENUM } from "../const-td";
+import { LLRP_TD_RSVD_TYPENUM, LLRP_TD_TV_TYPENUM } from "./header-fd";
 import { LLRPFieldFactory } from "../field/llrp";
 import { LLRPUserData } from "../types";
 import { LLRPElement, LLRPElementI } from "./element";

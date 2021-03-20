@@ -13,8 +13,7 @@ class LLRPCoreMessage extends LLRPMessage<LLRPUserData> {
                 super({ ...args, ...{ type: td['name'] } });
             }
         }
-        // TODO: add setters/getters dynamically?
-        // you add the methods dynamically here
+        // Fields
         for (let fd of td.fieldDescriptors) {
             if (fd.type === "reserved") continue;
             LLRPTypedMessage.prototype[`set${fd.name}`] = function <T extends LLRPTypedMessage>(this: T, v: any) {
@@ -25,7 +24,7 @@ class LLRPCoreMessage extends LLRPMessage<LLRPUserData> {
                 return this.origin.getField(fd.name);
             }
         }
-
+        // Sub-parameters
         for (let tRef of td.subTypeRefs) {
             const { td: name, repeat } = tRef;
             if (repeat === "0-1" || repeat === "1") {
