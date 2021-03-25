@@ -6,7 +6,6 @@ import { TypeRegistry } from "../src/type-registry";
 
 //import net from "net";
 import { LLRPMessage } from "../src/LLRPMessage";
-import { LLRPUserData } from "../src/types";
 
 import net from "net";
 
@@ -123,12 +122,19 @@ const msg = new LLRPCoreMessages.ADD_ROSPEC({
     await reader.disconnect();
 })();
 
-reader.on("message", (msg: LLRPMessage<LLRPUserData>) => {
+reader.on("message", (msg: LLRPMessage) => {
     const data = msg.toLLRPData();
     if (data.type === "KEEPALIVE") {
-        console.log(data.type);
         reader.send(new LLRPCoreMessages.KEEPALIVE_ACK()).catch(console.error);
     }
+});
+
+reader.on("KEEPALIVE", (msg: LLRPMessage) => {
+    console.log(`KEEPALIVE listener`);
+});
+
+reader.on("ADD_ROSPEC_RESPONSE", (msg: LLRPMessage) => {
+    console.log(`ADD_ROSPEC_RESPONSE listener`);
 });
 
 reader.on("error", err => {

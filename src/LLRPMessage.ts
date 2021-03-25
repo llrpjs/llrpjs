@@ -4,7 +4,7 @@ import { LLRPParameter as _LLRPParameter } from "./element/parameter";
 import { LLRPParameter } from "./LLRPParameter";
 import { LLRPDataValue, LLRPMessageI, LLRPUserData } from "./types";
 
-export class LLRPMessage<T extends LLRPUserData> {
+export class LLRPMessage<T extends LLRPUserData = LLRPUserData> {
     origin: _LLRPMessage<T>;
 
     constructor(m?: LLRPMessageI<T>);

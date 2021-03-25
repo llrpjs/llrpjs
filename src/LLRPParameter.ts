@@ -2,7 +2,7 @@ import { LLRPBuffer } from "./buffer/buffer";
 import { LLRPParameter as _LLRPParameter } from "./element/parameter";
 import { LLRPDataValue, LLRPParameterI, LLRPUserData } from "./types";
 
-export class LLRPParameter<T extends LLRPUserData> {
+export class LLRPParameter<T extends LLRPUserData = LLRPUserData> {
     origin: _LLRPParameter<T>;
 
     constructor(p?: LLRPParameterI<T>);

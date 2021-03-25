@@ -50,6 +50,7 @@ export class LLRPReader extends EventEmitter {
                 try {
                     const msg = new LLRPMessage(data).decode();
                     this.emit("message", msg);
+                    this.emit(msg.getName(), msg);
                 } catch (e) {
                     if (e instanceof LLRPError)
                         this.emit("error", e);
