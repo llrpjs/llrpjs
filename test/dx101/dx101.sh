@@ -3,8 +3,8 @@
 # Definitions
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 OUT_DIR="$ROOT/out"
-JSON2LLRP="$ROOT/../../bin/json2llrp"
-LLRP2JSON="$ROOT/../../bin/llrp2json"
+JSON2LLRP="$ROOT/../../dist/bin/json2llrp.js"
+LLRP2JSON="$ROOT/../../dist/bin/llrp2json.js"
 CVS=$(command -v cvs)
 NODE=$(command -v node)
 DX101="$ROOT/LTK/Tests/dx101"
@@ -38,21 +38,21 @@ echo "Generate .json files from original (LTK) .bin"
 
 for file in $(ls $DX101/dx101_[a-z].bin); do
     OUT_FILE="$OUT_DIR/$(basename -s .bin $file).json"
-    [ -e "$OUT_FILE" ] || execute "$LLRP2JSON $file -o $OUT_FILE"
+    [ -e "$OUT_FILE" ] || execute "$NODE $LLRP2JSON $file -o $OUT_FILE"
 done
 
 echo "Generate .bin files from generated .json"
 
 for file in $(ls $OUT_DIR/dx101_*.json); do
     OUT_FILE="$OUT_DIR/$(basename -s .json $file).bin"
-    [ -e "$OUT_FILE" ] || execute "$JSON2LLRP $file -o $OUT_FILE"
+    [ -e "$OUT_FILE" ] || execute "$NODE $JSON2LLRP $file -o $OUT_FILE"
 done
 
 echo "Generate .json files from generated .bin"
 
 for file in $(ls $OUT_DIR/dx101_*.bin); do
     OUT_FILE="$OUT_DIR/_$(basename -s .bin $file).json"
-    [ -e "$OUT_FILE" ] || execute "$LLRP2JSON $file -o $OUT_FILE"
+    [ -e "$OUT_FILE" ] || execute "$NODE $LLRP2JSON $file -o $OUT_FILE"
 done
 
 echo "Compare 2nd round .json with 1st round .json"

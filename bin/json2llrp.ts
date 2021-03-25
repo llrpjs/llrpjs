@@ -6,6 +6,7 @@ import fs from 'fs'
 import { LLRPMessage } from '../src/LLRPMessage';
 import { TypeRegistry } from '../src/type-registry';
 import { LLRPMessageI } from '../src/types';
+import { LLRPDef } from '../src/def';
 
 const argv = yargs.command('$0 <input>', 'convert llrp json to bin', yargs => {
     yargs.positional('input', {
@@ -27,7 +28,7 @@ const argv = yargs.command('$0 <input>', 'convert llrp json to bin', yargs => {
     .help().alias('help', 'h')
     .argv;
 
-TypeRegistry.getInstance().build();
+TypeRegistry.getInstance().enrollCoreDefinitions(LLRPDef).build();
 
 (() => {
     let json = fs.readFileSync(argv.input as any, 'utf-8');

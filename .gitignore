@@ -4,5 +4,3 @@ generated
 *.schema.json
 
 dist/**/*
-bin/llrp2json
-bin/json2llrp
