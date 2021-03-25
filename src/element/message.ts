@@ -1,18 +1,14 @@
-import { LLRPParameter, LLRPParameterI } from "./parameter";
-import { LLRPElement, LLRPElementI } from "./element";
-import { ExpandRecursively, LLRPUserData, Overwrite } from "../types";
+import { LLRPParameter } from "./parameter";
+import { LLRPElement } from "./element";
+import { Id, LLRPMessageI, LLRPParameterI, LLRPUserData } from "../types";
 import { LLRPBuffer } from "../buffer/buffer";
 import { LLRPMessageHeader } from "./header";
 import { LLRPError } from "../base/error";
 
 
-export interface LLRPMessageI<T extends LLRPUserData> extends LLRPElementI<T> {
-    id?: number,
-}
-
 export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
     LLRPDATATYPE: T;
-    LLRPMESSAGETYPE: ExpandRecursively<LLRPMessageI<T>>;
+    LLRPMESSAGETYPE: Id<LLRPMessageI<T>>;
 
     static readonly version: 1 = 1;
     static idCounter = 0;
@@ -27,6 +23,7 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
     get type() { return this.getName() };
     set type(v: this['td']['name']) { this.setType(v); };
 
+    get responseType() { return this.td.responseType };
 
     constructor(arg: LLRPMessageI<T> | LLRPBuffer) {
         super();

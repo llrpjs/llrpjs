@@ -1,6 +1,6 @@
 import { LLRPBuffer } from "./buffer/buffer";
-import { LLRPParameter as _LLRPParameter, LLRPParameterI } from "./element/parameter";
-import { LLRPDataValue, LLRPUserData } from "./types";
+import { LLRPParameter as _LLRPParameter } from "./element/parameter";
+import { LLRPDataValue, LLRPParameterI, LLRPUserData } from "./types";
 
 export class LLRPParameter<T extends LLRPUserData> {
     origin: _LLRPParameter<T>;

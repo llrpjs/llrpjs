@@ -1,6 +1,6 @@
 import { Base } from "../bryntum/chronograph/Base";
 import { ClassUnion, MixinAny } from "../bryntum/chronograph/Mixin";
-import { LLRPDataValue, LLRPUserData } from "../types";
+import { LLRPDataValue, LLRPElementI, LLRPUserData } from "../types";
 import { LLRPData } from "./data";
 import { LLRPFieldFactory } from "../field/llrp";
 import { LLRPTypeDescriptor } from "./type-descriptor";
@@ -10,11 +10,6 @@ import { LLRPElementList } from "./list";
 import { LLRPBuffer } from "../buffer/buffer";
 import { LLRPField, LLRPFieldInstanceType } from "../field/field";
 import { LLRPError } from "../base/error";
-
-export interface LLRPElementI<T extends LLRPUserData> {
-    type: string,
-    data: T
-}
 
 export class LLRPElement extends MixinAny(
     [LLRPNode, LLRPTypeDescriptor, LLRPData, Base],

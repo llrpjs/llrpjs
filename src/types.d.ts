@@ -172,35 +172,163 @@ export type LLRPUserData = {
   [x: string]: LLRPUserDataValue;
 }
 
-export type LLRPUserDataValue = LLRPDataValue | LLRPUserData | LLRPUserData[];
+export type LLRPUserDataValue = any;
+
+/** Class interfaces */
+export interface LLRPElementI<T extends LLRPUserData> {
+  type: string,
+  data: T
+}
+
+export interface LLRPMessageI<T extends LLRPUserData> extends LLRPElementI<T> {
+  id?: number,
+}
+
+export interface LLRPParameterI<T extends LLRPUserData> extends LLRPElementI<T> { }
 
 // Type registry tools
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
 
 export type SubTypeRefDefinition = Readonly<Overwrite<SubTypeReference, {
   td: string;
-  choices?: Readonly<string[]>;
+  choices: Readonly<string[]>;
 }>>;
 
 export type TypeDefinition<T extends string = string> = Readonly<Overwrite<TypeDescriptor, {
   name: T;
-  fieldDescriptors: ExpandRecursively< Readonly<Overwrite<FieldDescriptor, {enumTable: LLRPEnumTableType}>[]>>;
+  fieldDescriptors: Readonly<Overwrite<FieldDescriptor, { enumTable: LLRPEnumTableType }>[]>;
   responseType?: string;
   subTypeRefs: Readonly<SubTypeRefDefinition[]>;
 }>>;
 
-export type LLRPDefinition = {
-  LLRPTypeDefinitions: {
-      [x in string] : TypeDefinition
-  };
-  LLRPMessageNames: Readonly<string[]>;
-  LLRPParamNames: Readonly<string[]>;
+export type LLRPAllTypeDefinitions = Readonly<{
+  [x in string]: TypeDefinition<x>
+}>;
+
+export type Id<T> = T extends Date ? Date : T extends object ? {} & { [P in keyof T]: Id<T[P]> } : T;
+
+/** LLRP data type helpers and tools */
+// an array type of 1-N repeat
+type NonEmptyArray<T> = [T, ...T[]];
+
+// Parameter: 1
+type ParamOnlyOnce<T> = Required<T>;
+// Parameter: 1-N
+type ParamAtLeastOnce<T, Keys extends keyof T = keyof T> = {
+    [K in Keys]: T[K] | NonEmptyArray<T[K]>;
+};
+// Parameter: 0-N
+type ParamMultipleOptional<T, Keys extends keyof T = keyof T> = {
+    [K in Keys]?: T[K] | NonEmptyArray<T[K]>;
+};
+// Parameter: 0-1
+type ParameterOnceAtMost<T> = Partial<T>;
+
+// Choice: 1-N
+type ChoiceAtLeastOnce<T, Keys extends keyof T = keyof T> = [Keys] extends [never] ? {} : {
+    [K in Keys]-?:
+    Required<ParamAtLeastOnce<Pick<T, K>>>
+    & Partial<ParamAtLeastOnce<Pick<T, Exclude<Keys, K>>>>
+}[Keys];
+// Choice: 0-N
+type ChoiceMultipleOptional<T> = ChoiceAtLeastOnce<T> | {
+    [K in keyof T]?: undefined
+}
+// Choice: 1
+type ChoiceOnlyOnce<T, Keys extends keyof T = keyof T> = [Keys] extends [never] ? {} : {
+    [K in Keys]-?:
+    Required<Pick<T, K>>
+    & Partial<Record<Exclude<Keys, K>, undefined>>
+}[Keys];
+// Choice: 0-1
+type ChoiceOnceAtMost<T> = ChoiceOnlyOnce<T> | {
+    [K in keyof T]?: undefined
 }
 
-// expands object types one level deep
-export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
+// Fields
+export type FieldDefinition = Readonly<FieldDescriptor>;
+type GetEnum<FD extends FieldDefinition> = FD['enumTable'][number]['name'] | FD['enumTable'][number]['value'];
+export type GetDataTypeFromFieldType<FD extends FieldDefinition> =
+    | GetFieldRawValue<FD['type']>
+    | GetFieldFormatValue<FD['format']>
+    | GetEnum<FD>
 
-// expands object types recursively
-export type ExpandRecursively<T> = T extends object
-    ? T extends infer O ? { [K in keyof O]: ExpandRecursively<O[K]> } : never
-    : T;
+type GetDataTypeFromFD<
+    FD extends FieldDefinition,
+    _FD extends Exclude<FD, { type: "reserved" }> = Exclude<FD, { type: "reserved" }>,
+    K extends _FD['name'] = _FD['name']> = {
+        [x in K]: Id<GetDataTypeFromFieldType<Extract<FD, { name: x }>>>
+    };
+
+// Sub-parameters
+type GetDefFromRef<AD extends LLRPAllTypeDefinitions, Ref extends SubTypeRefDefinition> = AD[Ref['td']]
+
+type GetNormalSubTypes<AD extends LLRPAllTypeDefinitions, Ref extends SubTypeRefDefinition> =
+    Exclude<GetDefFromRef<AD, Ref>, { typeNum: -1 }>;
+
+type GetChoiceSubTypes<AD extends LLRPAllTypeDefinitions, Ref extends SubTypeRefDefinition> =
+    AD[Ref['choices'][number]];
+
+type RequiredOnceRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "1" }>
+type OptionalOnceRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "0-1" }>
+type RequiredAtLeastOnceRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "1-N" }>
+type OptionalManyRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "0-N" }>
+
+export type GetParamDataTypeFromTRef<
+    AD extends LLRPAllTypeDefinitions,
+    Ref extends SubTypeRefDefinition,
+    // parameters
+    ParamOnceDef extends GetNormalSubTypes<AD, RequiredOnceRef<Ref>> = GetNormalSubTypes<AD, RequiredOnceRef<Ref>>,
+    ParamOnceAtMostDef extends GetNormalSubTypes<AD, OptionalOnceRef<Ref>> = GetNormalSubTypes<AD, OptionalOnceRef<Ref>>,
+    ParamAtLeastOnceDef extends GetNormalSubTypes<AD, RequiredAtLeastOnceRef<Ref>> = GetNormalSubTypes<AD, RequiredAtLeastOnceRef<Ref>>,
+    ParamOptionalManyDef extends GetNormalSubTypes<AD, OptionalManyRef<Ref>> = GetNormalSubTypes<AD, OptionalManyRef<Ref>>
+    > =
+    // 1
+    ([ParamOnceDef] extends [never] ? {} : ParamOnlyOnce<{
+        [x in ParamOnceDef['name']]: GetDataType<AD, AD[x]>
+    }>) &
+    // 0-1
+    ([ParamOnceAtMostDef] extends [never] ? {} : ParameterOnceAtMost<{
+        [x in ParamOnceAtMostDef['name']]: GetDataType<AD, AD[x]>
+    }>) &
+    // 1-N
+    ([ParamAtLeastOnceDef] extends [never] ? {} : ParamAtLeastOnce<{
+        [x in ParamAtLeastOnceDef['name']]: GetDataType<AD, AD[x]>
+    }>) &
+    // 0-N
+    ([ParamOptionalManyDef] extends [never] ? {} : ParamMultipleOptional<{
+        [x in ParamOptionalManyDef['name']]: GetDataType<AD, AD[x]>
+    }>);
+
+export type GetChoiceDataTypeFromRef<
+    AD extends LLRPAllTypeDefinitions,
+    Ref extends SubTypeRefDefinition,
+    // choices
+    ChoiceOnceDef extends GetChoiceSubTypes<AD, RequiredOnceRef<Ref>> = GetChoiceSubTypes<AD, RequiredOnceRef<Ref>>,
+    ChoiceOnceAtMostDef extends GetChoiceSubTypes<AD, OptionalOnceRef<Ref>> = GetChoiceSubTypes<AD, OptionalOnceRef<Ref>>,
+    ChoiceAtLeastOnceDef extends GetChoiceSubTypes<AD, RequiredAtLeastOnceRef<Ref>> = GetChoiceSubTypes<AD, RequiredAtLeastOnceRef<Ref>>,
+    ChoiceOptionalManyDef extends GetChoiceSubTypes<AD, OptionalManyRef<Ref>> = GetChoiceSubTypes<AD, OptionalManyRef<Ref>>
+    > = &
+    // 1
+    ([ChoiceOnceDef] extends [never] ? {} : ChoiceOnlyOnce<{
+        [x in ChoiceOnceDef['name']]: GetDataType<AD, AD[x]>
+    }>) &
+    // 0-1
+    ([ChoiceOnceAtMostDef] extends [never] ? {} : ChoiceOnceAtMost<{
+        [x in ChoiceOnceAtMostDef['name']]: GetDataType<AD, AD[x]>
+    }>) &
+    // 1-N
+    ([ChoiceAtLeastOnceDef] extends [never] ? {} : ChoiceAtLeastOnce<{
+        [x in ChoiceAtLeastOnceDef['name']]: GetDataType<AD, AD[x]>
+    }>) &
+    // 0-N
+    ([ChoiceOptionalManyDef] extends [never] ? {} : ChoiceMultipleOptional<{
+        [x in ChoiceOptionalManyDef['name']]: GetDataType<AD, AD[x]>
+    }>);
+
+export type GetDataType<
+    AD extends LLRPAllTypeDefinitions,
+    T extends TypeDefinition<string>> =
+    GetDataTypeFromFD<T['fieldDescriptors'][number]> & (
+    GetParamDataTypeFromTRef<AD, T['subTypeRefs'][number]> &
+    GetChoiceDataTypeFromRef<AD, T['subTypeRefs'][number]>)

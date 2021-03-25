@@ -1,8 +1,8 @@
 import { LLRPBuffer } from "./buffer/buffer";
-import { LLRPMessage as _LLRPMessage, LLRPMessageI } from "./element/message";
+import { LLRPMessage as _LLRPMessage } from "./element/message";
 import { LLRPParameter as _LLRPParameter } from "./element/parameter";
 import { LLRPParameter } from "./LLRPParameter";
-import { LLRPDataValue, LLRPUserData } from "./types";
+import { LLRPDataValue, LLRPMessageI, LLRPUserData } from "./types";
 
 export class LLRPMessage<T extends LLRPUserData> {
     origin: _LLRPMessage<T>;
@@ -17,6 +17,18 @@ export class LLRPMessage<T extends LLRPUserData> {
             else
                 this.origin = new _LLRPMessage(_);
         }
+    }
+
+    get hasResponse() {
+        return !!this.origin.responseType;
+    }
+
+    getName() {
+        return this.origin.getName();
+    }
+
+    getResponseName() {
+        return this.origin.responseType?.name || null;
     }
 
     setField(name: string, v: LLRPDataValue) {
@@ -37,7 +49,7 @@ export class LLRPMessage<T extends LLRPUserData> {
         return this;
     }
 
-    getSubParameter(name: string) {
+    getSubParameter(name: string): LLRPParameter<LLRPUserData> | LLRPParameter<LLRPUserData>[] {
         const originP = this.origin.getSubElement(name) as _LLRPParameter<LLRPUserData> | _LLRPParameter<LLRPUserData>[];
         if (!originP) return null;
         // wrap it

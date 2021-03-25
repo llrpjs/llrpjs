@@ -2,9 +2,13 @@
   "name": "llrpjs",
   "version": "0.0.1",
   "description": "A Low Level Reader Protocol (LLRP) library based on the LTK project",
-  "main": "index.js",
+  "main": "./dist/src/index.js",
   "directories": {
-    "test": "test"
+    "test": "./dist/test"
+  },
+  "bin": {
+    "llrp2json": "./dist/bin/llrp2json.js",
+    "json2llrp": "./dist/bin/json2llrp.js"
   },
   "devDependencies": {
     "@types/json-bigint": "^1.0.0",
@@ -15,7 +19,6 @@
     "typescript": "^4.1.5"
   },
   "scripts": {
-    "postinstall": "[ -e ./definitions/core/llrp*.schema.json ] || wget --directory-prefix=./definitions/core https://llrpjs.github.io/schema/core/encoding/json/1.0/llrp-1x0.schema.json",
     "test": "mocha",
     "build": "npx tsc"
   },
@@ -24,6 +27,8 @@
     "url": "git@github.com:haytham43/llrpjs.git"
   },
   "keywords": [
+    "llrpts",
+    "llrpjs",
     "llrp",
     "rfid",
     "uhf",

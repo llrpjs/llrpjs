@@ -2,11 +2,9 @@ import { LLRPError } from "../base/error";
 import { LLRPBuffer } from "../buffer/buffer";
 import { LLRP_TD_RSVD_TYPENUM, LLRP_TD_TV_TYPENUM } from "./header-fd";
 import { LLRPFieldFactory } from "../field/llrp";
-import { LLRPUserData } from "../types";
-import { LLRPElement, LLRPElementI } from "./element";
+import { LLRPParameterI, LLRPUserData } from "../types";
+import { LLRPElement } from "./element";
 import { LLRPParameterHeader } from "./header";
-
-export interface LLRPParameterI<T extends LLRPUserData> extends LLRPElementI<T> { }
 
 export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
     header = new LLRPParameterHeader;

@@ -1,7 +1,5 @@
-import { SubTypeReference, TypeDefinition, TypeDescriptor } from "./types";
-import {LLRPDefinition} from "./def";
+import { LLRPAllTypeDefinitions, SubTypeReference, TypeDefinition, TypeDescriptor } from "./types";
 import { LLRPError } from "./base/error";
-const TypeDefinitions = LLRPDefinition.LLRPTypeDefinitions;
 
 type TypeByName<T> = { [name: string]: T };
 type TypeByNum<T> = { [name: number]: T };
@@ -24,9 +22,7 @@ export class TypeRegistry {
     private vendorIdList: number[] = [];
 
     private reset() {
-        this.coreTypeDefinitions
-            = this.customTypeDefinitions
-            = this.coreTypeByName
+        this.coreTypeByName
             = this.coreMsgByTypeNum
             = this.customTypeByName
             = this.customMsgByTypeNum
@@ -80,11 +76,15 @@ export class TypeRegistry {
         return this;
     }
 
-    private enrollCoreDefinitions() {
-        for (let key in TypeDefinitions) {
-            let tDef = TypeDefinitions[key];
-            this.enrollCoreDef(tDef);
+    private enrollCustomDef(tDef: TypeDefinition) {
+        if (tDef.typeNum > 1023 || tDef.typeNum < 0)
+            throw new LLRPError("ERR_LLRP_INTERNAL", `bad definition typeNum ${tDef.typeNum}`);
+        let vendorId = tDef.vendorDescriptor.vendorID;
+        if (!this.customTypeDefinitions[vendorId]) {
+            this.customTypeDefinitions[vendorId] = {};
         }
+        this.customTypeDefinitions[vendorId][tDef.name] = tDef;
+        this.vendorIdList.push(vendorId);
         return this;
     }
 
@@ -128,7 +128,7 @@ export class TypeRegistry {
     }
 
     build() {
-        this.enrollCoreDefinitions();
+        this.reset();
         for (let key in this.coreTypeDefinitions) {
             let tDef = this.coreTypeDefinitions[key];
             let td = this.convertToTypeDescriptor(tDef);
@@ -144,15 +144,19 @@ export class TypeRegistry {
         return this;
     }
 
-    enrollCustomDef(tDef: TypeDefinition) {
-        if (tDef.typeNum > 1023 || tDef.typeNum < 0)
-            throw new LLRPError("ERR_LLRP_INTERNAL", `bad definition typeNum ${tDef.typeNum}`);
-        let vendorId = tDef.vendorDescriptor.vendorID;
-        if (!this.customTypeDefinitions[vendorId]) {
-            this.customTypeDefinitions[vendorId] = {};
+    enrollCoreDefinitions<AD extends LLRPAllTypeDefinitions>(Def: AD) {
+        for (let key in Def) {
+            let tDef = Def[key];
+            this.enrollCoreDef(tDef);
         }
-        this.customTypeDefinitions[vendorId][tDef.name] = tDef;
-        this.vendorIdList.push(vendorId);
+        return this;
+    }
+
+    enrollCustomDefinitions<AD extends LLRPAllTypeDefinitions>(Def: AD) {
+        for (let key in Def) {
+            let tDef = Def[key];
+            this.enrollCustomDef(tDef);
+        }
         return this;
     }
 

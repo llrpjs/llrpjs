@@ -1,6 +1,6 @@
-import { LLRPMessage } from "./LLRPMessage";
-import { TypeRegistry } from "./type-registry";
-import { LLRPScanner } from "./LLRPScanner";
+import { LLRPMessage } from "../src/LLRPMessage";
+import { TypeRegistry } from "../src/type-registry";
+import { LLRPScanner } from "../src/LLRPScanner";
 
 TypeRegistry.getInstance().build();
 let n = new LLRPMessage({

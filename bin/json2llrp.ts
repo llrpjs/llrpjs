@@ -3,9 +3,9 @@
 import JSONbig from 'json-bigint';
 import yargs from 'yargs';
 import fs from 'fs'
-import { LLRPMessageI } from '../src/element/message';
 import { LLRPMessage } from '../src/LLRPMessage';
 import { TypeRegistry } from '../src/type-registry';
+import { LLRPMessageI } from '../src/types';
 
 const argv = yargs.command('$0 <input>', 'convert llrp json to bin', yargs => {
     yargs.positional('input', {
