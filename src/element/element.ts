@@ -68,7 +68,7 @@ export class LLRPElement extends MixinAny(
                 let tRef = this.getSubTypeRefByName(name);
                 if (!tRef)
                     throw new LLRPError("ERR_LLRP_PARAM_NOT_ALLOWED",
-                        `name ${name} is not allowed in type ${this.getName()}`);
+                        `name ${name} is not referenced in type ${this.getName()}`);
                 if (!this.isAllowedIn(tRef))
                     throw new LLRPError("ERR_LLRP_PARAM_NOT_ALLOWED",
                         `no more ${name} instances are allowed in type ${this.getName()}`);
@@ -112,7 +112,10 @@ export class LLRPElement extends MixinAny(
                     if (type === "reserved") continue;  // skip reserved, they can be added on assembly
 
                     let value = this.getDataKey(name) as any;
-                    if (value === undefined) continue;
+                    if (value === undefined) {
+                        this.getSubType(name) || this.addSubType(name, LLRPFieldFactory(fd));
+                        continue;
+                    }
                     // get class
                     let f = LLRPFieldFactory(fd).setValue(value);
                     this.addSubType(name, f);
