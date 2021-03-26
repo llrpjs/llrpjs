@@ -1,11 +1,11 @@
 
-import { LLRPFactory, LLRPMessageFactory, LLRPParameterFactory } from "../src/LLRPFactory";
+import { LLRPAllFactory, LLRPMessageFactory, LLRPParameterFactory } from "../src/LLRPFactory";
 import { TypeRegistry } from "../src/type-registry";
 import {  LLRPDef } from "../src/def";
 
 const LLRPCoreMessages = LLRPMessageFactory(LLRPDef);
 const LLRPCoreParameters = LLRPParameterFactory(LLRPDef);
-const LLRPCore = LLRPFactory(LLRPDef);
+const LLRPCore = LLRPAllFactory(LLRPDef);
 
 TypeRegistry.getInstance()
     .enrollCoreDefinitions(LLRPDef)

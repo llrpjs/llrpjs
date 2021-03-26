@@ -1,5 +1,6 @@
 import { LLRPMessage as _LLRPMessage } from "./LLRPMessage";
 import { LLRPParameter as _LLRPParameter } from "./LLRPParameter";
+import { LLRPReader as _LLRPReader, LLRPReaderNativeEvents } from "./reader/reader";
 import { Id, LLRPUserData, SubTypeRefDefinition, TypeDefinition, FieldDefinition, GetDataType, GetDataTypeFromFieldType, LLRPAllTypeDefinitions, LLRPMessageI, LLRPParameterI } from "./types";
 
 /** Extract all type names */
@@ -50,7 +51,7 @@ type GetClassType<
     AD extends LLRPAllTypeDefinitions,
     N extends keyof AD = keyof AD,
     TD extends AD[N] = AD[N]
-    > = 
+    > =
     TD extends { isMessage: true } ? GetMessageClassType<AD, N> : GetParamClassType<AD, N>;
 
 
@@ -119,7 +120,7 @@ class LLRPMessage extends _LLRPMessage<LLRPUserData> {
         class LLRPTypedMessage extends _LLRPMessage<Data> {
             static _def = Def;
             constructor(args?: GetMessageCtrArgs<Data>) {
-                super({data: {} ,...args, ...{ type: td['name'] } });
+                super({ data: {}, ...args, ...{ type: td['name'] } });
             }
         }
         // Fields
@@ -173,7 +174,7 @@ class LLRPParameter extends _LLRPParameter<LLRPUserData> {
         class LLRPTypedParameter extends _LLRPParameter<Data> {
             static _def = Def;
             constructor(args?: GetParamCtrArgs<Data>) {
-                super({data: {} , ...args, ...{ type: td['name'] } });
+                super({ data: {}, ...args, ...{ type: td['name'] } });
             }
         }
         // Fields
@@ -214,6 +215,42 @@ class LLRPParameter extends _LLRPParameter<LLRPUserData> {
     }
 }
 
+class LLRPReader<
+    AD extends LLRPAllTypeDefinitions,
+    N extends LLRPMessageNames<AD> = LLRPMessageNames<AD>,
+    L extends LLRPReaderNativeEvents = LLRPReaderNativeEvents,
+    MD extends { [x in LLRPMessageNames<AD>]: InstanceType<GetMessageClassType<AD, x>> } = { [x in LLRPMessageNames<AD>]: InstanceType<GetMessageClassType<AD, x>> },
+    > extends _LLRPReader {
+
+    on<E extends L>(event: E, listener: (msg: LLRPMessage) => void): this;
+    on<E extends N>(event: E, listener: (msg: MD[E]) => void): this;
+
+    on<E extends N | L>(event: E, listener: (msg: any) => void) {
+        this._ee.on(event, listener);
+        return this;
+    }
+
+    off<E extends N | L>(event: E, listener: (msg: E extends L ? LLRPMessage : MD[E]) => void) {
+        this._ee.off(event, listener);
+        return this;
+    }
+
+    once<E extends N | L>(event: E, listener: (msg: E extends L ? LLRPMessage : MD[E]) => void) {
+        this._ee.once(event, listener);
+        return this;
+    }
+
+    removeListener<E extends N | L>(event: E, listener: (msg: E extends L ? LLRPMessage : MD[E]) => void) {
+        this._ee.removeListener(event, listener);
+        return this;
+    }
+
+    removeAllListeners(event?: N | L) {
+        this._ee.removeAllListeners(event);
+        return this;
+    }
+}
+
 export function LLRPMessageFactory<AD extends LLRPAllTypeDefinitions>(Def: AD) {
     const results = {} as { [x in LLRPMessageNames<AD>]: GetMessageClassType<AD, x> };
     for (let name in Def) {
@@ -234,7 +271,7 @@ export function LLRPParameterFactory<AD extends LLRPAllTypeDefinitions>(Def: AD)
     return results;
 }
 
-export function LLRPFactory<AD extends LLRPAllTypeDefinitions>(Def: AD) {
+export function LLRPAllFactory<AD extends LLRPAllTypeDefinitions>(Def: AD) {
     const results = {} as { [x in Exclude<LLRPAllNames<AD>, LLRPChoiceNames<AD>>]: GetClassType<AD, x> };
     for (let name in Def) {
         const td = Def[name];
@@ -245,4 +282,8 @@ export function LLRPFactory<AD extends LLRPAllTypeDefinitions>(Def: AD) {
         }
     }
     return results;
+}
+
+export function LLRPReaderFactory<AD extends LLRPAllTypeDefinitions>(Def: AD) {
+    return class LLRPTypedReader extends LLRPReader<AD> {};
 }

@@ -4,16 +4,27 @@ import { promisify } from "util";
 import { LLRPError } from "../base/error";
 import { LLRPMessage } from "../LLRPMessage";
 import { LLRPScanner } from "../LLRPScanner";
-import { LLRPUserData } from "../types";
+import { LLRPAllTypeDefinitions, LLRPUserData } from "../types";
 import { Lock } from "./lock";
 import { Timer } from "./timer";
+
+const LLRPReaderNativeEvents = [
+    "connect",
+    "disconnect",
+    "message",
+    "error"
+] as const;
+
+export type LLRPReaderNativeEvents = typeof LLRPReaderNativeEvents[number];
 
 interface LLRPReaderI {
     host: string;
     port: number;
 }
 
-export class LLRPReader extends EventEmitter {
+export class LLRPReader {
+    protected _ee = new EventEmitter;
+
     private _scanner = new LLRPScanner;
     private _tcp: net.Socket;
     private _lock = new Lock;
@@ -21,9 +32,7 @@ export class LLRPReader extends EventEmitter {
     private _send = (b: Buffer) => new Promise<void>((r, j) => j(new Error(`send is not initialized`)));
     private _recv = () => new Promise<Buffer>((r,j) => { j (new Error (`recv is not initialized`)) });
 
-    constructor(public options: LLRPReaderI) {
-        super();
-    }
+    constructor(public options: LLRPReaderI) { }
 
     async connect() {
         return new Promise<void>((resolve, reject) => {
@@ -35,25 +44,32 @@ export class LLRPReader extends EventEmitter {
                 resolve(this._scanner.getNext.call(this._scanner));
             }));
 
-            this._tcp.on("connect", resolve);
+            this._tcp.on("connect", () => {
+                this._ee.emit("connect");
+                resolve();
+            });
 
-            this._tcp.on("error", reject);
+            this._tcp.on("error", err => {
+                this._ee.emit("error", err);
+                reject(err);
+            });
 
             this._tcp.on("close", () => {
                 this._timer.cancel();
                 this._tcp.removeAllListeners();
-                this._send = (b: Buffer) => new Promise<void>((r, j) => j(new Error(`send is not initialized`)));
-                this._recv = () => new Promise<Buffer>((r,j) => { j (new Error (`recv is not initialized`)) });
+                this._send = (b: Buffer) => new Promise<void>((r, j) => j(new LLRPError("ERR_LLRP_READER_OFFLINE", `Cannot send data`)));
+                this._recv = () => new Promise<Buffer>((r,j) => j(new LLRPError ("ERR_LLRP_READER_OFFLINE", `Cannot receive data`)));
+                this._ee.emit("disconnect");
             })
 
             this._tcp.on("data", async data => {
                 try {
                     const msg = new LLRPMessage(data).decode();
-                    this.emit("message", msg);
-                    this.emit(msg.getName(), msg);
+                    this._ee.emit("message", msg);
+                    this._ee.emit(msg.getName(), msg);
                 } catch (e) {
                     if (e instanceof LLRPError)
-                        this.emit("error", e);
+                        this._ee.emit("error", e);
                     else
                         throw e;
                 }
@@ -79,7 +95,7 @@ export class LLRPReader extends EventEmitter {
                 if (e.name === "ERR_LLRP_READER_TIMEOUT") {
                     e.message = `No message received after ${timeout} mSec`;
                 }
-                this.emit("error", e);
+                this._ee.emit("error", e);
             }
             throw e;
         }
@@ -104,7 +120,7 @@ export class LLRPReader extends EventEmitter {
                         if (e.name === "ERR_LLRP_READER_TIMEOUT") {
                             e.message = `Remote reader didn't respond after ${timeout} msec`;
                         }
-                        this.emit("error", e);
+                        this._ee.emit("error", e);
                     }
                     this._lock.release();
                     throw e;

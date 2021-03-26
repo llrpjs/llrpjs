@@ -1,7 +1,7 @@
 // Server
 import { LLRPDef } from "../src/def";
 import { LLRPMessageFactory } from "../src/LLRPFactory";
-import { LLRPReader } from "../src/reader/reader";
+import { LLRPReader } from "../src";
 import { TypeRegistry } from "../src/type-registry";
 
 //import net from "net";
@@ -30,7 +30,7 @@ const server = net.createServer(function (socket) {
         const msg = new LLRPMessage(data).decode();
         if (msg.getName() === "KEEPALIVE_ACK") return;
         setTimeout(() => {
-            const msg = new LLRPCoreMessages.ADD_ROSPEC_RESPONSE({
+            const rsp = new LLRPCoreMessages.ADD_ROSPEC_RESPONSE({
                 data: {
                     LLRPStatus: {
                         StatusCode: "M_Success",
@@ -38,7 +38,7 @@ const server = net.createServer(function (socket) {
                     }
                 }
             });
-            socket.write(msg.encode().getBuffer());
+            socket.write(rsp.encode().getBuffer());
         }, 200);
     });
 });
@@ -122,18 +122,18 @@ const msg = new LLRPCoreMessages.ADD_ROSPEC({
     await reader.disconnect();
 })();
 
-reader.on("message", (msg: LLRPMessage) => {
+reader.on("message", msg => {
     const data = msg.toLLRPData();
     if (data.type === "KEEPALIVE") {
         reader.send(new LLRPCoreMessages.KEEPALIVE_ACK()).catch(console.error);
     }
 });
 
-reader.on("KEEPALIVE", (msg: LLRPMessage) => {
+reader.on("KEEPALIVE", msg => {
     console.log(`KEEPALIVE listener`);
 });
 
-reader.on("ADD_ROSPEC_RESPONSE", (msg: LLRPMessage) => {
+reader.on("ADD_ROSPEC_RESPONSE", msg => {
     console.log(`ADD_ROSPEC_RESPONSE listener`);
 });
 
