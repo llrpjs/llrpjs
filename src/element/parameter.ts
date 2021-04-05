@@ -6,20 +6,23 @@ import { LLRPParameterI, LLRPUserData } from "../types";
 import { LLRPElement } from "./element";
 import { LLRPParameterHeader } from "./header";
 
-export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
+export class LLRPParameter<T extends LLRPUserData, N extends string = string> extends LLRPElement {
+    LLRPDATATYPE: LLRPParameterI<T, N>['data'];
     header = new LLRPParameterHeader;
 
     get type() { return this.getName() };
     set type(v: this['td']['name']) { this.setType(v); };
 
-    constructor(arg: LLRPParameterI<T> | LLRPBuffer) {
+    constructor(args?: LLRPParameterI<T, N> | LLRPBuffer) {
         super();
-        if (arg instanceof LLRPBuffer) {
-            this.setBuffer(arg);
-        } else {
-            this.type = arg.type;
-            this.setData(arg.data);
-            this.unmarshal();
+        if (args) {
+            if (args instanceof LLRPBuffer) {
+                this.setBuffer(args);
+            } else {
+                this.type = args.type;
+                this.setData(args.data);
+                this.unmarshal();
+            }
         }
         this.setStartBit(0);
     }
@@ -108,8 +111,4 @@ export class LLRPParameter<T extends LLRPUserData> extends LLRPElement {
     toLLRPData() {
         return this.getData();
     }
-}
-
-export interface LLRPParameter<T extends LLRPUserData> {
-    LLRPDATATYPE: T;
 }

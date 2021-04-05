@@ -1,47 +1,40 @@
-import { LLRPDef } from "./def";
-import { LLRPMessageFactory, LLRPParameterFactory, LLRPAllFactory, LLRPReaderFactory } from "./LLRPFactory";
-import { LLRPMessage } from "./LLRPMessage";
-import { LLRPParameter } from "./LLRPParameter";
-import { TypeRegistry as LLRPTypeRegistry } from "./type-registry";
-import { LLRPAllTypeDefinitions } from "./types";
+import { LLRPDef as LLRPCoreDef } from "./def";
+import { LLRPTypedMessage } from "./typed/message";
+import { LLRPTypedParameter } from "./typed/parameter";
+import { LLRPClassRegistry } from "./registry/class-registry";
+import { TypeRegistry } from "./registry/type-registry";
+import { GetDataType, LLRPAllTypeDefinitions, LLRPMessageNames, LLRPParamNames } from "./types";
+import { LLRPClientOfDef } from "./net/client";
+import { LLRPServerOfDef } from "./net/server";
 
-function LLRPCustomFactory<AD extends LLRPAllTypeDefinitions>(customDef: AD) {
-    const LLRPAllDef = {...LLRPDef, ...customDef};
-    const LLRPCustomMessages = LLRPMessageFactory(customDef);
-    const LLRPCustomParameters = LLRPParameterFactory(customDef);
-    const LLRPCustom = LLRPAllFactory(customDef);
 
-    const LLRPReader = LLRPReaderFactory(LLRPAllDef);
+TypeRegistry.getInstance().enrollCoreDefinitions(LLRPCoreDef).build();
+const CR = LLRPClassRegistry.getInstance(LLRPCoreDef).enrollCoreDefinitions(LLRPCoreDef).build();
 
-    LLRPTypeRegistry.getInstance()
-        .enrollCoreDefinitions(LLRPDef)
-        .enrollCustomDefinitions(customDef)
-        .build()
+const LLRPCoreMessages = CR.getCoreMessageClasses();
+const LLRPCoreParameters = CR.getCoreParamClasses();
+const LLRPCore = { ...LLRPCoreMessages, ...LLRPCoreParameters };
 
-    return {
-        LLRPCustomMessages,
-        LLRPCustomParameters,
-        LLRPCustom,
-        LLRPReader
-    }
-}
+const LLRPMessage = LLRPTypedMessage.ofDef(LLRPCoreDef);
+const LLRPParameter = LLRPTypedParameter.ofDef(LLRPCoreDef);
 
-const LLRPCoreMessages = LLRPMessageFactory(LLRPDef);
-const LLRPCoreParameters = LLRPParameterFactory(LLRPDef);
-const LLRPCore = LLRPAllFactory(LLRPDef);
+const LLRPClient = LLRPClientOfDef(LLRPCoreDef);
+const LLRPServer = LLRPServerOfDef(LLRPCoreDef);
 
-const LLRPReader = LLRPReaderFactory(LLRPDef);
+type GetAllDataTypes<
+    AD extends LLRPAllTypeDefinitions,
+    K extends LLRPMessageNames<AD> | LLRPParamNames<AD> = LLRPMessageNames<AD> | LLRPParamNames<AD>
+> = {
+    [ x in K ]: GetDataType<AD, AD[x]>
+};
 
-LLRPTypeRegistry.getInstance()
-    .enrollCoreDefinitions(LLRPDef)
-    .build()
+export type LLRPCoreDataTypes = GetAllDataTypes<typeof LLRPCoreDef>;
 
 export {
+    LLRPCoreDef,
+    LLRPCore,
     LLRPMessage,
     LLRPParameter,
-    LLRPReader,
-    LLRPCoreMessages,
-    LLRPCoreParameters,
-    LLRPCore,
-    LLRPCustomFactory
-};
+    LLRPClient,
+    LLRPServer
+}

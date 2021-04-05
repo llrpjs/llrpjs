@@ -1,5 +1,5 @@
 import { AnyConstructor, Mixin } from "../bryntum/chronograph/Mixin";
-import { TypeRegistry } from "../type-registry";
+import { TypeRegistry } from "../registry/type-registry";
 import { LLRPRepeat, SubTypeReference, TypeDescriptor } from "../types";
 import { LLRPList } from "../base/list";
 import { LLRPNode } from "../base/node";

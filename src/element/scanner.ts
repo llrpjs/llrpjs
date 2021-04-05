@@ -1,6 +1,6 @@
-import { LLRPError } from "./base/error";
-import { LLRPBuffer } from "./buffer/buffer";
-import { LLRPMessageHeader } from "./element/header";
+import { LLRPError } from "../base/error";
+import { LLRPBuffer } from "../buffer/buffer";
+import { LLRPMessageHeader } from "./header";
 
 export class LLRPScanner {
     private llrpBuf: LLRPBuffer;

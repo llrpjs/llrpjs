@@ -1,5 +1,5 @@
-import { LLRPAllTypeDefinitions, SubTypeReference, TypeDefinition, TypeDescriptor } from "./types";
-import { LLRPError } from "./base/error";
+import { LLRPAllTypeDefinitions, SubTypeReference, TypeDefinition, TypeDescriptor } from "../types";
+import { LLRPError } from "../base/error";
 
 type TypeByName<T> = { [name: string]: T };
 type TypeByNum<T> = { [name: number]: T };

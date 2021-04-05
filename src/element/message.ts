@@ -1,14 +1,14 @@
 import { LLRPParameter } from "./parameter";
 import { LLRPElement } from "./element";
-import { Id, LLRPMessageI, LLRPParameterI, LLRPUserData } from "../types";
+import { LLRPMessageI, LLRPParameterI, LLRPUserData } from "../types";
 import { LLRPBuffer } from "../buffer/buffer";
 import { LLRPMessageHeader } from "./header";
 import { LLRPError } from "../base/error";
 
 
-export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
-    LLRPDATATYPE: T;
-    LLRPMESSAGETYPE: Id<LLRPMessageI<T>>;
+export class LLRPMessage<T extends LLRPUserData, N extends string = string> extends LLRPElement {
+    LLRPMESSAGETYPE: LLRPMessageI<T, N>;
+    LLRPDATATYPE: this['LLRPMESSAGETYPE']['data'];
 
     static readonly version: 1 = 1;
     static idCounter = 0;
@@ -20,26 +20,28 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
 
     get id() { return this.header.getMessageId() as number }
     set id(v: number) { this.header.setMessageId(v) }
-    get type() { return this.getName() };
-    set type(v: this['td']['name']) { this.setType(v); };
+    get type(): N { return this.getName() as N };
+    set type(v: N) { this.setType(v); };
 
     get responseType() { return this.td.responseType };
 
-    constructor(arg: LLRPMessageI<T> | LLRPBuffer) {
+    constructor(args?: LLRPMessageI<T, N> | LLRPBuffer) {
         super();
-        if (arg instanceof LLRPBuffer) {
-            this.setBuffer(arg);
-        } else {
-            // unmarshalHeader
-            this.id = arg.id ?? LLRPMessage.getId();
-            this.type = arg.type;
-            this.setData(arg.data);
-            this.unmarshal();   // convert this data to elements
+        if (args) {
+            if (args instanceof LLRPBuffer) {
+                this.setBuffer(args);
+            } else {
+                // unmarshalHeader
+                this.id = args.id ?? LLRPMessage.getId();
+                this.type = args.type;
+                this.setData(args.data);
+                this.unmarshal();   // convert this data to elements
+            }
         }
         this.setStartBit(0);
     }
 
-    createElement(args: LLRPParameterI<LLRPUserData> | LLRPBuffer ) {
+    createElement(args: LLRPParameterI<LLRPUserData> | LLRPBuffer) {
         return new LLRPParameter(args);
     }
 
@@ -50,7 +52,7 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
         return this;
     }
 
-    setType(type: string) {
+    setType(type: N) {
         super.setType(type);
         this.header.setMessageTypeNum(this.getTypeNum());
         return this;
@@ -98,5 +100,3 @@ export class LLRPMessage<T extends LLRPUserData> extends LLRPElement {
         } as this['LLRPMESSAGETYPE'];
     }
 }
-
-export interface LLRPMessage<T extends LLRPUserData> { }
