@@ -51,7 +51,13 @@ export class LLRPElement extends MixinAny(
 
             setField(name: string, data: LLRPDataValue) {
                 let f = this.getSubType(name) as LLRPFieldInstanceType;
-                if (!f) throw new LLRPError("ERR_LLRP_FIELD_NOT_ALLOWED", `field ${name} not allowed in type ${this.getName()}`);
+                if (!f) {
+                    const fd = this.getFieldDescriptors().find(fd => fd.name === name);
+                    if (fd) {
+                        f = LLRPFieldFactory(fd);
+                        this.addSubType(name, f);
+                    } else throw new LLRPError("ERR_LLRP_FIELD_NOT_ALLOWED", `field ${name} not allowed in type ${this.getName()}`);
+                }
                 f.setValue(data);
                 return this;
             }
