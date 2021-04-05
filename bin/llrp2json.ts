@@ -3,10 +3,8 @@
 import JSONbig from 'json-bigint';
 import yargs from 'yargs';
 import fs from 'fs'
-import { LLRPScanner } from '../src/LLRPScanner';
-import { LLRPMessage } from '../src/LLRPMessage';
-import { TypeRegistry } from '../src/type-registry';
-import { LLRPDef } from '../src/def';
+import { LLRPScanner } from '../src/element/scanner';
+import { LLRPMessage } from '../src';
 
 const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs => {
     yargs.positional('input', {
@@ -27,9 +25,8 @@ const argv = yargs.command('$0 <input>', 'convert llrp bin to json', yargs => {
     }).help().alias('help', 'h')
     .argv;
 
-TypeRegistry.getInstance().enrollCoreDefinitions(LLRPDef).build();
 
-(() => {
+(async () => {
     let buf = fs.readFileSync(argv.input as any);   // https://github.com/yargs/yargs/issues/1649
     let scanner = new LLRPScanner();
     scanner.addBuffer(buf);
@@ -49,4 +46,4 @@ TypeRegistry.getInstance().enrollCoreDefinitions(LLRPDef).build();
     } else {
         console.log(jsonData);
     }
-})();
+})().catch(e => console.error(e));

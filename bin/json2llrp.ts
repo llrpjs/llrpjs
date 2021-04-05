@@ -3,10 +3,8 @@
 import JSONbig from 'json-bigint';
 import yargs from 'yargs';
 import fs from 'fs'
-import { LLRPMessage } from '../src/LLRPMessage';
-import { TypeRegistry } from '../src/type-registry';
-import { LLRPMessageI } from '../src/types';
-import { LLRPDef } from '../src/def';
+import { LLRPMessage } from '../src';
+
 
 const argv = yargs.command('$0 <input>', 'convert llrp json to bin', yargs => {
     yargs.positional('input', {
@@ -28,22 +26,20 @@ const argv = yargs.command('$0 <input>', 'convert llrp json to bin', yargs => {
     .help().alias('help', 'h')
     .argv;
 
-TypeRegistry.getInstance().enrollCoreDefinitions(LLRPDef).build();
-
-(() => {
+(async () => {
     let json = fs.readFileSync(argv.input as any, 'utf-8');
-    let obj: LLRPMessageI<{}> | LLRPMessageI<{}>[] = JSONbig.parse(json);
+    let obj = JSONbig.parse(json);
 
     let result: Buffer[] = [];
     if (Array.isArray(obj)) {
         for (let i in obj) {
             let m = obj[i];
-            let msg = new LLRPMessage(m);
+            let msg = new LLRPMessage(m as any);
             let buf = msg.encode().getBuffer();
             result.push(buf);
         }
     } else {
-        let msg = new LLRPMessage(obj);
+        let msg = new LLRPMessage(obj as any);
         let buf = msg.encode().getBuffer();
         result.push(buf);
     }
@@ -53,4 +49,4 @@ TypeRegistry.getInstance().enrollCoreDefinitions(LLRPDef).build();
     } else {
         process.stdout.write(Buffer.concat(result));
     }
-})();
+})().catch(e => console.error(e));
