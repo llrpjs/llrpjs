@@ -9,9 +9,9 @@
 
 const LLRP_NAMESPACE = {
     prefix: "llrp",
-    uri: "http://www.llrp.org/ltk/schema/core/encoding/xml/1.0",
-    schemaLocation: "http://www.llrp.org/ltk/schema/core/encoding/xml/1.0/llrp.xsd"
-};
+    uri: "https://llrpjs.github.io/schema/core/encoding/json/1.0",
+    schemaLocation: "https://llrpjs.github.io/schema/core/encoding/json/1.0/llrp-1x0.schema.json"
+} as const;
 
 // Parameters
 
