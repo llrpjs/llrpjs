@@ -9,8 +9,4 @@ export const LLRPClientOfDef = <AD extends LLRPAllTypeDefinitions>(Def: AD) =>
             const socket = net.createConnection(this.options);
             return this.initializeClient(socket);
         }
-
-        async disconnect() {
-            return this.cleanupSocket();
-        }
     }

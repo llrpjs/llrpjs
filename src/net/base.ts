@@ -143,6 +143,10 @@ export class LLRPNet {
         });
     }
 
+    async disconnect() {
+        return this.cleanupSocket();
+    }
+
     get socketWritable() {
         return !!this._tcp?.writable
     }
@@ -153,7 +157,7 @@ export class LLRPNet {
 
     async recv(timeout = 5000) {
         const _timer = new Timer;
-        _timer.start(timeout);
+        if (timeout > 0) _timer.start(timeout);
         let msg: LLRPMessage = await Promise.race([this._recv(), _timer.watch()]);
         _timer.cancel();
         return msg;
