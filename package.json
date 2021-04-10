@@ -21,7 +21,8 @@
     "typescript": "4.1.5"
   },
   "scripts": {
-    "build": "npx tsc --build tsconfig.json"
+    "build": "npx tsc --build tsconfig.json",
+    "postinstall": "npm run-script build"
   },
   "repository": {
     "type": "git",
