@@ -1,7 +1,12 @@
 /**
  * This example program is an exact recreation of the example1.cpp found in the LTKCPP project
  */
-import { LLRPClient, LLRPCore } from "../src";
+import { LLRPCoreDef, LLRPFactory, GetLLRPDataTypes } from "../src";
+type LLRPCoreDataTypes = GetLLRPDataTypes<typeof LLRPCoreDef>;
+
+const LLRP = LLRPFactory(LLRPCoreDef);
+const { LLRPClient, LLRPCore } = LLRP;
+
 type LLRPClient = InstanceType<typeof LLRPClient>;
 
 /** LLRPClient */

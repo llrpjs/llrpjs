@@ -7,34 +7,38 @@ import { GetDataType, LLRPAllTypeDefinitions, LLRPMessageNames, LLRPParamNames }
 import { LLRPClientOfDef } from "./net/client";
 import { LLRPServerOfDef } from "./net/server";
 
+import EventEmitter from "events";
 
-TypeRegistry.getInstance().enrollCoreDefinitions(LLRPCoreDef).build();
-const CR = LLRPClassRegistry.getInstance(LLRPCoreDef).enrollCoreDefinitions(LLRPCoreDef).build();
+function LLRPFactory<AD extends LLRPAllTypeDefinitions>(Def: AD) {
+    TypeRegistry.getInstance().enrollCoreDefinitions(Def).build();
+    const CR = LLRPClassRegistry.getInstance(Def).enrollCoreDefinitions(Def).build();
+    
+    const LLRPCoreMessages = CR.getCoreMessageClasses();
+    const LLRPCoreParameters = CR.getCoreParamClasses();
+    const LLRPCore = { ...LLRPCoreMessages, ...LLRPCoreParameters };
+    
+    const LLRPMessage = LLRPTypedMessage.ofDef(Def);
+    const LLRPParameter = LLRPTypedParameter.ofDef(Def);
+    
+    const LLRPClient = LLRPClientOfDef(Def);
+    const LLRPServer = LLRPServerOfDef(Def);
+    return {
+        LLRPMessage,
+        LLRPParameter,
+        LLRPClient,
+        LLRPServer,
+        LLRPCore
+    };
+}
 
-const LLRPCoreMessages = CR.getCoreMessageClasses();
-const LLRPCoreParameters = CR.getCoreParamClasses();
-const LLRPCore = { ...LLRPCoreMessages, ...LLRPCoreParameters };
-
-const LLRPMessage = LLRPTypedMessage.ofDef(LLRPCoreDef);
-const LLRPParameter = LLRPTypedParameter.ofDef(LLRPCoreDef);
-
-const LLRPClient = LLRPClientOfDef(LLRPCoreDef);
-const LLRPServer = LLRPServerOfDef(LLRPCoreDef);
-
-type GetAllDataTypes<
+export type GetLLRPDataTypes<
     AD extends LLRPAllTypeDefinitions,
     K extends LLRPMessageNames<AD> | LLRPParamNames<AD> = LLRPMessageNames<AD> | LLRPParamNames<AD>
 > = {
     [ x in K ]: GetDataType<AD, AD[x]>
 };
 
-export type LLRPCoreDataTypes = GetAllDataTypes<typeof LLRPCoreDef>;
-
 export {
     LLRPCoreDef,
-    LLRPCore,
-    LLRPMessage,
-    LLRPParameter,
-    LLRPClient,
-    LLRPServer
+    LLRPFactory
 }

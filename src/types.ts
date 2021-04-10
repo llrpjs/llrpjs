@@ -206,8 +206,8 @@ export type LLRPAllTypeDefinitions = Readonly<{
   [x in string]: TypeDefinition<x>
 }>;
 
-type Id<T> = T extends Date ? Date : T extends object ? {} & { [P in keyof T]: Id<T[P]> } : T;
-type Trim<T, S extends string> = T extends `${S}${infer U}` ? Trim<U, S> : T extends `${S}${infer U}` ? Trim<U, S> : T;
+export type Id<T> = T extends Date ? Date : T extends object ? {} & { [P in keyof T]: Id<T[P]> } : T;
+export type Trim<T, S extends string> = T extends `${S}${infer U}` ? Trim<U, S> : T extends `${S}${infer U}` ? Trim<U, S> : T;
 
 
 
@@ -252,13 +252,13 @@ type ChoiceOnceAtMost<T> = ChoiceOnlyOnce<T> | {
 
 // Fields
 export type FieldDefinition = Readonly<FieldDescriptor>;
-type GetEnum<FD extends FieldDefinition> = FD['enumTable'][number]['name'] | FD['enumTable'][number]['value'];
+export type GetEnum<FD extends FieldDefinition> = FD['enumTable'][number]['name'] | FD['enumTable'][number]['value'];
 export type GetDataTypeFromFieldType<FD extends FieldDefinition> = Id<
   | GetFieldRawValue<FD['type']>
   | GetFieldFormatValue<FD['format']>
   | GetEnum<FD>>
 
-type GetDataTypeFromFD<
+export type GetDataTypeFromFD<
   FD extends FieldDefinition,
   _FD extends Exclude<FD, { type: "reserved" }> = Exclude<FD, { type: "reserved" }>,
   K extends _FD['name'] = _FD['name']> = {
@@ -266,18 +266,18 @@ type GetDataTypeFromFD<
   };
 
 // Sub-parameters
-type GetDefFromRef<AD extends LLRPAllTypeDefinitions, Ref extends SubTypeRefDefinition> = AD[Ref['td']]
+export type GetDefFromRef<AD extends LLRPAllTypeDefinitions, Ref extends SubTypeRefDefinition> = AD[Ref['td']]
 
-type GetNormalSubTypes<AD extends LLRPAllTypeDefinitions, Ref extends SubTypeRefDefinition> =
+export type GetNormalSubTypes<AD extends LLRPAllTypeDefinitions, Ref extends SubTypeRefDefinition> =
   Exclude<GetDefFromRef<AD, Ref>, { typeNum: -1 }>;
 
-type GetChoiceSubTypes<AD extends LLRPAllTypeDefinitions, Ref extends SubTypeRefDefinition> =
+export type GetChoiceSubTypes<AD extends LLRPAllTypeDefinitions, Ref extends SubTypeRefDefinition> =
   AD[Ref['choices'][number]];
 
-type RequiredOnceRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "1" }>
-type OptionalOnceRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "0-1" }>
-type RequiredAtLeastOnceRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "1-N" }>
-type OptionalManyRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "0-N" }>
+export type RequiredOnceRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "1" }>
+export type OptionalOnceRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "0-1" }>
+export type RequiredAtLeastOnceRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "1-N" }>
+export type OptionalManyRef<Ref extends SubTypeRefDefinition> = Extract<Ref, { repeat: "0-N" }>
 
 export type GetParamDataTypeFromTRef<
   AD extends LLRPAllTypeDefinitions,
@@ -331,7 +331,7 @@ export type GetChoiceDataTypeFromRef<
     [x in ChoiceOptionalManyDef['name']]: GetDataType<AD, AD[x]>
   }>);
 
-type GetDataType<
+export type GetDataType<
   AD extends LLRPAllTypeDefinitions,
   T extends TypeDefinition<string>> =
   GetDataTypeFromFD<T['fieldDescriptors'][number]> & (
@@ -342,21 +342,21 @@ type GetDataType<
 
 
 /** Extract all type names */
-type LLRPAllNames<AD extends LLRPAllTypeDefinitions, K extends keyof AD = keyof AD> = K;
-type LLRPMessageNames<AD extends LLRPAllTypeDefinitions, K extends keyof AD = keyof AD> = Extract<AD[K], { isMessage: true }>['name'];
-type LLRPParamNames<AD extends LLRPAllTypeDefinitions, K extends keyof AD = keyof AD> = Extract<Exclude<AD[K], { typeNum: -1 }>, { isMessage: false }>['name'];
-type LLRPChoiceNames<AD extends LLRPAllTypeDefinitions, K extends keyof AD = keyof AD> = Extract<AD[K], { typeNum: -1 }>['name']
+export type LLRPAllNames<AD extends LLRPAllTypeDefinitions, K extends keyof AD = keyof AD> = K;
+export type LLRPMessageNames<AD extends LLRPAllTypeDefinitions, K extends keyof AD = keyof AD> = Extract<AD[K], { isMessage: true }>['name'];
+export type LLRPParamNames<AD extends LLRPAllTypeDefinitions, K extends keyof AD = keyof AD> = Extract<Exclude<AD[K], { typeNum: -1 }>, { isMessage: false }>['name'];
+export type LLRPChoiceNames<AD extends LLRPAllTypeDefinitions, K extends keyof AD = keyof AD> = Extract<AD[K], { typeNum: -1 }>['name']
 
 /** Type descriptor attribute extractors */
-type GetFieldDescriptors<TD extends TypeDefinition> = TD['fieldDescriptors'][number];
-type GetSubTypeRefs<TD extends TypeDefinition> = TD['subTypeRefs'][number];
-type GetChoiceRefNames<Ref extends SubTypeRefDefinition> = Ref['choices'][number];
+export type GetFieldDescriptors<TD extends TypeDefinition> = TD['fieldDescriptors'][number];
+export type GetSubTypeRefs<TD extends TypeDefinition> = TD['subTypeRefs'][number];
+export type GetChoiceRefNames<Ref extends SubTypeRefDefinition> = Ref['choices'][number];
 
 /** Top-level class constructor argument types */
-type GetTypedMessageCtrArgs<M extends LLRPMessageI<any, any>> =
+export type GetTypedMessageCtrArgs<M extends LLRPMessageI<any, any>> =
   Partial<Pick<M, "id">> & Pick<M, "data">;
 
-type GetTypedParamCtrArgs<P extends LLRPParameterI<any> = LLRPParameterI<any>> = Pick<P, "data">;
+export type GetTypedParamCtrArgs<P extends LLRPParameterI<any> = LLRPParameterI<any>> = Pick<P, "data">;
 
 
 
@@ -387,32 +387,32 @@ export type GetParamClassType<
     GetAllSubParamSettersGetters<P, AD, GetSubTypeRefs<TD>>;
 
 
-type GetAllTypedMessageClasses<M extends AnyConstructor, P extends AnyConstructor, AD extends LLRPAllTypeDefinitions> = {
+export type GetAllTypedMessageClasses<M extends AnyConstructor, P extends AnyConstructor, AD extends LLRPAllTypeDefinitions> = {
   [x in LLRPMessageNames<AD>]:
   GetMessageClassType<M, P, AD, x>
 }
 
-type GetAllTypedParamClasses<P extends AnyConstructor, AD extends LLRPAllTypeDefinitions> = {
+export type GetAllTypedParamClasses<P extends AnyConstructor, AD extends LLRPAllTypeDefinitions> = {
   [x in LLRPParamNames<AD>]:
   GetParamClassType<P, AD, x>
 }
 
 
 
-type GetFieldSettersGetters<E extends AnyConstructor, FD extends FieldDefinition> = {
+export type GetFieldSettersGetters<E extends AnyConstructor, FD extends FieldDefinition> = {
   [x in `set${FD['name']}`]: (v: GetDataTypeFromFieldType<Extract<FD, { name: Trim<x, "set">; }>>) => InstanceType<E>;
 } & {
     [x in `get${FD['name']}`]: () => GetDataTypeFromFieldType<Extract<FD, { name: Trim<x, "get">; }>>;
   };
-// Sub-type setters/getters tools
-type GetAllSubParamSettersGetters<
+// Sub-export type setters/getters tools
+export type GetAllSubParamSettersGetters<
   SP extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
   Ref extends SubTypeRefDefinition> =
   GetOnceSettersGetters<SP, AD, Extract<Ref, { repeat: "0-1" | "1"; }>> &
   GetManySettersGetters<SP, AD, Extract<Ref, { repeat: "0-N" | "1-N"; }>>;
 
-type GetOnceSettersGetters<
+export type GetOnceSettersGetters<
   SP extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
   Ref extends SubTypeRefDefinition,
@@ -428,7 +428,7 @@ type GetOnceSettersGetters<
     [x in `get${normalRef['td']}`]: SubParameterGetter<SP, AD, Extract<Ref, { td: Trim<x, "get">; }>['td']>;
   };
 
-type GetManySettersGetters<
+export type GetManySettersGetters<
   SP extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
   Ref extends SubTypeRefDefinition,
@@ -444,35 +444,35 @@ type GetManySettersGetters<
     [x in `get${normalRef['td']}`]: SubParamManyGetter<SP, AD, Extract<Ref, { td: Trim<x, "get">; }>['td']>;
   };
 
-type SubParameterSetter<
+export type SubParameterSetter<
   P extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
   N extends LLRPParamNames<AD>> = <U>(this: U, p: InstanceType<GetParamClassType<P, AD, N>>) => U;
 
-type SubParameterGetter<
+export type SubParameterGetter<
   P extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
   N extends LLRPParamNames<AD>> = <U>(this: U) => InstanceType<GetParamClassType<P, AD, N>> | null;
-type SubChoiceSetter<
+export type SubChoiceSetter<
   P extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
   N extends LLRPChoiceNames<AD>> = <U>(this: U, p: GetLLRPParameterUnion<P, AD, N>) => U;
-type SubChoiceGetter<
+export type SubChoiceGetter<
   P extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
   N extends LLRPChoiceNames<AD>> = <U>(this: U) => GetLLRPParameterUnion<P, AD, N> | null;
 
-type SubParamManyGetter<
+export type SubParamManyGetter<
   P extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
   N extends LLRPParamNames<AD>> = <U>(this: U) => GetLLRPParameterUnion<P, AD, N> | GetLLRPParameterUnion<P, AD, N>[];
 
-type SubChoiceManyGetter<
+export type SubChoiceManyGetter<
   P extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
   N extends LLRPParamNames<AD>> = <U>(this: U) => GetLLRPParameterUnion<P, AD, N> | GetLLRPParameterUnion<P, AD, N>[];
 
-type GetLLRPParameterUnion<
+export type GetLLRPParameterUnion<
   P extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions, N extends LLRPParamNames<AD>> = {
     [x in N]: InstanceType<GetParamClassType<P, AD, Extract<N, x>>>;

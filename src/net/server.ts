@@ -3,6 +3,7 @@ import net from "net";
 import { LLRPNetI } from "./base";
 import { LLRPTypedNet } from "./typed";
 import { LLRPAllTypeDefinitions } from "../types";
+import EventEmitter from "events";
 
 export const LLRPServerOfDef = <AD extends LLRPAllTypeDefinitions>(Def: AD) =>
     class LLRPServer extends LLRPTypedNet.ofDef(Def) {

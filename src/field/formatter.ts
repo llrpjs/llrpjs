@@ -14,15 +14,15 @@ export class LLRPFormatterParser extends Mixin(
         RV: any;
         FMTV: any;
 
-        protected static fullPrecision = true;
+        static fullPrecision = true;
 
-        protected static formatIso8601Microseconds(microseconds: bigint): string {
+        static formatIso8601Microseconds(microseconds: bigint): string {
             const date = (new Date(Number(microseconds / 1000n))).toISOString();
             const residue = (microseconds % 1000000n).toString().padStart(6, "0");
             return date.replace(ISO8601_REGEX_MILLI, residue);
         }
 
-        protected static parseIso8601Microseconds(timestamp: LLRPFMTDate): bigint {
+        static parseIso8601Microseconds(timestamp: LLRPFMTDate): bigint {
             // seconds
             if (timestamp instanceof Date)
                 timestamp = timestamp.toJSON();
@@ -48,64 +48,64 @@ export class LLRPFormatterParser extends Mixin(
 
         // Formatters
 
-        protected static formatNormal(value: any) {
+        static formatNormal(value: any) {
             return value;
         }
 
-        protected static formatDec(value: number | bigint): LLRPFMTDec {
+        static formatDec(value: number | bigint): LLRPFMTDec {
             return value.toString(10);
         }
 
-        protected static formatDecVector(value: (number | bigint)[]) {
+        static formatDecVector(value: (number | bigint)[]) {
             return value.map(x => LLRPFormatterParser.formatDec(x)).join(' ');
         }
 
-        protected static formatHex(value: number | bigint, bitWidth: number): LLRPFMTHex {
+        static formatHex(value: number | bigint, bitWidth: number): LLRPFMTHex {
             return value.toString(16).padStart(bitWidth / 4, "0").toUpperCase();
         }
 
-        protected static formatHexVector(value: (number | bigint)[], bitWidth: number): LLRPFMTHex {
+        static formatHexVector(value: (number | bigint)[], bitWidth: number): LLRPFMTHex {
             return value.map(x => LLRPFormatterParser.formatHex(x, bitWidth)).join('')
         }
 
-        protected static formatDateTime(value: bigint): string {
+        static formatDateTime(value: bigint): string {
             return LLRPFormatterParser.fullPrecision ?
                 LLRPFormatterParser.formatIso8601Microseconds(value)
                 : (new Date(Number(value) / 1000)).toJSON();
         }
 
-        protected static formatUTF8(value: string): string {
+        static formatUTF8(value: string): string {
             return value;
         }
         // Parsers
-        protected static parseNormal(v: any) {
+        static parseNormal(v: any) {
             return v;
         }
 
-        protected static parseDec(v: string): number {
+        static parseDec(v: string): number {
             return parseInt(v, 10);
         }
 
-        protected static parseDecVector(v: string): number[] {
+        static parseDecVector(v: string): number[] {
             return v.split(' ').map(() => LLRPFormatterParser.parseDec(v));
         }
 
-        protected static parseHex(v: string): number {
+        static parseHex(v: string): number {
             return parseInt(v, 16);
         }
 
-        protected static parseHexVector(v: string, bitWidth: number): number[] {
+        static parseHexVector(v: string, bitWidth: number): number[] {
             let n = bitWidth / 4;
             v = v.trim().split('').reduce((acc, x, i) => (i % n == 0) && (i != 0) ? `${acc},${x}` : `${acc}${x}`, '');
             return v.length ? v.split(',').map(x => parseInt(x.padEnd(2, "0"), 16)) : [];
         }
 
-        protected static parseDateTime(v: LLRPFMTDate): bigint {
+        static parseDateTime(v: LLRPFMTDate): bigint {
             return LLRPFormatterParser.fullPrecision ? LLRPFormatterParser.parseIso8601Microseconds(v)
                 : BigInt(new Date(v)) * 1000n;
         }
 
-        protected static parseUTF8(value: string): string {
+        static parseUTF8(value: string): string {
             return value;
         }
 

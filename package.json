@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "A Low Level Reader Protocol (LLRP) library based on the LTK project",
   "main": "./dist/src/index.js",
-  "typings": "./src/index.ts",
+  "typings": "./dist/src/index.d.ts",
+  "files": [
+    "/dist"
+  ],
   "directories": {
     "test": "./dist/test"
   },

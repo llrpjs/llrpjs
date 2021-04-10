@@ -7,7 +7,7 @@ export class LLRPFieldData extends Mixin(
     (base: AnyConstructor<LLRPFieldDescriptor, typeof LLRPFieldDescriptor>) =>
     class LLRPFieldData extends base {
         RV: LLRPRawDataValue
-        protected rValue: this['RV'];
+        rValue: this['RV'];
 
         setDefaultRawValue(): void {
             this.rValue = (this.isVectorType ?

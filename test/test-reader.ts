@@ -1,4 +1,9 @@
-import { LLRPMessage, LLRPClient, LLRPCoreDataTypes, LLRPCore } from "../src/";
+import { LLRPFactory, LLRPCoreDef, GetLLRPDataTypes } from "../src";
+type LLRPCoreDataTypes = GetLLRPDataTypes<typeof LLRPCoreDef>;
+
+const LLRP = LLRPFactory(LLRPCoreDef);
+const { LLRPCore, LLRPMessage, LLRPClient } = LLRP;
+
 import net from "net";
 
 

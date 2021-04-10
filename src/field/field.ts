@@ -22,7 +22,7 @@ export class LLRPField<FD extends FieldDescriptor> extends MixinAny(
         ETV: any;
         EV: this['RV'] | this['FMTV'] | this['ETV'];      // end-user value type: raw | formatted | enumerated
 
-        private isEVFormattable(v: this['EV']) {
+        isEVFormattable(v: this['EV']) {
             if (this.isUtf8Formattable) return true;
             if (!this.isUnsigned) return false;
             if (this.isBigInt)
@@ -30,7 +30,7 @@ export class LLRPField<FD extends FieldDescriptor> extends MixinAny(
             return typeof v === 'string' && !this.isNormalFormattable;
         }
 
-        private isEVEnumerable(v: this['EV']) {
+        isEVEnumerable(v: this['EV']) {
             if (!this.isUnsigned) return false;
             if (Array.isArray(v))
                 return v.every(x=>typeof x === 'string') && this.isEnumerable;

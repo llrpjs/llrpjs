@@ -1,9 +1,11 @@
-import { LLRPCore, LLRPMessage, LLRPCoreDataTypes, LLRPServer } from "../src";
+import { LLRPFactory, LLRPCoreDef, GetLLRPDataTypes } from "../src";
+type LLRPCoreDataTypes = GetLLRPDataTypes<typeof LLRPCoreDef>;
+
+const LLRP = LLRPFactory(LLRPCoreDef);
+const { LLRPCore, LLRPServer } = LLRP;
 
 type LLRPServer = InstanceType<typeof LLRPServer>;
-type LLRPMessage = InstanceType<typeof LLRPMessage>;
 
-import net from "net";
 import { promisify } from "util";
 
 const sleep = promisify(setTimeout);

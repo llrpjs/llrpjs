@@ -1,7 +1,12 @@
 
-import { LLRPClient, LLRPCore, LLRPCoreDataTypes } from "../src";
+import { GetLLRPDataTypes, LLRPFactory, LLRPCoreDef } from "../src";
 import * as ADD_ROSPEC from "./ADD_ROSPEC.json";
+
+type LLRPCoreDataTypes = GetLLRPDataTypes<typeof LLRPCoreDef>;
 const ADD_ROSPEC_DATA = ADD_ROSPEC.data as LLRPCoreDataTypes['ADD_ROSPEC'];
+
+const LLRP = LLRPFactory(LLRPCoreDef);
+const { LLRPClient, LLRPCore } = LLRP;
 
 // create a client
 //const reader = new LLRPClient({ host: "192.168.7.2" });

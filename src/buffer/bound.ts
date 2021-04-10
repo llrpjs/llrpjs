@@ -8,10 +8,10 @@ export class LLRPBound extends Mixin(
     [],
     (base: AnyConstructor) =>
         class LLRPBound extends base {
-            private _byteSize: number = 0;       // number of bytes
-            private _bitSize: number = 0;        // total number of bits. Equals ( <byteSize> * 8 + <bitCount> ) (specifically used by u1v and reserved)
-            private _startByte: number = 0;      // starting byte of our field
-            private _startBit: number = 0;       // starting bit of our field
+            _byteSize: number = 0;       // number of bytes
+            _bitSize: number = 0;        // total number of bits. Equals ( <byteSize> * 8 + <bitCount> ) (specifically used by u1v and reserved)
+            _startByte: number = 0;      // starting byte of our field
+            _startBit: number = 0;       // starting bit of our field
 
 
             setBitSize(bitSize: number): this {

@@ -5,7 +5,7 @@ import { LLRPTypedMessage } from "../typed/message";
 import { LLRPNetNativeEvents, LLRPNet } from "./base";
 import { LLRPClassRegistry } from "../registry/class-registry";
 import { LLRPAllTypeDefinitions, LLRPMessageNames, GetAllTypedMessageClasses, LLRPUserData } from "../types";
-
+import EventEmitter from "events";
 
 export class LLRPTypedNet<
     AD extends LLRPAllTypeDefinitions,
@@ -17,7 +17,7 @@ export class LLRPTypedNet<
     Def: AD;
     CR = LLRPClassRegistry.getInstance();
 
-    protected listenerMap: Map<AnyFunction, [string, AnyFunction]> = new Map;
+    listenerMap: Map<AnyFunction, [string, AnyFunction]> = new Map;
 
     static ofDef<AD extends LLRPAllTypeDefinitions>(Def: AD) {
         return class LLRPTypedNet extends this<AD> {
@@ -43,7 +43,7 @@ export class LLRPTypedNet<
         };
     }
 
-    private getNewListener<E extends N | L>(event: E, listener: AnyFunction) {
+    getNewListener<E extends N | L>(event: E, listener: AnyFunction) {
         const newListener = (m) => {
             if (LLRPNetNativeEvents.includes(<LLRPNetNativeEvents>event)) {
                 listener(m);

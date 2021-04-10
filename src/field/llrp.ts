@@ -1,7 +1,6 @@
 import { CRUMB, FieldDescriptor, GetEnumTable, GetFieldFormat, LLRPFieldType } from "../types";
 import { LLRPField } from "./field";
 
-// TODO: add buffer availability assertion before read/write ops
 
 class LLRPU1 extends LLRPField.ofType("u1") {
     encode(): this {

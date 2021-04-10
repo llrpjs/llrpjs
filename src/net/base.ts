@@ -24,30 +24,30 @@ export interface LLRPNetI {
 }
 
 export class LLRPNet {
-    protected options: Required<LLRPNetI>;
-    protected _ee = new EventEmitter;
+    options: Required<LLRPNetI>;
+    _ee = new EventEmitter;
 
-    private _scanner = new LLRPScanner;
-    protected _server: net.Server;
-    protected _tcp: net.Socket;
-    private _lock = new Lock;
-    private _send = this.invalidSend;
-    private _recv = this.invalidRecv;
+    _scanner = new LLRPScanner;
+    _server: net.Server;
+    _tcp: net.Socket;
+    _lock = new Lock;
+    _send = this.invalidSend;
+    _recv = this.invalidRecv;
 
     constructor(options?: LLRPNetI) {
         options = { host: "localhost", port: 5084, ...options };
         this.options = <Required<LLRPNetI>>options;
     }
 
-    private async invalidSend (m: LLRPMessage) {
+    async invalidSend (m: LLRPMessage) {
         return new Promise<void>((r, j) => j(new LLRPError("ERR_LLRP_READER_OFFLINE", `Cannot send data`)));
     }
 
-    private async invalidRecv () {
+    async invalidRecv () {
         return new Promise<LLRPMessage>((r, j) => j(new LLRPError("ERR_LLRP_READER_OFFLINE", `Cannot receive data`)));
     }
 
-    private async validSend(m: LLRPMessage) {
+    async validSend(m: LLRPMessage) {
         return new Promise<void>((resolve, reject) => {
             this._tcp.write.call(this._tcp, m.encode().getBuffer(), err => {
                 if (err) reject(err);
@@ -56,13 +56,13 @@ export class LLRPNet {
         });
     }
 
-    private async validRecv() {
+    async validRecv() {
         return new Promise<LLRPMessage>(resolve => this._ee.once("message", msg => {
             resolve(msg);
         }))
     };
 
-    private async onData(data: Buffer) {
+    async onData(data: Buffer) {
         try {
             this._scanner.addBuffer.call(this._scanner, data);
             const msgBuf = this._scanner.getNext.call(this._scanner);
@@ -79,7 +79,7 @@ export class LLRPNet {
         }
     }
 
-    private async onSocketClose() {
+    async onSocketClose() {
         this._tcp.removeAllListeners();
         this._send = this.invalidSend.bind(this);
         this._recv = this.invalidRecv.bind(this);
@@ -87,7 +87,7 @@ export class LLRPNet {
         this._ee.emit("disconnect");
     }
 
-    protected async initializeServer(server: net.Server) {
+    async initializeServer(server: net.Server) {
         this._server = server;
         server.maxConnections = 1;
         server.on("connection", async socket => {
@@ -111,7 +111,7 @@ export class LLRPNet {
         });
     }
 
-    protected async initializeClient(socket: net.Socket) {
+    async initializeClient(socket: net.Socket) {
         this._tcp = socket;
         return new Promise<void>((resolve, reject) => {
             this._send = this.validSend.bind(this);
@@ -134,7 +134,7 @@ export class LLRPNet {
         });
     }
 
-    protected async cleanupSocket() {
+    async cleanupSocket() {
         return new Promise<void>(resolve => {
             if (this._tcp) {
                 this._tcp.end(resolve);

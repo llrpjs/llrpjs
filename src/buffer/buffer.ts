@@ -3,22 +3,22 @@ import { BOOL } from "../types";
 
 
 export class LLRPBuffer {
-    private _buffer: Buffer;
-    private _bitOps: BitOps;
-    private _byte = 0;           // index (offset)
-    private _bit = 0;            // index of bit in the current byte address MSB(0)/LSB(7)
+    _buffer: Buffer;
+    _bitOps: BitOps;
+    _byte = 0;           // index (offset)
+    _bit = 0;            // index of bit in the current byte address MSB(0)/LSB(7)
 
-    private get bit(): number {
+    get bit(): number {
         return this._byte * 8 + this._bit;
     }
-    private set bit(v: number) {
+    set bit(v: number) {
         this._bit = v & 7;
         this._byte = v >> 3;
     }
-    private get byte(): number {
+    get byte(): number {
         return this._byte;
     }
-    private set byte(v: number) {
+    set byte(v: number) {
         this._byte = v;
     }
 
