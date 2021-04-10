@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "npx tsc --build tsconfig.json",
-    "postinstall": "npm run-script build"
+    "prepare": "npm run-script build"
   },
   "repository": {
     "type": "git",
