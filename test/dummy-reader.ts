@@ -160,6 +160,18 @@ class Main {
         })
 
         this.reader.on("KEEPALIVE_ACK", msg => { /** keep this connection up */ });
+
+        this.reader.on("CLOSE_CONNECTION", async msg => {
+            await this.reader.send(new LLRPCore.CLOSE_CONNECTION_RESPONSE({
+                data: {
+                    LLRPStatus: {
+                        StatusCode: "M_Success",
+                        ErrorDescription: "Connection closed gracefully"
+                    }
+                }
+            }));
+            await this.reader.disconnect();
+        });
     }
 
     async sendReaderEventNotification() {

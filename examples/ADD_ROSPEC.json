@@ -1,0 +1,48 @@
+{
+    "$schema": "https://llrpjs.github.io/schema/core/encoding/json/1.0/llrp-1x0.schema.json",
+    "id": 1,
+    "type": "ADD_ROSPEC",
+    "data": {
+        "ROSpec": {
+            "ROSpecID": 123,
+            "Priority": 1,
+            "CurrentState": "Disabled",
+            "ROBoundarySpec": {
+                "ROSpecStartTrigger": {
+                    "ROSpecStartTriggerType": "Null"
+                },
+                "ROSpecStopTrigger": {
+                    "ROSpecStopTriggerType": "Null",
+                    "DurationTriggerValue": 0
+                }
+            },
+            "AISpec": {
+                "AntennaIDs": [1, 2, 3, 4],
+                "AISpecStopTrigger": {
+                    "AISpecStopTriggerType": "Null",
+                    "DurationTrigger": 0
+                },
+                "InventoryParameterSpec": {
+                    "InventoryParameterSpecID": 1234,
+                    "ProtocolID": "EPCGlobalClass1Gen2"
+                }
+            },
+            "ROReportSpec": {
+                "ROReportTrigger": "Upon_N_Tags_Or_End_Of_AISpec",
+                "N": 1,
+                "TagReportContentSelector": {
+                    "EnableROSpecID": false,
+                    "EnableSpecIndex": false,
+                    "EnableInventoryParameterSpecID": false,
+                    "EnableAntennaID": false,
+                    "EnableChannelIndex": false,
+                    "EnablePeakRSSI": false,
+                    "EnableFirstSeenTimestamp": true,
+                    "EnableLastSeenTimestamp": true,
+                    "EnableTagSeenCount": false,
+                    "EnableAccessSpecID": false
+                }
+            }
+        }
+    }
+}
