@@ -1,7 +1,7 @@
 {
   "name": "llrpjs",
   "version": "0.0.1",
-  "description": "A Low Level Reader Protocol (LLRP) library based on the LTK project",
+  "description": "A Low Level Reader Protocol (LLRP) library for node",
   "main": "./dist/src/index.js",
   "typings": "./src/index.ts",
   "directories": {
@@ -23,7 +23,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:haytham43/llrpjs.git"
+    "url": "git@github.com:llrpjs/llrpjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/llrpjs/llrpjs/issues"
   },
   "keywords": [
     "llrpts",
@@ -37,7 +40,7 @@
     "llrp-toolkit"
   ],
   "author": "Haytham Halimeh <haytham.halimeh@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "json-bigint": "^1.0.0",
     "yargs": "^16.2.0"
