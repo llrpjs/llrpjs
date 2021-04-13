@@ -447,7 +447,7 @@ type GetManySettersGetters<
 type SubParameterSetter<
   P extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
-  N extends LLRPParamNames<AD>> = <U>(this: U, p: InstanceType<GetParamClassType<P, AD, N>>) => U;
+  N extends LLRPParamNames<AD>> = <U>(this: U, p: InstanceType<P>) => U;
 
 type SubParameterGetter<
   P extends AnyConstructor,
@@ -456,7 +456,7 @@ type SubParameterGetter<
 type SubChoiceSetter<
   P extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
-  N extends LLRPChoiceNames<AD>> = <U>(this: U, p: GetLLRPParameterUnion<P, AD, N>) => U;
+  N extends LLRPChoiceNames<AD>> = <U>(this: U, p: InstanceType<P>) => U;
 type SubChoiceGetter<
   P extends AnyConstructor,
   AD extends LLRPAllTypeDefinitions,
