@@ -15,7 +15,7 @@ export class LLRPTypedNet<
     GetAllTypedMessageClasses<AnyConstructor<LLRPTypedMessage<AD, N>>, AnyConstructor<LLRPProxyParameter>, AD>,
     > extends LLRPNet {
     Def: AD;
-    CR = LLRPClassRegistry.getInstance();
+    CR: LLRPClassRegistry<AD> = LLRPClassRegistry.getInstance() as any;
 
     protected listenerMap: Map<AnyFunction, [string, AnyFunction]> = new Map;
 

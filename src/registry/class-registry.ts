@@ -10,7 +10,7 @@ export class LLRPClassRegistry<
     MN extends LLRPMessageNames<AD> = LLRPMessageNames<AD>,
     PN extends LLRPParamNames<AD> = LLRPParamNames<AD>
     > {
-    private static instance: LLRPClassRegistry<LLRPAllTypeDefinitions>;
+    private static instance: any;
 
     private CoreDef: AD;
     private CoreMessageClasses: GetAllTypedMessageClasses<AnyConstructor<LLRPProxyMessage>, AnyConstructor<LLRPProxyParameter>, AD> = {} as any;

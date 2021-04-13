@@ -16,7 +16,7 @@ export class LLRPTypedParameter<
     > extends LLRPProxyParameter<DT, N> {
 
     Def: AD;
-    CR = LLRPClassRegistry.getInstance();
+    CR: LLRPClassRegistry<AD> = LLRPClassRegistry.getInstance() as any;
 
     static ofDef<AD extends LLRPAllTypeDefinitions>(Def: AD) {
         return class LLRPTypedParameter extends this<AD> {
@@ -30,9 +30,8 @@ export class LLRPTypedParameter<
         N extends LLRPParamNames<AD>,
         TD extends AD[N] = AD[N],
         DT extends GetDataType<AD, TD> = GetDataType<AD, TD>,
-        >(Def: AD, Name?: N): GetParamClassType<AnyConstructor<LLRPTypedParameter<AD, N, TD, DT>>, AD, N, TD, DT> {
-
-        class LLRPTypedParameter extends this<AD, N, TD, DT> {
+        >(Def: AD, Name?: N) {
+        class _LLRPTypedParameter extends this<AD, N, TD, DT> {
             static _def = Def;
 
             constructor(args?: GetTypedParamCtrArgs<LLRPParameterI<DT, N>> | _LLRPParameter<DT, N> | Buffer) {
@@ -47,11 +46,11 @@ export class LLRPTypedParameter<
         // Fields
         for (let fd of td.fieldDescriptors) {
             if (fd.type === "reserved") continue;
-            LLRPTypedParameter.prototype[`set${fd.name}`] = function <T extends LLRPTypedParameter>(this: T, v: any) {
+            _LLRPTypedParameter.prototype[`set${fd.name}`] = function <T extends _LLRPTypedParameter>(this: T, v: any) {
                 this.setField(fd.name, v);
                 return this;
             }
-            LLRPTypedParameter.prototype[`get${fd.name}`] = function <T extends LLRPTypedParameter>(this: T) {
+            _LLRPTypedParameter.prototype[`get${fd.name}`] = function <T extends _LLRPTypedParameter>(this: T) {
                 return this.getField(fd.name);
             }
         }
@@ -59,17 +58,17 @@ export class LLRPTypedParameter<
         for (let tRef of td.subTypeRefs) {
             const { td: name, repeat } = tRef;
             if (repeat === "0-1" || repeat === "1") {
-                LLRPTypedParameter.prototype[`set${name}`] = function <T extends LLRPTypedParameter>(this: T, p: LLRPProxyParameter<LLRPUserData>) {
+                _LLRPTypedParameter.prototype[`set${name}`] = function <T extends _LLRPTypedParameter>(this: T, p: LLRPProxyParameter<LLRPUserData>) {
                     this.setSubParameter(name as any, p)
                     return this;
                 }
             } else {
-                LLRPTypedParameter.prototype[`add${name}`] = function <T extends LLRPTypedParameter>(this: T, p: LLRPProxyParameter<LLRPUserData>) {
+                _LLRPTypedParameter.prototype[`add${name}`] = function <T extends _LLRPTypedParameter>(this: T, p: LLRPProxyParameter<LLRPUserData>) {
                     this.addSubParameter(name as any, p);
                     return this;
                 }
             }
-            LLRPTypedParameter.prototype[`get${name}`] = function <T extends LLRPTypedParameter>(this: T) {
+            _LLRPTypedParameter.prototype[`get${name}`] = function <T extends _LLRPTypedParameter>(this: T) {
                 const subP = this.getSubParameter(name as any);
                 if (!subP) return null;
                 if (Array.isArray(subP)) {
@@ -78,7 +77,7 @@ export class LLRPTypedParameter<
                 return subP;
             }
         }
-        return LLRPTypedParameter;
+        return <unknown>_LLRPTypedParameter as GetParamClassType<AnyConstructor<LLRPTypedParameter<AD, N, TD, DT>>, AD, N, TD, DT>;
     }
 
     setField<
