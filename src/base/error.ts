@@ -15,6 +15,7 @@ const LLRP_ERROR_CODES = [
     "ERR_LLRP_INVALID_LENGTH",
     "ERR_LLRP_INTERNAL",
     "ERR_LLRP_READER_TIMEOUT",
+    "ERR_LLRP_READER_RESPONSE_TIMEOUT",
     "ERR_LLRP_READER_OFFLINE"
 ] as const;
 
@@ -28,4 +29,3 @@ export class LLRPError extends Error {
         this.name = code;
     }
 }
- 
