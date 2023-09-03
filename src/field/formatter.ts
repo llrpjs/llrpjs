@@ -102,7 +102,7 @@ export class LLRPFormatterParser extends Mixin(
 
         protected static parseDateTime(v: LLRPFMTDate): bigint {
             return LLRPFormatterParser.fullPrecision ? LLRPFormatterParser.parseIso8601Microseconds(v)
-                : BigInt(new Date(v)) * 1000n;
+                : BigInt(new Date(v).getTime()) * 1000n;
         }
 
         protected static parseUTF8(value: string): string {
