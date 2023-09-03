@@ -172,6 +172,8 @@ export class LLRPNet {
         let recvPromise = this.recv(timeout);
         await this.send(m);
         if (resName) {
+            const startTimestamp = Date.now();
+
             while (true) {
                 try {
                     rsp = await recvPromise;
@@ -181,6 +183,10 @@ export class LLRPNet {
                 }
                 // check type
                 if (rsp.getName() === resName) break;
+                if (startTimestamp + timeout < Date.now()) {
+                    this._lock.release();
+                    throw new LLRPError("ERR_LLRP_READER_RESPONSE_TIMEOUT");
+                }
             }
         }
 
