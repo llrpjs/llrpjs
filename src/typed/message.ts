@@ -7,7 +7,21 @@ import { LLRPProxyParameter } from "../proxy/parameter";
 import { LLRPTypedParameter } from "./parameter";
 import { LLRPClassRegistry } from "../registry/class-registry";
 import { LLRPProxyMessage } from "../proxy/message";
-import { LLRPAllTypeDefinitions, LLRPMessageNames, GetDataType, GetDefFromRef, GetSubTypeRefs, LLRPParamNames, GetDataTypeFromFD, LLRPUserData, GetParamClassType, LLRPMessageI, GetTypedMessageCtrArgs, GetMessageClassType } from "../types";
+import {
+    LLRPAllTypeDefinitions,
+    LLRPMessageNames,
+    GetDataType,
+    GetDefFromRef,
+    GetSubTypeRefs,
+    LLRPParamNames,
+    GetDataTypeFromFD,
+    LLRPUserData,
+    GetParamClassType,
+    LLRPMessageI,
+    GetTypedMessageCtrArgs,
+    GetMessageClassType,
+    LLRPDataValue
+} from "../types";
 
 
 export class LLRPTypedMessage<
@@ -64,11 +78,13 @@ export class LLRPTypedMessage<
             const { td: name, repeat } = tRef;
             if (repeat === "0-1" || repeat === "1") {
                 _LLRPTypedMessage.prototype[`set${name}`] = function <T extends _LLRPTypedMessage>(this: T, p: LLRPProxyParameter) {
+                    // @ts-ignore
                     this.setSubParameter(name as any, p);
                     return this;
                 }
             } else {
                 _LLRPTypedMessage.prototype[`add${name}`] = function <T extends _LLRPTypedMessage>(this: T, p: LLRPProxyParameter) {
+                    // @ts-ignore
                     this.addSubParameter(name as any, p);
                     return this;
                 }
@@ -101,10 +117,8 @@ export class LLRPTypedMessage<
     }
 
     setField<
-        FN extends TD['fieldDescriptors'][number]['name'],
-        FD extends Extract<TD['fieldDescriptors'][number], { name: FN }>,
-        DT extends GetDataTypeFromFD<FD>[FN]
-    >(name: FN, v: DT) {
+        FN extends TD['fieldDescriptors'][number]['name']
+    >(name: FN, v: LLRPDataValue) {
         this.origin.setField(name, v);
         return this;
     }
@@ -112,7 +126,7 @@ export class LLRPTypedMessage<
     getField<
         FN extends TD['fieldDescriptors'][number]['name'],
         FD extends Extract<TD['fieldDescriptors'][number], { name: FN }>,
-        DT extends GetDataTypeFromFD<FD>[FN]
+        DT extends GetDataTypeFromFD<FD>
     >(name: FN) {
         return this.origin.getField(name) as DT;
     }

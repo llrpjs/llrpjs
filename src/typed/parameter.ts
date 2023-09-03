@@ -2,7 +2,20 @@ import { AnyConstructor } from "../bryntum/chronograph/Mixin";
 import { LLRPParameter as _LLRPParameter } from "../element/parameter";
 import { LLRPProxyParameter } from "../proxy/parameter";
 import { LLRPClassRegistry } from "../registry/class-registry";
-import { GetDataType, GetDataTypeFromFD, GetDefFromRef, GetParamClassType, GetSubTypeRefs, GetTypedParamCtrArgs, Id, LLRPAllTypeDefinitions, LLRPParameterI, LLRPParamNames, LLRPUserData } from "../types";
+import {
+    GetDataType,
+    GetDataTypeFromFD,
+    GetDefFromRef,
+    GetParamClassType,
+    GetSubTypeRefs,
+    GetTypedParamCtrArgs,
+    Id,
+    LLRPAllTypeDefinitions,
+    LLRPDataValue,
+    LLRPParameterI,
+    LLRPParamNames,
+    LLRPUserData
+} from "../types";
 
 
 export class LLRPTypedParameter<
@@ -59,11 +72,13 @@ export class LLRPTypedParameter<
             const { td: name, repeat } = tRef;
             if (repeat === "0-1" || repeat === "1") {
                 _LLRPTypedParameter.prototype[`set${name}`] = function <T extends _LLRPTypedParameter>(this: T, p: LLRPProxyParameter<LLRPUserData>) {
+                    // @ts-ignore
                     this.setSubParameter(name as any, p)
                     return this;
                 }
             } else {
                 _LLRPTypedParameter.prototype[`add${name}`] = function <T extends _LLRPTypedParameter>(this: T, p: LLRPProxyParameter<LLRPUserData>) {
+                    // @ts-ignore
                     this.addSubParameter(name as any, p);
                     return this;
                 }
@@ -81,10 +96,8 @@ export class LLRPTypedParameter<
     }
 
     setField<
-        FN extends TD['fieldDescriptors'][number]['name'],
-        FD extends Extract<TD['fieldDescriptors'][number], { name: FN }>,
-        DT extends GetDataTypeFromFD<FD>[FN]
-    >(name: FN, v: DT) {
+        FN extends TD['fieldDescriptors'][number]['name']
+    >(name: FN, v: LLRPDataValue) {
         this.origin.setField(name, v);
         return this;
     }
@@ -92,7 +105,7 @@ export class LLRPTypedParameter<
     getField<
         FN extends TD['fieldDescriptors'][number]['name'],
         FD extends Extract<TD['fieldDescriptors'][number], { name: FN }>,
-        DT extends GetDataTypeFromFD<FD>[FN]
+        DT extends GetDataTypeFromFD<FD>
     >(name: FN) {
         return this.origin.getField(name) as DT;
     }
